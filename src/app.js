@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import cors from "cors";
 import express from "express";
 
+import { userRoutes } from "./routes/userRoutes.js";
 import logger from "./logger.js";
 
 const requiredEnvVars = [
@@ -26,7 +27,8 @@ if (missingEnvVars.length) {
 
 const dbConfig = {
   test: process.env.DB_TEST_CONNECTION_STRING,
-  dev: process.env.DB_CONNECTION_STRING || "mongodb://mongo:27017/carpooldatabase",
+  dev:
+    process.env.DB_CONNECTION_STRING || "mongodb://mongo:27017/carpooldatabase",
 };
 
 const mongoConnectionString = dbConfig[process.env.NODE_ENV];
@@ -64,5 +66,7 @@ mongoose
 const server = app.listen(port, () => {
   logger.info(`CARPOOL-API App listening on port ${port}`);
 });
+
+app.use("/api/auth", userRoutes);
 
 export { app, server };
