@@ -1,6 +1,7 @@
 {
   "name": "carpool_api_be",
   "version": "1.0.0",
+  "type": "module",
   "description": "API for Hop In App",
   "main": "app.js",
   "scripts": {
