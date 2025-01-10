@@ -4,6 +4,7 @@ import cors from "cors";
 import express from "express";
 
 import logger from "./logger.js";
+import { liftRoutes } from "./routes/liftRoutes.js";
 
 const requiredEnvVars = [
   "SECRET_KEY",
@@ -64,5 +65,7 @@ mongoose
 const server = app.listen(port, () => {
   logger.info(`CARPOOL-API App listening on port ${port}`);
 });
+
+app.use("/api/lifts", liftRoutes)
 
 export { app, server };
