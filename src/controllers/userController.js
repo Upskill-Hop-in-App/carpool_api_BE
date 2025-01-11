@@ -91,7 +91,14 @@ class UserController {
         res.status(404).json({ error: MESSAGES.USER_NOT_FOUND });
         return;
       }
-      const inputDTO = new UserInputDTO(req.body);
+      const updates = {
+        name: req.body.name,
+        email: req.body.email,
+        username: req.body.username,
+        contact: req.body.contact,
+        password: password,
+      };
+      const inputDTO = new UserInputDTO(updates);
       const user = await inputDTO.toUser();
       await UserService.updateUserMongo(req.params.username, user);
       await UserService.updateUserSQL(
@@ -122,6 +129,86 @@ class UserController {
       } else {
         res.status(500).json({
           error: MESSAGES.ERROR_UPDATING_USER,
+          details: err,
+        });
+      }
+    }
+  };
+
+  updatePassword = async (req, res) => {
+    logger.info(`PUT: /api/auth/password/${req.params.username}`);
+    try {
+      const { password } = req.body;
+
+      if (!password || password.trim() === "") {
+        res.status(400).json({ error: "Password cannot be empty." });
+        return;
+      }
+
+      const usernameExists = await UserService.checkUsernameExists(
+        req.params.username
+      );
+      if (!usernameExists) {
+        res.status(404).json({ error: MESSAGES.USER_NOT_FOUND });
+        return;
+      }
+
+      await UserService.updatePassword(req.params.username, password);
+      res.status(200).json({ message: MESSAGES.PASSWORD_UPDATED_SUCCESS });
+    } catch (err) {
+      logger.error(`Error updating password: ${err.message}`);
+      res.status(500).json({
+        error: MESSAGES.ERROR_UPDATING_PASSWORD,
+        details: err,
+      });
+    }
+  };
+
+  updateDriverRating = async (req, res) => {
+    logger.info(`PUT: /api/auth/driverRating/${req.params.username}`);
+    try {
+      const model = "driverRating";
+      await this.updateRating(req, res, model);
+    } catch (err) {
+      logger.error("UserController - Error updating driverRating - ", err);
+    }
+  };
+
+  updatePassengerRating = async (req, res) => {
+    logger.info(`PUT: /api/auth/passengerRating/${req.params.username}`);
+    try {
+      const model = "passengerRating";
+      await this.updateRating(req, res, model);
+    } catch (err) {
+      logger.error("UserController - Error updating passengerRating - ", err);
+    }
+  };
+
+  //TODO acrescentar totalRatings ao modelo e nesta função aqui fazer incremento +1 e média nova consoante valor introduzido OU fazer um get all + count das ofertas de boleia terminadas (ou candidaturas a boleia aceites em boleias terminadas) para obter o numero total e fazer o mesmo OU fazer a funçao que calcula a média à parte e trazer o valor para esta função aqui
+  updateRating = async (req, res, ratingModel) => {
+    logger.info(`userController - updateRating - ${ratingModel}`);
+    try {
+      const user = await UserService.findUserMongo(req.params.username);
+      if (!user) {
+        res.status(404).json({ error: MESSAGES.USER_NOT_FOUND });
+        return;
+      }
+
+      const ratingValue = req.body[ratingModel];
+      if (ratingValue === undefined) {
+        res.status(400).json({ error: `Missing value for ${ratingModel}` });
+        return;
+      }
+
+      await UserService.updateRating(user, ratingModel, ratingValue);
+      res.status(200).json({ message: `${ratingModel} updated successfully!` });
+    } catch (err) {
+      logger.error(`userController - updateRating`, err);
+      if (err.message === "RatingMustBe1To5")
+        res.status(400).json({ error: MESSAGES.RATING_MUST_1_TO_5 });
+      else {
+        res.status(500).json({
+          error: `Failed updating ${ratingModel}`,
           details: err,
         });
       }

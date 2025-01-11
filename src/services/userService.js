@@ -46,6 +46,11 @@ class UserService {
     });
   }
 
+  async findUserMongo(username) {
+    logger.info(`userService - findUserMongo`);
+    return await User.findOne({ username: username });
+  }
+
   async saveUserMongo(data, role) {
     logger.info("userService - saveUserMongo");
     const { email, name, username, contact, driverRating, passengerRating } =
@@ -146,6 +151,44 @@ class UserService {
         }
       });
     });
+  }
+
+  async updatePassword(paramsUsername, password) {
+    logger.info(`userService - updatePassword`);
+    try {
+      const hashedPassword = await this.hashPassword(password);
+
+      const query = "UPDATE users SET password = ? WHERE username = ?";
+      const params = [hashedPassword, paramsUsername];
+
+      return new Promise((resolve, reject) => {
+        db.run(query, params, function (err) {
+          if (err) {
+            logger.error(`Error in updatePassword: ${err.message}`);
+            reject(err);
+          } else {
+            resolve({ message: "Password updated successfully" });
+          }
+        });
+      });
+    } catch (err) {
+      logger.error(`Error hashing password: ${err.message}`);
+      throw err;
+    }
+  }
+
+  async updateRating(user, ratingModel, ratingValue) {
+    if (typeof ratingValue !== "number" || ratingValue < 1 || ratingValue > 5) {
+      throw new Error("RatingMustBe1To5");
+    }
+
+    if (ratingModel === "driverRating") {
+      user.driverRating = ratingValue;
+    } else {
+      user.passengerRating = ratingValue;
+    }
+    await user.save();
+    return await User.findOne({ username: user.username });
   }
 }
 
