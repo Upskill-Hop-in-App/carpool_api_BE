@@ -17,6 +17,12 @@ const UserSchema = new Schema(
           .normalize("NFD")
           .replace(/[\u0300-\u036f]/g, "")
           .toLowerCase(),
+      validate: {
+        validator: function (value) {
+          return !/\s/.test(value);
+        },
+        message: "Username must not contain spaces.",
+      },
     },
     name: {
       type: String,

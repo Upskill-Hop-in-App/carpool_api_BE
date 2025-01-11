@@ -14,12 +14,12 @@ const db = new sqlite3.Database(dbConfig[process.env.NODE_ENV]);
 const saltRounds = parseInt(process.env.SALT_ROUNDS);
 
 class UserService {
-  async checkEmailAlreadyExists(email) {
-    logger.info("userService - checkEmailAlreadyExists");
+  async checkEmailExists(email) {
+    logger.info("userService - checkEmailExists");
     return new Promise((resolve, reject) => {
       db.get("SELECT * FROM users WHERE email = ?", [email], (err, row) => {
         if (err) {
-          logger.error("userService - checkEmailAlreadyExists: ", err.message);
+          logger.error("userService - checkEmailExists: ", err.message);
           reject(err);
         } else {
           resolve(row);
@@ -28,18 +28,15 @@ class UserService {
     });
   }
 
-  async checkUsernameAlreadyExists(username) {
-    logger.info("userService - checkUsernameAlreadyExists");
+  async checkUsernameExists(username) {
+    logger.info("userService - checkUsernameExists");
     return new Promise((resolve, reject) => {
       db.get(
         "SELECT * FROM users WHERE username = ?",
         [username],
         (err, row) => {
           if (err) {
-            logger.error(
-              "userService - checkUsernameAlreadyExists: ",
-              err.message
-            );
+            logger.error("userService - checkUsernameExists: ", err.message);
             reject(err);
           } else {
             resolve(row);
@@ -92,6 +89,63 @@ class UserService {
   async hashPassword(password) {
     logger.info("userService - hashPassword");
     return await bcrypt.hash(password, saltRounds);
+  }
+
+  async updateUserMongo(paramsUsername, updates) {
+    logger.info(`userService - updateUserMongo`);
+    const { email, username, name, contact } = updates;
+
+    const user = await User.findOne({ username: paramsUsername });
+    user.email = email || user.email;
+    user.name = name || user.name;
+    user.username = username || user.username;
+    user.role = user.role;
+    user.contact = contact || user.contact;
+    user.passengerRating = user.passengerRating;
+    user.driverRating = user.driverRating;
+
+    await user.save();
+    return await User.findOne({ username: user.username });
+  }
+
+  async updateUserSQL(paramsUsername, password, updates) {
+    logger.info(`userService - updateUserSQL`);
+    const { email, username } = updates;
+
+    let hashedPassword;
+    if (password) {
+      hashedPassword = await this.hashPassword(password);
+    }
+
+    return new Promise((resolve, reject) => {
+      const queryParts = [];
+      const params = [];
+
+      if (email) {
+        queryParts.push("email = ?");
+        params.push(email);
+      }
+      if (username) {
+        queryParts.push("username = ?");
+        params.push(username);
+      }
+      if (password) {
+        queryParts.push("password = ?");
+        params.push(hashedPassword);
+      }
+      const query = `UPDATE users SET ${queryParts.join(
+        ", "
+      )} WHERE username = ?`;
+      params.push(paramsUsername);
+
+      db.run(query, params, function (err) {
+        if (err) {
+          reject(err);
+        } else {
+          resolve({ message: "User updated successfully" });
+        }
+      });
+    });
   }
 }
 

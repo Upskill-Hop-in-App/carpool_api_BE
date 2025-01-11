@@ -32,8 +32,8 @@ class UserController {
     try {
       const inputDTO = new UserInputDTO(req.body);
       const user = await inputDTO.toUser();
-      const emailExists = await UserService.checkEmailAlreadyExists(user.email);
-      const usernameExists = await UserService.checkUsernameAlreadyExists(
+      const emailExists = await UserService.checkEmailExists(user.email);
+      const usernameExists = await UserService.checkUsernameExists(
         user.username
       );
       if (emailExists || usernameExists) {
@@ -46,7 +46,9 @@ class UserController {
             throw err;
           }
         );
-        res.status(201).json({ message: role + " " + "registado com sucesso" });
+        res
+          .status(201)
+          .json({ message: role + " " + "registered successfully" });
       }
     } catch (err) {
       logger.error(
@@ -61,7 +63,7 @@ class UserController {
         res.status(400).json({ error: errorMessage.trim() });
       } else if (err.code === 11000) {
         res.status(400).json({
-          error: "Duplicate value",
+          error: MESSAGES.DUPLICATE_EMAIL_OR_USERNAME,
         });
       } else if (err.message === "MissingRequiredFields") {
         res.status(400).json({
@@ -70,6 +72,56 @@ class UserController {
       } else {
         res.status(500).json({
           error: MESSAGES.REGISTER_FAILED + " " + role,
+          details: err,
+        });
+      }
+    }
+  };
+
+  update = async (req, res) => {
+    logger.info(`PUT: /api/auth/profile/${req.params.username}`);
+    try {
+      let password;
+      const usernameExists = await UserService.checkUsernameExists(
+        req.params.username
+      );
+      if (usernameExists) {
+        password = usernameExists.password;
+      } else {
+        res.status(404).json({ error: MESSAGES.USER_NOT_FOUND });
+        return;
+      }
+      const inputDTO = new UserInputDTO(req.body);
+      const user = await inputDTO.toUser();
+      await UserService.updateUserMongo(req.params.username, user);
+      await UserService.updateUserSQL(
+        req.params.username,
+        password,
+        user
+      ).catch((err) => {
+        logger.error(`Error updating user in SQLite:`, err);
+        throw err;
+      });
+      res.status(201).json({ message: MESSAGES.USER_UPDATED_SUCCESS });
+    } catch (err) {
+      logger.error(`Error updating user:`, err.message);
+      if (err.name === "ValidationError") {
+        let errorMessage = "Validation Error: ";
+        for (const field in err.errors) {
+          errorMessage += `${err.errors[field].message} `;
+        }
+        res.status(400).json({ error: errorMessage.trim() });
+      } else if (err.code === 11000) {
+        res.status(400).json({
+          error: MESSAGES.DUPLICATE_EMAIL_OR_USERNAME,
+        });
+      } else if (err.message === "MissingRequiredFields") {
+        res.status(400).json({
+          error: MESSAGES.MISSING_REQUIRED_FIELDS,
+        });
+      } else {
+        res.status(500).json({
+          error: MESSAGES.ERROR_UPDATING_USER,
           details: err,
         });
       }

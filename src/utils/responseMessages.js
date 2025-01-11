@@ -1,7 +1,7 @@
 export const MESSAGES = {
   /* -------------------------- User Success messages ------------------------- */
   LOGIN_SUCCESS: "Logged in successfully",
-  ACCOUNT_UPDATED_SUCCESS: "Account updated successfully",
+  USER_UPDATED_SUCCESS: "User updated successfully",
   MARKED_ACTIVE_SUCCESS: "User marked active!",
   MARKED_INACTIVE_SUCCESS: `User marked inactive!`,
   REGISTER_SUCCESS: "Registered successfully!",
@@ -10,22 +10,18 @@ export const MESSAGES = {
   /* -------------------------------------------------------------------------- */
 
   /* --------------------------- User Error messages -------------------------- */
-  DUPLICATE_NIF_OR_CONTACT:
-    "There's already an account with this NIF and/or contact",
   INACTIVE_USER: "Could not login. Inactive user.",
   INCORRECT_LOGIN: "Incorrect email or password",
   USER_NOT_FOUND: "User not found",
   ERROR_MARKING_INACTIVE: "Error marking user as inactive.",
   ERROR_MARKING_ACTIVE: "Error marking user as active.",
-  EMAIL_NOT_REGISTERED: "Email is not registered",
+  USERNAME_NOT_REGISTERED: "Username is not registered",
   INVALID_EMAIL_FORMAT: "Invalid email format",
   DUPLICATE_EMAIL_OR_USERNAME: "That email or username is already in use",
   PASSWORD_TOO_LONG: "Password is too long",
   INVALID_NIF_FORMAT: "Invalid NIF format",
   INVALID_CONTACT_FORMAT: "Invalid contact format",
-  DUPLICATE_NIF: "Duplicate NIF",
-  DUPLICATE_CONTACT: "Duplicate contact",
-  ERROR_UPDATING_ACCOUNT: "Error updating account",
+  ERROR_UPDATING_USER: "Error updating user",
   USER_ALREADY_ACTIVE: "User status is already active",
   USER_ALREADY_INACTIVE: "User status is already inactive",
   MARKING_ACTIVE_FAILED: `Error marking user active`,
