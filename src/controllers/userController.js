@@ -36,25 +36,31 @@ class UserController {
       const usernameExists = await UserService.checkUsernameExists(
         user.username
       );
+
       if (emailExists || usernameExists) {
         res.status(400).json({ error: MESSAGES.DUPLICATE_EMAIL_OR_USERNAME });
       } else {
-        await UserService.saveUserMongo(user, role);
-        await UserService.saveUserSQL(email, username, password, role).catch(
-          (err) => {
-            logger.error(`Error saving ${role} in SQLite:`, err);
-            throw err;
-          }
-        );
-        res
-          .status(201)
-          .json({ message: role + " " + "registered successfully" });
+        const saveMongo = UserService.saveUserMongo(user, role);
+        const saveSQL = UserService.saveUserSQL(
+          email,
+          username,
+          password,
+          role
+        ).catch((err) => {
+          logger.error(`Error saving ${role} in SQLite:`, err);
+          throw err;
+        });
+
+        await Promise.all([saveMongo, saveSQL]);
+
+        res.status(201).json({ message: `${role} registered successfully` });
       }
     } catch (err) {
       logger.error(
         `UserController - Error registering ${role} - `,
         err.message
       );
+
       if (err.name === "ValidationError") {
         let errorMessage = "Validation Error: ";
         for (const field in err.errors) {
@@ -62,13 +68,9 @@ class UserController {
         }
         res.status(400).json({ error: errorMessage.trim() });
       } else if (err.code === 11000) {
-        res.status(400).json({
-          error: MESSAGES.DUPLICATE_EMAIL_OR_USERNAME,
-        });
+        res.status(400).json({ error: MESSAGES.DUPLICATE_EMAIL_OR_USERNAME });
       } else if (err.message === "MissingRequiredFields") {
-        res.status(400).json({
-          error: MESSAGES.MISSING_REQUIRED_FIELDS,
-        });
+        res.status(400).json({ error: MESSAGES.MISSING_REQUIRED_FIELDS });
       } else {
         res.status(500).json({
           error: MESSAGES.REGISTER_FAILED + " " + role,
@@ -100,8 +102,11 @@ class UserController {
       };
       const inputDTO = new UserInputDTO(updates);
       const user = await inputDTO.toUser();
-      await UserService.updateUserMongo(req.params.username, user);
-      await UserService.updateUserSQL(
+      const updateMongo = UserService.updateUserMongo(
+        req.params.username,
+        user
+      );
+      const updateSQL = UserService.updateUserSQL(
         req.params.username,
         password,
         user
@@ -109,6 +114,7 @@ class UserController {
         logger.error(`Error updating user in SQLite:`, err);
         throw err;
       });
+      await Promise.all([updateMongo, updateSQL]);
       res.status(201).json({ message: MESSAGES.USER_UPDATED_SUCCESS });
     } catch (err) {
       logger.error(`Error updating user:`, err.message);
