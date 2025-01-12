@@ -190,6 +190,34 @@ class UserService {
     await user.save();
     return await User.findOne({ username: user.username });
   }
+
+  async deleteUserMongo(username) {
+    logger.info("userService - deleteUserMongo");
+    try {
+      await User.findOneAndDelete({ username });
+    } catch (err) {
+      logger.error(`userService - deleteUserMongo: ${err.message}`);
+      throw err;
+    }
+  }
+
+  async deleteUserSQL(username) {
+    logger.info("userService - deleteUserSQL");
+    return new Promise((resolve, reject) => {
+      db.run(
+        "DELETE FROM users WHERE username = ?",
+        [username],
+        function (err) {
+          if (err) {
+            logger.error("userService - deleteUserSQL: ", err.message);
+            reject(err);
+          } else {
+            resolve({ message: "User deleted successfully from SQLite" });
+          }
+        }
+      );
+    });
+  }
 }
 
 export default new UserService();

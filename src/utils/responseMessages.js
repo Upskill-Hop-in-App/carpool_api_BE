@@ -3,6 +3,7 @@ export const MESSAGES = {
   USER_UPDATED_SUCCESS: "User updated successfully",
   PASSWORD_UPDATED_SUCCESS: "Password updated successfully",
   REGISTER_SUCCESS: "Registered successfully!",
+  USER_DELETED_SUCCESS: "User deleted successfully.",
   /* -------------------------------------------------------------------------- */
 
   /* --------------------------- User Error messages -------------------------- */
@@ -16,6 +17,7 @@ export const MESSAGES = {
   REGISTER_FAILED: "Failed to register",
   ALREADY_REGISTERED: "You're already registered",
   RATING_MUST_1_TO_5:"Rating must be a number between 1 and 5.",
+  ERROR_DELETING_USER: "Error deleting user.",
   /* -------------------------------------------------------------------------- */
 
   /* -------------------------- Common Error messages ------------------------- */
