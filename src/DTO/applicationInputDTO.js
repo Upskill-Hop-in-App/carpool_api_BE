@@ -2,15 +2,16 @@ import User from "../models/userModel.js"
 import Lift from "../models/liftModel.js"
 import Application from "../models/applicationModel.js"
 import logger from "../logger.js"
+import { v4 as uuidv4 } from "uuid"
 
 class ApplicationInputDTO {
   constructor(data) {
-    const { ca, passenger, lift } = data
+    const { passenger, lift } = data
 
-    if (!ca || !passenger || !lift) {
+    if (!passenger || !lift) {
       throw new Error("MissingRequiredFields")
     }
-    this.ca = ca
+
     this.passenger = passenger
     this.lift = lift
   }
@@ -32,7 +33,7 @@ class ApplicationInputDTO {
     }
 
     return new Application({
-      ca: this.ca,
+      ca: uuidv4(),
       passenger: user._id,
       lift: lift._id,
     })

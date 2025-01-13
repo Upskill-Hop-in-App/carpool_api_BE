@@ -6,11 +6,6 @@ const ApplicationSchema = new Schema(
       type: String,
       unique: true,
       required: true,
-      match: [
-        /^[1-9]{2}[A-Za-z]{3}$/,
-        "Lift code must be exactly 2 numbers followed by 3 letters",
-      ],
-      lowercase: true,
     },
     passenger: {
       type: Schema.Types.ObjectId,

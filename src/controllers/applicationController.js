@@ -3,6 +3,7 @@ import ApplicationInputDTO from "../DTO/applicationInputDTO.js"
 import ApplicationOutputDTO from "../DTO/applicationOutputDTO.js"
 import logger from "../logger.js"
 import { MESSAGES } from "../utils/responseMessages.js"
+import { v4 as uuidv4 } from "uuid"
 
 class ApplicationController {
   //TODO criar validação para não deixar criar application se o status da lift não for XXXX
