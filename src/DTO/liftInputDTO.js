@@ -1,4 +1,4 @@
-import Lift from "../models/liftModel.js";
+import Lift from "../models/liftModel.js"
 /* import User from "../models/userModel.js"; */
 
 class LiftInputDTO {
@@ -22,25 +22,27 @@ class LiftInputDTO {
       price === undefined ||
       !providedSeats
     ) {
-      throw new Error("MissingRequiredFields");
+      throw new Error("MissingRequiredFields")
     }
 
-    this.cl = cl;
-    this.driver = driver;
+    this.cl = cl
+    this.driver = driver
     // this.car = car;
-    this.startPoint = startPoint;
-    this.endPoint = endPoint;
-    this.schedule = schedule;
-    this.price = price;
-    this.providedSeats = providedSeats;
+    this.startPoint = startPoint
+    this.endPoint = endPoint
+    this.schedule = schedule
+    this.price = price
+    this.providedSeats = providedSeats
   }
 
   async toLift() {
+    logger.debug("LiftInputDTO - toLift")
+
     const liftDriver = await User.findOne({
       username: this.driver,
-    });
+    })
     if (!liftDriver) {
-      throw new Error("DriverNotFound");
+      throw new Error("DriverNotFound")
     }
 
     // const liftCar = await Car.findOne({
@@ -59,8 +61,8 @@ class LiftInputDTO {
       schedule: this.schedule,
       price: this.price,
       providedSeats: this.providedSeats,
-    });
+    })
   }
 }
 
-export default LiftInputDTO;
+export default LiftInputDTO
