@@ -9,25 +9,23 @@ class LiftController {
     try {
       const {
         cl,
-       /*  driver,
-        car, */
+        driver,
+        /* car, */
         startPoint,
         endPoint,
         schedule,
         price,
         providedSeats,
-        occupiedSeats,
       } = req.body;
       const inputDTO = new LiftInputDTO({
         cl,
-        /* driver,
-        car, */
+        driver,
+        /* car, */
         startPoint,
         endPoint,
         schedule,
         price,
         providedSeats,
-        occupiedSeats,
       });
       const liftModel = await inputDTO.toLift();
       const savedLift = await LiftService.create(liftModel);

@@ -2,6 +2,7 @@ import { Schema, model } from "mongoose";
 
 const LiftSchema = new Schema(
   {
+    //TODO acrescentar field STATUS!
     cl: {
       type: String,
       unique: true,
@@ -12,16 +13,16 @@ const LiftSchema = new Schema(
       ],
       lowercase: true,
     },
-    /* driver: {
+    driver: {
       type: Schema.Types.ObjectId,
       ref: "User",
       required: true,
     },
-    car: {
-      type: Schema.Types.ObjectId,
-      ref: "Car",
-      required: true,
-    }, */
+    // car: {
+    //   type: Schema.Types.ObjectId,
+    //   ref: "Car",
+    //   required: true,
+    // },
     startPoint: {
       type: String,
       required: true,
@@ -47,6 +48,10 @@ const LiftSchema = new Schema(
       type: Number,
       min: [0, "There must be at least one free seat"],
       required: true,
+    },
+    applications: {
+      type: [ { type: Schema.Types.ObjectId, ref: "Application" } ],
+      default: [],
     },
     occupiedSeats: {
       type: Number,
