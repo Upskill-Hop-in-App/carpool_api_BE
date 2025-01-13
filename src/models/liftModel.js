@@ -1,7 +1,8 @@
-import { Schema, model } from "mongoose";
+import { Schema, model } from "mongoose"
 
 const LiftSchema = new Schema(
   {
+    //TODO acrescentar field STATUS!
     cl: {
       type: String,
       unique: true,
@@ -12,16 +13,16 @@ const LiftSchema = new Schema(
       ],
       lowercase: true,
     },
-    /* driver: {
+    driver: {
       type: Schema.Types.ObjectId,
       ref: "User",
       required: true,
     },
-    car: {
-      type: Schema.Types.ObjectId,
-      ref: "Car",
-      required: true,
-    }, */
+    // car: {
+    //   type: Schema.Types.ObjectId,
+    //   ref: "Car",
+    //   required: true,
+    // },
     startPoint: {
       type: String,
       required: true,
@@ -48,12 +49,16 @@ const LiftSchema = new Schema(
       min: [0, "There must be at least one free seat"],
       required: true,
     },
+    applications: {
+      type: [{ type: Schema.Types.ObjectId, ref: "Application" }],
+      default: [],
+    },
     occupiedSeats: {
       type: Number,
       default: 0,
       validate: {
         validator: function (value) {
-          return value <= this.providedSeats;
+          return value <= this.providedSeats
         },
         message:
           "Occupied seats ({VALUE}) can't be greater than provided seats",
@@ -61,6 +66,6 @@ const LiftSchema = new Schema(
     },
   },
   { collection: "lifts", timestamps: true }
-);
+)
 
-export default model("Lift", LiftSchema);
+export default model("Lift", LiftSchema)

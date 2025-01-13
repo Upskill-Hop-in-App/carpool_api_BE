@@ -1,68 +1,68 @@
-import Lift from "../models/liftModel.js";
+import Lift from "../models/liftModel.js"
+/* import User from "../models/userModel.js"; */
 
 class LiftInputDTO {
   constructor({
     cl,
-    /* driver,
-    car, */
+    driver,
+    // car,
     startPoint,
     endPoint,
     schedule,
     price,
     providedSeats,
-    occupiedSeats,
   }) {
     if (
       !cl ||
-      /* !driver ||
-      !car || */
+      !driver ||
+      // !car ||
       !startPoint ||
       !endPoint ||
       !schedule ||
       price === undefined ||
       !providedSeats
     ) {
-      throw new Error("MissingRequiredFields");
+      throw new Error("MissingRequiredFields")
     }
 
-    this.cl = cl;
-    /* this.driver = driver;
-    this.car = car; */
-    this.startPoint = startPoint;
-    this.endPoint = endPoint;
-    this.schedule = schedule;
-    this.price = price;
-    this.providedSeats = providedSeats;
-    this.occupiedSeats = occupiedSeats;
+    this.cl = cl
+    this.driver = driver
+    // this.car = car;
+    this.startPoint = startPoint
+    this.endPoint = endPoint
+    this.schedule = schedule
+    this.price = price
+    this.providedSeats = providedSeats
   }
 
   async toLift() {
-    /* const liftDriver = await User.findOne({
+    logger.debug("LiftInputDTO - toLift")
+
+    const liftDriver = await User.findOne({
       username: this.driver,
-    });
+    })
     if (!liftDriver) {
-      throw new Error("DriverNotFound");
+      throw new Error("DriverNotFound")
     }
 
-    const liftCar = await Car.findOne({
-      cc: this.car,
-    });
-    if (!liftCar) {
-      throw new Error("CarNotFound");
-    } */
+    // const liftCar = await Car.findOne({
+    //   cc: this.car,
+    // });
+    // if (!liftCar) {
+    //   throw new Error("CarNotFound");
+    // }
 
     return new Lift({
       cl: this.cl,
-      /* driver: liftDriver._id,
-      car: liftCar._id, */
+      driver: liftDriver._id,
+      // car: liftCar._id,
       startPoint: this.startPoint,
       endPoint: this.endPoint,
       schedule: this.schedule,
       price: this.price,
       providedSeats: this.providedSeats,
-      occupiedSeats: this.occupiedSeats,
-    });
+    })
   }
 }
 
-export default LiftInputDTO;
+export default LiftInputDTO
