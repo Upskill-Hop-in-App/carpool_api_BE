@@ -1,17 +1,17 @@
 import Lift from "../models/liftModel.js";
-import User from "../models/userModel.js";
-// import Car from "../models/carModel.js";
-import Application from "../models/applicationModel.js"
+/* import User from "../models/userModel.js";
+import Car from "../models/carModel.js";
+import Application from "../models/applicationModel.js" */
 
 class LiftService {
 
   async create(lift) {
     const { cl, driver, startPoint, endPoint, schedule, price, providedSeats, occupiedSeats } = lift
 
-    const driverDoc = await User.findOne({ _id: driver })
+    /* const driverDoc = await User.findOne({ _id: driver })
     if (!driverDoc && driver !== undefined) {
       throw new Error("DriverNotFound")
-    }
+    } */
 
     /* const carDoc = await Car.findOne({ cc: car })
     if (!carDoc && car !== undefined) {
