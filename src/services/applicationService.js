@@ -7,7 +7,7 @@ import Application from "../models/applicationModel.js"
 class ApplicationService {
   async create(application) {
     logger.info("applicationService - create")
-    const { ca, passenger, lift } = application
+    const { passenger, lift } = application
 
     const passengerDoc = await User.findOne({ _id: passenger })
     if (!passengerDoc && passenger !== undefined) {
@@ -17,6 +17,10 @@ class ApplicationService {
     const liftDoc = await Lift.findOne({ _id: lift })
     if (!liftDoc) {
       throw new Error("LiftNotFound")
+    }
+
+    if (liftDoc.status !== "open") {
+      throw new Error("LiftStatusNotOpen")
     }
 
     const sameApplication = await Application.findOne({

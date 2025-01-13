@@ -3,7 +3,6 @@ import ApplicationInputDTO from "../DTO/applicationInputDTO.js"
 import ApplicationOutputDTO from "../DTO/applicationOutputDTO.js"
 import logger from "../logger.js"
 import { MESSAGES } from "../utils/responseMessages.js"
-import { v4 as uuidv4 } from "uuid"
 
 class ApplicationController {
   //TODO criar validação para não deixar criar application se o status da lift não for XXXX
@@ -21,11 +20,13 @@ class ApplicationController {
       })
       const applicationModel = await inputDTO.toApplication()
       const savedApplication = await ApplicationService.create(applicationModel)
-      console.log("oi", applicationModel)
       const outputDTO = new ApplicationOutputDTO(savedApplication)
       res
         .status(201)
-        .json({ message: "Application created successfully!", data: outputDTO })
+        .json({
+          message: MESSAGES.APPLICATION_CREATED_SUCCESS,
+          data: outputDTO,
+        })
     } catch (err) {
       logger.error("LiftController - Error creating application", err.message)
       if (err.name === "ValidationError") {
@@ -38,20 +39,28 @@ class ApplicationController {
           .json({ message: errorMessage.trim(), error: err.message })
       } else if (err.message === "MissingRequiredFields") {
         res.status(400).json({ error: MESSAGES.MISSING_REQUIRED_FIELDS })
-      } else if (err.message === "DriverNotFound") {
+      } else if (err.message === "PassengerNotFound") {
         res.status(400).json({
-          error: MESSAGES.DRIVER_NOT_FOUND_BY_CODE,
+          error: MESSAGES.PASSENGER_NOT_FOUND,
         })
-      } else if (err.message === "CarNotFound") {
+      } else if (err.message === "LiftNotFound") {
         res.status(400).json({
-          error: MESSAGES.CAR_NOT_FOUND_BY_CODE,
+          error: MESSAGES.LIFT_NOT_FOUND_BY_CODE,
+        })
+      } else if (err.message === "ApplicationAlreadyExists") {
+        res.status(400).json({
+          error: MESSAGES.DUPLICATE_APPLICATION,
+        })
+      } else if (err.message === "LiftStatusNotOpen") {
+        res.status(400).json({
+          error: MESSAGES.LIFT_STATUS_NOT_OPEN,
         })
       } else if (err.code === 11000) {
         res.status(400).json({
-          error: "Duplicate application code.",
+          error: MESSAGES.DUPLICATE_CA,
         })
       } else {
-        res.status(500).json({ error: MESSAGES.FAILED_TO_CREATE_LIFT })
+        res.status(500).json({ error: MESSAGES.FAILED_CREATE_APPLICATION })
       }
     }
   }
