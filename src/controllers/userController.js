@@ -2,7 +2,6 @@ import {} from "dotenv/config"
 import UserService from "../services/userService.js"
 import logger from "../logger.js"
 import UserInputDTO from "../DTO/userInputDTO.js"
-// import UserOutputDTO from "../DTO/userOutputDTO.js";
 import { MESSAGES } from "../utils/responseMessages.js"
 
 class UserController {
