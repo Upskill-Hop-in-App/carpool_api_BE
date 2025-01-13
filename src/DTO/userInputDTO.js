@@ -1,4 +1,5 @@
 import User from "../models/userModel.js"
+import logger from "../logger.js"
 class UserInputDTO {
   constructor(data) {
     const { email, password, username, name, contact } = data

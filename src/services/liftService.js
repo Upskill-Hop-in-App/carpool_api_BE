@@ -1,7 +1,8 @@
 import Lift from "../models/liftModel.js"
-/* import User from "../models/userModel.js";
-import Car from "../models/carModel.js";
-import Application from "../models/applicationModel.js" */
+import User from "../models/userModel.js"
+// import Car from "../models/carModel.js";
+import Application from "../models/applicationModel.js"
+import logger from "../logger.js"
 
 class LiftService {
   async create(lift) {
@@ -17,10 +18,10 @@ class LiftService {
       occupiedSeats,
     } = lift
 
-    /* const driverDoc = await User.findOne({ _id: driver })
+    const driverDoc = await User.findOne({ _id: driver })
     if (!driverDoc && driver !== undefined) {
       throw new Error("DriverNotFound")
-    } */
+    }
 
     /* const carDoc = await Car.findOne({ cc: car })
     if (!carDoc && car !== undefined) {
@@ -72,6 +73,7 @@ class LiftService {
     }
     return lift
   }
+
   async update(code, data) {
     logger.info("LiftService - update")
     const {
@@ -89,12 +91,12 @@ class LiftService {
       throw new Error("LiftNotFound")
     }
 
-    /* const driverDoc = await User.findOne({ username: driver })
+    const driverDoc = await User.findOne({ username: driver })
     if (!driverDoc && driver !== undefined) {
       throw new Error("DriverNotFound")
     }
 
-    const carDoc = await Car.findOne({ cc: car })
+    /* const carDoc = await Car.findOne({ cc: car })
     if (!carDoc && car !== undefined) {
       throw new Error("CarNotFound")
     } */
@@ -111,10 +113,10 @@ class LiftService {
       throw new Error("LiftNotFound")
     }
 
-    /* const application = Application.findOne({lift: lift._id})
-    if(application) {
-        throw new Error("ApplicationAssociated")
-    } */
+    const application = Application.findOne({ lift: lift._id })
+    if (application) {
+      throw new Error("ApplicationAssociated")
+    }
     await lift.deleteOne()
   }
 }

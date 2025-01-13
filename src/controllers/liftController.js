@@ -108,8 +108,8 @@ class LiftController {
     try {
       const {
         cl,
-        /* driver,
-        car, */
+        driver,
+        // car,
         startPoint,
         endPoint,
         schedule,
@@ -119,8 +119,8 @@ class LiftController {
       } = req.body
       const inputDTO = new LiftInputDTO({
         cl,
-        /* driver,
-        car, */
+        driver,
+        // car,
         startPoint,
         endPoint,
         schedule,
