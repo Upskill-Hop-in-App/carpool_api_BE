@@ -50,14 +50,20 @@ export const MESSAGES = {
 
   /* ---------------------- Application Success messages ---------------------- */
   APPLICATION_CREATED_SUCCESS: "Application created successfully!",
+  APPLICATIONS_RETRIEVED_SUCCSESS: "Applications retrieved successfully!",
+  APPLICATION_RETRIEVED_BY_CODE: "Application retrieved by code",
   /* -------------------------------------------------------------------------- */
 
   /* ----------------------- Application Error messages ----------------------- */
   PASSENGER_NOT_FOUND: "Passenger not found",
+  NO_APPLICATIONS_FOUND: "No applications found",
+  APPLICATION_NOT_FOUND: "Application not found",
   DUPLICATE_CA: "Duplicate application code",
   FAILED_CREATE_APPLICATION: "Failed to create application",
   DUPLICATE_APPLICATION: "This user already applied for this lift",
   LIFT_STATUS_NOT_OPEN: "You can only apply for a lift with 'open' status",
+  FAILED_TO_RETRIEVE_APPLICATION: "Failed to retrieve applications",
+  INVALID_STATUS: "Invalid status. Try 'pending', 'rejected' or 'accepted'",
 
   /* -------------------------------------------------------------------------- */
 }

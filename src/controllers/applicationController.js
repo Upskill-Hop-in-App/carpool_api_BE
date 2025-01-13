@@ -21,12 +21,10 @@ class ApplicationController {
       const applicationModel = await inputDTO.toApplication()
       const savedApplication = await ApplicationService.create(applicationModel)
       const outputDTO = new ApplicationOutputDTO(savedApplication)
-      res
-        .status(201)
-        .json({
-          message: MESSAGES.APPLICATION_CREATED_SUCCESS,
-          data: outputDTO,
-        })
+      res.status(201).json({
+        message: MESSAGES.APPLICATION_CREATED_SUCCESS,
+        data: outputDTO,
+      })
     } catch (err) {
       logger.error("LiftController - Error creating application", err.message)
       if (err.name === "ValidationError") {
@@ -61,6 +59,206 @@ class ApplicationController {
         })
       } else {
         res.status(500).json({ error: MESSAGES.FAILED_CREATE_APPLICATION })
+      }
+    }
+  }
+
+  async getAllApplications(req, res) {
+    logger.info("GET: /api/applications")
+    try {
+      const applications = await ApplicationService.list()
+      const outputDTOs = applications.map(
+        (application) => new ApplicationOutputDTO(application)
+      )
+      res.status(200).json({
+        message: MESSAGES.APPLICATIONS_RETRIEVED_SUCCSESS,
+        data: outputDTOs,
+      })
+    } catch (err) {
+      logger.error(
+        "ApplicationController - Failed to retrieve applications: ",
+        err.message
+      )
+      if (err.message === "NoApplicationFound") {
+        res.status(404).json({ error: MESSAGES.NO_APPLICATIONS_FOUND })
+      } else {
+        res.status(500).json({ error: MESSAGES.FAILED_TO_RETRIEVE_APPLICATION })
+      }
+    }
+  }
+
+  async getApplicationByCode(req, res) {
+    logger.info(`GET:/api/applications/ca/${req.params.ca} `)
+    try {
+      const application = await ApplicationService.listByCode(req.params.ca)
+      const outputDTO = new ApplicationOutputDTO(application)
+      res.status(200).json({
+        message: MESSAGES.APPLICATION_RETRIEVED_BY_CODE,
+        data: outputDTO,
+      })
+    } catch (err) {
+      logger.error(
+        "ApplicationController - Failed to retrieve application by code: ",
+        err.message
+      )
+      if (err.message === "ApplicationNotFound") {
+        res.status(404).json({ error: MESSAGES.APPLICATION_NOT_FOUND })
+      } else {
+        res.status(500).json({ error: MESSAGES.FAILED_TO_RETRIEVE_APPLICATION })
+      }
+    }
+  }
+
+  async getApplicationsByUsername(req, res) {
+    logger.info(`GET: /api/applications/username/${req.params.username}`)
+    try {
+      const applications = await ApplicationService.listByPassenger(
+        "username",
+        req.params.username
+      )
+      const outputDTOs = applications.map(
+        (application) => new ApplicationOutputDTO(application)
+      )
+      res.status(200).json({
+        message: MESSAGES.APPLICATIONS_RETRIEVED_SUCCSESS,
+        data: outputDTOs,
+      })
+    } catch (err) {
+      logger.error(
+        "ApplicationController - Failed to retrieve applications: ",
+        err.message
+      )
+      if (err.message === "UserNotFound") {
+        res.status(404).json({ error: MESSAGES.USER_NOT_FOUND })
+      } else if (err.message === "NoApplicationFound") {
+        res.status(400).json({ error: MESSAGES.NO_APPLICATIONS_FOUND })
+      } else {
+        res.status(500).json({ error: MESSAGES.FAILED_TO_RETRIEVE_APPLICATION })
+      }
+    }
+  }
+
+  async getApplicationsByEmail(req, res) {
+    logger.info(`GET: /api/applications/email/${req.params.email}`)
+    try {
+      const applications = await ApplicationService.listByPassenger(
+        "email",
+        req.params.email
+      )
+      const outputDTOs = applications.map(
+        (application) => new ApplicationOutputDTO(application)
+      )
+      res.status(200).json({
+        message: MESSAGES.APPLICATIONS_RETRIEVED_SUCCSESS,
+        data: outputDTOs,
+      })
+    } catch (err) {
+      logger.error(
+        "ApplicationController - Failed to retrieve applications: ",
+        err.message
+      )
+      if (err.message === "UserNotFound") {
+        res.status(404).json({ error: MESSAGES.USER_NOT_FOUND })
+      } else if (err.message === "NoApplicationFound") {
+        res.status(400).json({ error: MESSAGES.NO_APPLICATIONS_FOUND })
+      } else {
+        res.status(500).json({ error: MESSAGES.FAILED_TO_RETRIEVE_APPLICATION })
+      }
+    }
+  }
+
+  async getApplicationsByStatus(req, res) {
+    logger.info(`GET: /api/applications/status/${req.params.status}`)
+    try {
+      const applications = await ApplicationService.listByStatus(
+        req.params.status
+      )
+      const outputDTOs = applications.map(
+        (application) => new ApplicationOutputDTO(application)
+      )
+      res.status(200).json({
+        message: MESSAGES.APPLICATIONS_RETRIEVED_SUCCSESS,
+        data: outputDTOs,
+      })
+    } catch (err) {
+      logger.error(
+        "ApplicationController - Failed to retrieve applications: ",
+        err.message
+      )
+      if (err.message === "InvalidStatus") {
+        res.status(400).json({ error: MESSAGES.INVALID_STATUS })
+      } else if (err.message === "NoApplicationFound") {
+        res.status(400).json({ error: MESSAGES.NO_APPLICATIONS_FOUND })
+      } else {
+        res.status(500).json({ error: MESSAGES.FAILED_TO_RETRIEVE_APPLICATION })
+      }
+    }
+  }
+
+  async getApplicationsByUsernameAndStatus(req, res) {
+    logger.info(
+      `GET: /api/applications/username/status/${req.params.username}/${req.params.status}`
+    )
+    try {
+      const applications = await ApplicationService.listByPassengerAndStatus(
+        "username",
+        req.params.username,
+        req.params.status
+      )
+      const outputDTOs = applications.map(
+        (application) => new ApplicationOutputDTO(application)
+      )
+      res.status(200).json({
+        message: MESSAGES.APPLICATIONS_RETRIEVED_SUCCSESS,
+        data: outputDTOs,
+      })
+    } catch (err) {
+      logger.error(
+        "ApplicationController - Failed to retrieve applications: ",
+        err.message
+      )
+      if (err.message === "UserNotFound") {
+        res.status(404).json({ error: MESSAGES.USER_NOT_FOUND })
+      } else if (err.message === "InvalidStatus") {
+        res.status(400).json({ error: MESSAGES.INVALID_STATUS })
+      } else if (err.message === "NoApplicationFound") {
+        res.status(400).json({ error: MESSAGES.NO_APPLICATIONS_FOUND })
+      } else {
+        res.status(500).json({ error: MESSAGES.FAILED_TO_RETRIEVE_APPLICATION })
+      }
+    }
+  }
+
+  async getApplicationsByEmailAndStatus(req, res) {
+    logger.info(
+      `GET: /api/applications/email/status/${req.params.email}/${req.params.status}`
+    )
+    try {
+      const applications = await ApplicationService.listByPassengerAndStatus(
+        "email",
+        req.params.email,
+        req.params.status
+      )
+      const outputDTOs = applications.map(
+        (application) => new ApplicationOutputDTO(application)
+      )
+      res.status(200).json({
+        message: MESSAGES.APPLICATIONS_RETRIEVED_SUCCSESS,
+        data: outputDTOs,
+      })
+    } catch (err) {
+      logger.error(
+        "ApplicationController - Failed to retrieve applications: ",
+        err.message
+      )
+      if (err.message === "UserNotFound") {
+        res.status(404).json({ error: MESSAGES.USER_NOT_FOUND })
+      } else if (err.message === "InvalidStatus") {
+        res.status(400).json({ error: MESSAGES.INVALID_STATUS })
+      } else if (err.message === "NoApplicationFound") {
+        res.status(400).json({ error: MESSAGES.NO_APPLICATIONS_FOUND })
+      } else {
+        res.status(500).json({ error: MESSAGES.FAILED_TO_RETRIEVE_APPLICATION })
       }
     }
   }

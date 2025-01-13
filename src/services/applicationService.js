@@ -39,6 +39,97 @@ class ApplicationService {
     await application.populate(["passenger", "lift"])
     return application
   }
+
+  async list() {
+    logger.info("ApplicationService - list")
+    const applications = await Application.find().populate([
+      "passenger",
+      "lift",
+    ])
+
+    if (applications.length === 0) {
+      throw new Error("NoApplicationFound")
+    }
+    return applications
+  }
+
+  async listByCode(code) {
+    logger.info("ApplicationService - listByCode")
+    const application = await Application.findOne({ ca: code }).populate([
+      "passenger",
+      "lift",
+    ])
+
+    if (!application) {
+      throw new Error("ApplicationNotFound")
+    }
+    return application
+  }
+
+  async listByPassenger(param, paramValue) {
+    logger.info("ApplicationService - listByPassenger")
+    const user = await User.findOne({ [param]: paramValue })
+
+    if (!user) {
+      throw new Error("UserNotFound")
+    }
+
+    const applications = await Application.find({
+      passenger: user._id,
+    }).populate(["passenger", "lift"])
+
+    if (applications.length === 0) {
+      throw new Error("NoApplicationFound")
+    }
+    return applications
+  }
+
+  async listByStatus(status) {
+    logger.info("ApplicationService - listByStatus")
+    if (
+      status !== "pending" &&
+      status !== "rejected" &&
+      status !== "accepted"
+    ) {
+      throw new Error("InvalidStatus")
+    }
+
+    const applications = await Application.find({ status: status }).populate([
+      "passenger",
+      "lift",
+    ])
+
+    if (applications.length === 0) {
+      throw new Error("NoApplicationFound")
+    }
+    return applications
+  }
+
+  async listByPassengerAndStatus(param, paramValue, status) {
+    logger.info("ApplicationService - listByUsernameAndStatus")
+    if (
+      status !== "pending" &&
+      status !== "rejected" &&
+      status !== "accepted"
+    ) {
+      throw new Error("InvalidStatus")
+    }
+
+    const user = await User.findOne({ [param]: paramValue })
+    if (!user) {
+      throw new Error("UserNotFound")
+    }
+
+    const applications = await Application.find({
+      passenger: user._id,
+      status: status,
+    }).populate(["passenger", "lift"])
+
+    if (applications.length === 0) {
+      throw new Error("NoApplicationFound")
+    }
+    return applications
+  }
 }
 
 export default new ApplicationService()
