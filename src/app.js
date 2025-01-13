@@ -6,6 +6,7 @@ import express from "express"
 import { userRoutes } from "./routes/userRoutes.js"
 import logger from "./logger.js"
 import { liftRoutes } from "./routes/liftRoutes.js";
+import { applicationRoutes } from "./routes/applicationRoutes.js";
 
 const requiredEnvVars = [
   "SECRET_KEY",
@@ -71,5 +72,7 @@ const server = app.listen(port, () => {
 app.use("/api/auth", userRoutes)
 
 app.use("/api/lifts", liftRoutes)
+app.use("/api/lifts", liftRoutes)
+app.use("/api/applications", applicationRoutes)
 
 export { app, server }
