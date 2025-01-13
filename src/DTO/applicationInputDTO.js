@@ -1,6 +1,7 @@
 import User from "../models/userModel.js"
 import Lift from "../models/liftModel.js"
 import Application from "../models/applicationModel.js"
+import logger from "../logger.js"
 
 class ApplicationInputDTO {
   constructor(data) {

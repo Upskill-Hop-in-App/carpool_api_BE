@@ -1,5 +1,6 @@
 import Lift from "../models/liftModel.js"
-/* import User from "../models/userModel.js"; */
+import User from "../models/userModel.js"
+import logger from "../logger.js"
 
 class LiftInputDTO {
   constructor({
