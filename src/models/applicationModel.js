@@ -1,4 +1,4 @@
-import { Schema, model } from "mongoose";
+import { Schema, model } from "mongoose"
 
 const ApplicationSchema = new Schema(
   {
@@ -13,10 +13,10 @@ const ApplicationSchema = new Schema(
       lowercase: true,
     },
     passenger: {
-        type: Schema.Types.ObjectId,
-        ref: "User",
-        required: true,
-      },
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
     lift: {
       type: Schema.Types.ObjectId,
       ref: "Lift",
@@ -26,9 +26,9 @@ const ApplicationSchema = new Schema(
       type: String,
       default: "pending",
       enum: ["pending", "accepted", "rejected"],
-    }
+    },
   },
   { collection: "applications", timestamps: true }
-);
+)
 
-export default model("Application", ApplicationSchema);
+export default model("Application", ApplicationSchema)

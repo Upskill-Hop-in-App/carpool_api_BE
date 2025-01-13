@@ -5,8 +5,8 @@ import express from "express"
 
 import { userRoutes } from "./routes/userRoutes.js"
 import logger from "./logger.js"
-import { liftRoutes } from "./routes/liftRoutes.js";
-import { applicationRoutes } from "./routes/applicationRoutes.js";
+import { liftRoutes } from "./routes/liftRoutes.js"
+import { applicationRoutes } from "./routes/applicationRoutes.js"
 
 const requiredEnvVars = [
   "SECRET_KEY",
