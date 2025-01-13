@@ -1,4 +1,4 @@
-import { Schema, model } from "mongoose";
+import { Schema, model } from "mongoose"
 
 const LiftSchema = new Schema(
   {
@@ -50,7 +50,7 @@ const LiftSchema = new Schema(
       required: true,
     },
     applications: {
-      type: [ { type: Schema.Types.ObjectId, ref: "Application" } ],
+      type: [{ type: Schema.Types.ObjectId, ref: "Application" }],
       default: [],
     },
     occupiedSeats: {
@@ -58,7 +58,7 @@ const LiftSchema = new Schema(
       default: 0,
       validate: {
         validator: function (value) {
-          return value <= this.providedSeats;
+          return value <= this.providedSeats
         },
         message:
           "Occupied seats ({VALUE}) can't be greater than provided seats",
@@ -66,6 +66,6 @@ const LiftSchema = new Schema(
     },
   },
   { collection: "lifts", timestamps: true }
-);
+)
 
-export default model("Lift", LiftSchema);
+export default model("Lift", LiftSchema)

@@ -84,7 +84,7 @@ class LiftService {
       occupiedSeats,
     } = data
 
-    const lift = await Lift.findOne({ cl: cl })
+    const lift = await Lift.findOne({ cl: code })
     if (!lift) {
       throw new Error("LiftNotFound")
     }
