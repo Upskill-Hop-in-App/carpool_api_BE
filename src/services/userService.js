@@ -178,6 +178,7 @@ class UserService {
   }
 
   async updateRating(user, ratingModel, ratingValue) {
+    logger.info("userService - updateRating")
     if (typeof ratingValue !== "number" || ratingValue < 1 || ratingValue > 5) {
       throw new Error("RatingMustBe1To5");
     }

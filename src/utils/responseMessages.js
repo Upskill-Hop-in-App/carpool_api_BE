@@ -16,7 +16,7 @@ export const MESSAGES = {
   ERROR_UPDATING_PASSWORD: "Error updating password",
   REGISTER_FAILED: "Failed to register",
   ALREADY_REGISTERED: "You're already registered",
-  RATING_MUST_1_TO_5:"Rating must be a number between 1 and 5.",
+  RATING_MUST_1_TO_5: "Rating must be a number between 1 and 5.",
   ERROR_DELETING_USER: "Error deleting user.",
   /* -------------------------------------------------------------------------- */
 
@@ -24,4 +24,4 @@ export const MESSAGES = {
   MISSING_REQUIRED_FIELDS: "Missing required fields.",
   VALIDATION_ERROR: "Validation Error",
   /* -------------------------------------------------------------------------- */
-};
+}
