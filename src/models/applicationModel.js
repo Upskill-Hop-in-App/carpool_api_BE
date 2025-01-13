@@ -27,6 +27,14 @@ const ApplicationSchema = new Schema(
       default: "pending",
       enum: ["pending", "accepted", "rejected"],
     },
+    receivedPassengerRating: {
+      type: Number,
+      default: null,
+      validate: {
+        validator: (value) => (value >= 1 && value <= 5) || value == null,
+        message: "Rating must be between 1 and 5.",
+      },
+    },
   },
   { collection: "applications", timestamps: true }
 )
