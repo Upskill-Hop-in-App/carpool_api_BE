@@ -156,7 +156,6 @@ class ApplicationService {
       .populate(["passenger", "lift"])
       .sort(sort)
 
-
     const filteredApplications = applications.filter((application) => {
       if (
         filters.liftStartPoint &&
