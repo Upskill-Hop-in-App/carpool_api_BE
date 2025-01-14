@@ -1,12 +1,11 @@
 import Lift from "../models/liftModel.js"
 import User from "../models/userModel.js"
 import logger from "../logger.js"
+import { v4 as uuidv4 } from "uuid"
 
 class LiftInputDTO {
   constructor({
-    cl,
     driver,
-    // car,
     startPoint,
     endPoint,
     schedule,
@@ -14,9 +13,7 @@ class LiftInputDTO {
     providedSeats,
   }) {
     if (
-      !cl ||
       !driver ||
-      // !car ||
       !startPoint ||
       !endPoint ||
       !schedule ||
@@ -26,9 +23,7 @@ class LiftInputDTO {
       throw new Error("MissingRequiredFields")
     }
 
-    this.cl = cl
     this.driver = driver
-    // this.car = car;
     this.startPoint = startPoint
     this.endPoint = endPoint
     this.schedule = schedule
@@ -46,17 +41,19 @@ class LiftInputDTO {
       throw new Error("DriverNotFound")
     }
 
-    // const liftCar = await Car.findOne({
-    //   cc: this.car,
-    // });
-    // if (!liftCar) {
-    //   throw new Error("CarNotFound");
-    // }
+    const driverDetails = {
+      email: liftDriver.email,
+      username: liftDriver.username,
+      name: liftDriver.name,
+      contact: liftDriver.contact,
+      role: liftDriver.role,
+      driverRating: liftDriver.driverRating,
+      passengerRating: liftDriver.passengerRating,
+    }
 
     return new Lift({
-      cl: this.cl,
-      driver: liftDriver._id,
-      // car: liftCar._id,
+      cl: uuidv4(),
+      driver: driverDetails,
       startPoint: this.startPoint,
       endPoint: this.endPoint,
       schedule: this.schedule,

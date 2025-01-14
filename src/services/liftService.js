@@ -8,7 +8,6 @@ class LiftService {
   async create(lift) {
     logger.info("LiftService - create")
     const {
-      cl,
       driver,
       startPoint,
       endPoint,
@@ -18,34 +17,18 @@ class LiftService {
       occupiedSeats,
     } = lift
 
-    const driverDoc = await User.findOne({ _id: driver })
-    if (!driverDoc && driver !== undefined) {
-      throw new Error("DriverNotFound")
-    }
-
     /* const carDoc = await Car.findOne({ cc: car })
     if (!carDoc && car !== undefined) {
       throw new Error("CarNotFound")
     } */
     await lift.save()
-    await lift.populate("driver")
+    // await lift.populate("driver")
     return lift
   }
 
   async list() {
     logger.info("LiftService - list")
-    const lifts = await Lift.find().populate([
-      {
-        path: "driver",
-      },
-      {
-        path: "applications",
-        populate: {
-          path: "passenger",
-          model: "User",
-        },
-      },
-    ])
+    const lifts = await Lift.find()
 
     if (lifts.length === 0) {
       throw new Error("NoLiftFound")

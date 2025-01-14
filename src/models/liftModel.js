@@ -2,27 +2,56 @@ import { Schema, model } from "mongoose"
 
 const LiftSchema = new Schema(
   {
-    //TODO acrescentar field STATUS!
     cl: {
       type: String,
       unique: true,
       required: true,
-      match: [
-        /^[A-Za-z]{2}[1-9]{3}$/,
-        "Lift code must be exactly 2 letters followed by 3 numbers",
-      ],
       lowercase: true,
     },
     driver: {
-      type: Schema.Types.ObjectId,
-      ref: "User",
+      type: new Schema(
+        {
+          email: {
+            type: String,
+            required: true,
+            match: [
+              /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+              "Invalid email address format",
+            ],
+          },
+          username: {
+            type: String,
+            required: true,
+          },
+          name: {
+            type: String,
+            required: true,
+          },
+          contact: {
+            type: String,
+            match: [/^[+]?[0-9]{9,12}$/, "Invalid phone number format"],
+            default: null,
+          },
+          role: {
+            type: String,
+            required: true,
+            match: /^(admin|client)$/,
+          },
+          driverRating: {
+            type: Number,
+            required: true,
+            default: 5,
+          },
+          passengerRating: {
+            type: Number,
+            required: true,
+            default: 5,
+          },
+        },
+        { _id: false }
+      ),
       required: true,
     },
-    // car: {
-    //   type: Schema.Types.ObjectId,
-    //   ref: "Car",
-    //   required: true,
-    // },
     startPoint: {
       type: String,
       required: true,
@@ -50,7 +79,44 @@ const LiftSchema = new Schema(
       required: true,
     },
     applications: {
-      type: [{ type: Schema.Types.ObjectId, ref: "Application" }],
+      type: [
+        new Schema(
+          {
+            email: {
+              type: String,
+              required: true,
+              match: [
+                /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                "Invalid email address format",
+              ],
+            },
+            username: {
+              type: String,
+              required: true,
+            },
+            name: {
+              type: String,
+              required: true,
+            },
+            contact: {
+              type: String,
+              match: [/^[+]?[0-9]{9,12}$/, "Invalid phone number format"],
+              default: null,
+            },
+            role: {
+              type: String,
+              required: true,
+              match: /^(admin|client)$/,
+            },
+            passengerRating: {
+              type: Number,
+              required: true,
+              default: 5,
+            },
+          },
+          { _id: false }
+        ),
+      ],
       default: [],
     },
     occupiedSeats: {
@@ -63,6 +129,11 @@ const LiftSchema = new Schema(
         message:
           "Occupied seats ({VALUE}) can't be greater than provided seats",
       },
+    },
+    status: {
+      type: String,
+      default: "open",
+      enum: ["open", "inProgress", "finished", "closed"],
     },
   },
   { collection: "lifts", timestamps: true }

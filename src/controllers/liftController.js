@@ -8,7 +8,6 @@ class LiftController {
     logger.info("POST: /api/lifts")
     try {
       const {
-        cl,
         driver,
         /* car, */
         startPoint,
@@ -18,7 +17,6 @@ class LiftController {
         providedSeats,
       } = req.body
       const inputDTO = new LiftInputDTO({
-        cl,
         driver,
         /* car, */
         startPoint,
@@ -28,10 +26,12 @@ class LiftController {
         providedSeats,
       })
       const liftModel = await inputDTO.toLift()
+      console.log("ola", liftModel)
       const savedLift = await LiftService.create(liftModel)
       const outputDTO = new LiftOutputDTO(savedLift)
       res.status(201).json({ message: MESSAGES.LIFT_CREATED, data: outputDTO })
     } catch (err) {
+      console.log("adeus", err.message)
       logger.error("LiftController - Error creating lift: ", err.message)
       if (err.name === "ValidationError") {
         let errorMessage = `${MESSAGES.VALIDATION_ERROR}: `
