@@ -12,9 +12,8 @@ class ApplicationController {
   async createApplication(req, res) {
     logger.info("POST: /api/applications")
     try {
-      const { ca, passenger, lift } = req.body
+      const { passenger, lift } = req.body
       const inputDTO = new ApplicationInputDTO({
-        ca,
         passenger,
         lift,
       })
@@ -77,7 +76,7 @@ class ApplicationController {
     } catch (err) {
       logger.error(
         "ApplicationController - Failed to retrieve applications: ",
-        err.message
+        err
       )
       if (err.message === "NoApplicationFound") {
         res.status(404).json({ error: MESSAGES.NO_APPLICATIONS_FOUND })
@@ -275,12 +274,16 @@ class ApplicationController {
         message: MESSAGES.APPLICATIONS_RETRIEVED_SUCCSESS,
         data: outputDTO,
       })
-    } catch (error) {
+    } catch (err) {
       logger.error(
         "ApplicationController - Failed to filter applications:",
-        error.message
+        err
       )
-      res.status(500).json({ error: MESSAGES.FAILED_TO_RETRIEVE_APPLICATION })
+      if (err.message === "NoApplicationFound") {
+        res.status(404).json({ error: MESSAGES.NO_APPLICATIONS_FOUND })
+      } else {
+        res.status(500).json({ error: MESSAGES.FAILED_TO_RETRIEVE_APPLICATION })
+      }
     }
   }
 }

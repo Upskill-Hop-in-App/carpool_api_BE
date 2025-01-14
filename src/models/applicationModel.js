@@ -8,8 +8,47 @@ const ApplicationSchema = new Schema(
       required: true,
     },
     passenger: {
-      type: Schema.Types.ObjectId,
-      ref: "User",
+      type: new Schema(
+        {
+          email: {
+            type: String,
+            required: true,
+            match: [
+              /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+              "Invalid email address format",
+            ],
+          },
+          username: {
+            type: String,
+            required: true,
+          },
+          name: {
+            type: String,
+            required: true,
+          },
+          contact: {
+            type: String,
+            match: [/^[+]?[0-9]{9,12}$/, "Invalid phone number format"],
+            default: null,
+          },
+          role: {
+            type: String,
+            required: true,
+            match: /^(admin|client)$/,
+          },
+          driverRating: {
+            type: Number,
+            required: true,
+            default: 5,
+          },
+          passengerRating: {
+            type: Number,
+            required: true,
+            default: 5,
+          },
+        },
+        { _id: false }
+      ),
       required: true,
     },
     lift: {

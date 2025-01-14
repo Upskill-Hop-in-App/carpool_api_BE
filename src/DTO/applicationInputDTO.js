@@ -18,6 +18,7 @@ class ApplicationInputDTO {
 
   async toApplication() {
     logger.info("applicationInputDTO - toApplication")
+
     const user = await User.findOne({
       username: this.passenger,
     })
@@ -32,9 +33,19 @@ class ApplicationInputDTO {
       throw new Error("LiftNotFound")
     }
 
+    const passengerDetails = {
+      email: user.email,
+      username: user.username,
+      name: user.name,
+      contact: user.contact,
+      role: user.role,
+      driverRating: user.driverRating,
+      passengerRating: user.passengerRating,
+    }
+
     return new Application({
       ca: uuidv4(),
-      passenger: user._id,
+      passenger: passengerDetails,
       lift: lift._id,
     })
   }
