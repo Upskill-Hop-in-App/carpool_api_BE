@@ -262,6 +262,27 @@ class ApplicationController {
       }
     }
   }
+
+  //TODO Acrescentar mais campos possiveis de filtro e fazer filtro a iniciar ja com um filtro por username 
+  async filterApplications(req, res) {
+    try {
+      logger.info(`GET:/api/applications/filter/${req.query}`);
+
+      const filters = req.query
+      const applications = await ApplicationService.filterApplications(filters);
+      const outputDTO = applications.map((app) => new ApplicationOutputDTO(app))
+      res.status(200).json({
+        message: MESSAGES.APPLICATIONS_RETRIEVED_SUCCSESS,
+        data: (outputDTO),
+      });
+
+    } catch (error) {
+      logger.error('ApplicationController - Failed to filter applications:', error.message);
+      res.status(500).json({ error: MESSAGES.FAILED_TO_RETRIEVE_APPLICATION });
+    }
+  }
+
+  
 }
 
 export default new ApplicationController()

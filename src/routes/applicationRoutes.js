@@ -21,5 +21,6 @@ router.get(
   "/email/status/:email/:status",
   ApplicationController.getApplicationsByEmailAndStatus
 )
+router.get("/filter", ApplicationController.filterApplications)
 
 export { router as applicationRoutes }

@@ -130,6 +130,62 @@ class ApplicationService {
     }
     return applications
   }
+
+  async filterApplications(filters) {
+    logger.info("ApplicationService - filterApplications")
+
+    const query = {}
+
+    //Filtrar campos mais acessíveis de documentos Application
+    if (filters.ca) query.ca = filters.ca
+    // if (filters.passenger) {
+    //   const passenger = await User.findOne({ username: filters.passenger })
+    //   if (!passenger) throw new Error("PassengerNotFound")
+    //   query.passenger = passenger.username
+    // }
+    if (filters.status) {
+      const validStatuses = ["pending", "accepted", "rejected"]
+      if (!validStatuses.includes(filters.status))
+        throw new Error("InvalidStatus")
+      query.status = filters.status
+    }
+
+    const sort = filters.sort || { createdAt: -1 }
+
+    const applications = await Application.find(query)
+      .populate(["passenger", "lift"])
+      .sort(sort)
+
+
+    const filteredApplications = applications.filter((application) => {
+      if (
+        filters.liftStartPoint &&
+        application.lift?.startPoint !== filters.liftStartPoint
+      ) {
+        return false
+      }
+
+      if (
+        filters.liftDriver &&
+        application.lift?.driver !== filters.liftDriver
+      ) {
+        return false
+      }
+
+      if (
+        filters.username &&
+        application.passenger?.username !== filters.username
+      ) {
+        return false
+      }
+
+      return true
+    })
+
+    if (filteredApplications.length === 0) throw new Error("NoApplicationFound")
+
+    return filteredApplications
+  }
 }
 
 export default new ApplicationService()
