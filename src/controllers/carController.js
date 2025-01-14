@@ -12,6 +12,7 @@ class CarController {
         brand,
         model,
         year,
+        user,
         color,
         plate,
       } = req.body;
@@ -20,9 +21,11 @@ class CarController {
         brand,
         model,
         year,
+        user,
         color,
         plate,
       });
+      logger.debug("CarController - createCar - inputDTO")
       const carModel = await inputDTO.toCar();
       const savedCar = await CarService.create(carModel);
       const outputDTO = new CarOutputDTO(savedCar);
@@ -39,6 +42,10 @@ class CarController {
           .json({ message: errorMessage.trim(), error: err.message });
       } else if (err.message === "MissingRequiredFields") {
         res.status(400).json({ error: MESSAGES.MISSING_REQUIRED_FIELDS });
+      } else if (err.message === "DriverNotFound") {
+        res.status(400).json({ error: MESSAGES.DRIVER_NOT_FOUND });
+      } else if (err.message === "CarNotValid") {
+        res.status(400).json({ error: MESSAGES.INVALID_CAR });
       } else if (err.code === 11000) {
         res.status(400).json({
           error: MESSAGES.DUPLICATE_CAR,
@@ -96,6 +103,7 @@ class CarController {
         brand,
         model,
         year,
+        user,
         color,
         plate,
       } = req.body;
@@ -104,6 +112,7 @@ class CarController {
         brand,
         model,
         year,
+        user,
         color,
         plate,
       });

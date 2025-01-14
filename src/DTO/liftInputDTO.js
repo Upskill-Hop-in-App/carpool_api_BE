@@ -1,12 +1,13 @@
 import Lift from "../models/liftModel.js"
 import User from "../models/userModel.js"
 import logger from "../logger.js"
+import Car from "../models/carModel.js"
 
 class LiftInputDTO {
   constructor({
     cl,
     driver,
-    // car,
+    car,
     startPoint,
     endPoint,
     schedule,
@@ -16,7 +17,7 @@ class LiftInputDTO {
     if (
       !cl ||
       !driver ||
-      // !car ||
+      !car ||
       !startPoint ||
       !endPoint ||
       !schedule ||
@@ -28,7 +29,7 @@ class LiftInputDTO {
 
     this.cl = cl
     this.driver = driver
-    // this.car = car;
+    this.car = car
     this.startPoint = startPoint
     this.endPoint = endPoint
     this.schedule = schedule
@@ -42,21 +43,23 @@ class LiftInputDTO {
     const liftDriver = await User.findOne({
       username: this.driver,
     })
+
     if (!liftDriver) {
       throw new Error("DriverNotFound")
     }
 
-    // const liftCar = await Car.findOne({
-    //   cc: this.car,
-    // });
-    // if (!liftCar) {
-    //   throw new Error("CarNotFound");
-    // }
+    const liftCar = await Car.findOne({
+      cc: this.car,
+    })
+
+    if (!liftCar) {
+      throw new Error("CarNotFound")
+    }
 
     return new Lift({
       cl: this.cl,
       driver: liftDriver._id,
-      // car: liftCar._id,
+      car: liftCar._id,
       startPoint: this.startPoint,
       endPoint: this.endPoint,
       schedule: this.schedule,

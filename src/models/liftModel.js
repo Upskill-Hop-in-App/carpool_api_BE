@@ -18,11 +18,11 @@ const LiftSchema = new Schema(
       ref: "User",
       required: true,
     },
-    // car: {
-    //   type: Schema.Types.ObjectId,
-    //   ref: "Car",
-    //   required: true,
-    // },
+    car: {
+      type: Schema.Types.ObjectId,
+      ref: "Car",
+      required: true,
+    },
     startPoint: {
       type: String,
       required: true,
@@ -62,6 +62,18 @@ const LiftSchema = new Schema(
         },
         message:
           "Occupied seats ({VALUE}) can't be greater than provided seats",
+      },
+    },
+    liftStatus: {
+      type: String,
+      default: "open",
+      enum: ["open", "inProgress", "finished", "closed"],
+    },
+    receivedDriverRatings: {
+      type: Number,
+      default: null,
+      validate: {
+        validator: (rating) => (rating >= 1 && rating <= 5) || rating === null,
       },
     },
   },

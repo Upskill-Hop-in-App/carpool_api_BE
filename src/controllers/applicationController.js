@@ -20,7 +20,7 @@ class ApplicationController {
       })
       const applicationModel = await inputDTO.toApplication()
       const savedApplication = await ApplicationService.create(applicationModel)
-      console.log("oi", applicationModel)
+
       const outputDTO = new ApplicationOutputDTO(savedApplication)
       res
         .status(201)
