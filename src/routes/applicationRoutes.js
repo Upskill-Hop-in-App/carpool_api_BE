@@ -27,6 +27,8 @@ router.get(
   ApplicationController.filterApplications
 )
 router.put("/accept/:ca", ApplicationController.accept)
+router.put("/reject/:ca", ApplicationController.reject)
+router.put("/cancel/:ca", ApplicationController.cancel)
 router.delete("/:ca", ApplicationController.delete)
 
 export { router as applicationRoutes }

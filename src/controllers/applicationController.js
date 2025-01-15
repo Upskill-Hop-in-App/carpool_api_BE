@@ -349,6 +349,52 @@ class ApplicationController {
     }
   }
 
+  async reject(req, res) {
+    try {
+      logger.info(`PUT: /api/applications/reject/${req.params.ca}`)
+      await ApplicationService.rejectApplication(req.params.ca)
+      res.status(200).json({ message: MESSAGES.APPLICATION_REJECTED_SUCCESS })
+    } catch (err) {
+      logger.error("applicationController - rejectApplication", err)
+      if (err.message === "ApplicationNotFound") {
+        res.status(400).json({ error: MESSAGES.APPLICATION_NOT_FOUND })
+      } else if (err.message === "StatusNotPending") {
+        res.status(400).json({ error: MESSAGES.STATUS_NOT_PENDING })
+      } else if (err.message === "LiftNotFound") {
+        res.status(400).json({ error: MESSAGES.LIFT_NOT_FOUND })
+      } else if (err.message === "LiftNotOpen") {
+        res
+          .status(400)
+          .json({ error: MESSAGES.LIFT_NOT_ACCEPTING_APPLICATIONS })
+      } else {
+        res.status(500).json({ error: MESSAGES.FAILED_TO_ACCEPT_APPLICATION })
+      }
+    }
+  }
+
+  async cancel(req, res) {
+    try {
+      logger.info(`PUT: /api/applications/cancel/${req.params.ca}`)
+      await ApplicationService.cancelApplication(req.params.ca)
+      res.status(200).json({ message: MESSAGES.APPLICATION_CANCELED_SUCCESS })
+    } catch (err) {
+      logger.error("applicationController - cancelApplication", err)
+      if (err.message === "ApplicationNotFound") {
+        res.status(400).json({ error: MESSAGES.APPLICATION_NOT_FOUND })
+      } else if (err.message === "LiftAlreadyStartedOrCanceled") {
+        res.status(400).json({ error: MESSAGES.LIFT_STARTED_OR_CANCELED })
+      } else if (err.message === "LiftNotFound") {
+        res.status(400).json({ error: MESSAGES.LIFT_NOT_FOUND })
+      } else if (err.message === "ApplicationRejectedCanceled") {
+        res
+          .status(400)
+          .json({ error: MESSAGES.APPLICATION_ALREADY_REJECTED_CANCELED })
+      } else {
+        res.status(500).json({ error: MESSAGES.FAILED_TO_CANCEL_APPLICATION })
+      }
+    }
+  }
+
   async delete(req, res) {
     try {
       logger.info(`DELETE: /api/applications/${req.params.ca}`)

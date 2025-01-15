@@ -58,6 +58,8 @@ export const MESSAGES = {
   APPLICATION_RETRIEVED_BY_CODE: "Application retrieved by code",
   APPLICATION_DELETED_SUCCESS: "Application deleted successfully!",
   APPLICATION_ACCEPTED_SUCCESS: "Application accepted successfully!",
+  APPLICATION_REJECTED_SUCCESS: "Application rejected successfully!",
+  APPLICATION_CANCELED_SUCCESS: "Application canceled successfully!",
   /* -------------------------------------------------------------------------- */
 
   /* ----------------------- Application Error messages ----------------------- */
@@ -76,6 +78,9 @@ export const MESSAGES = {
   LIFT_IS_FULL: "The lift is full.",
   STATUS_NOT_PENDING: "Application status is not 'pending'",
   FAILED_TO_ACCEPT_APPLICATION: "Failed to accept application",
+  APPLICATION_ALREADY_REJECTED_CANCELED:
+    "Application status is already rejected or canceled.",
+  FAILED_TO_CANCEL_APPLICATION: "Failed to cancel application.",
 
   /* -------------------------------------------------------------------------- */
 }

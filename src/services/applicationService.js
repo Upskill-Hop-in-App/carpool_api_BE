@@ -378,6 +378,72 @@ class ApplicationService {
     }
   }
 
+  async rejectApplication(ca) {
+    const application = await Application.findOne({ ca }).populate(["lift"])
+    if (!application) {
+      throw new Error("ApplicationNotFound")
+    }
+
+    if (application.status !== "pending") {
+      throw new Error("StatusNotPending")
+    }
+
+    const lift = await Lift.findOne({
+      _id: application.lift._id,
+    }).populate("applications")
+    if (!lift) {
+      throw new Error("LiftNotFound")
+    }
+
+    if (lift.status !== "open") {
+      throw new Error("LiftNotOpen")
+    }
+
+    await Application.updateOne(
+      { _id: application._id },
+      { status: "rejected" }
+    )
+  }
+
+  async cancelApplication(ca) {
+    const application = await Application.findOne({ ca: ca })
+    if (!application) {
+      throw new Error("ApplicationNotFound")
+    }
+
+    const lift = await Lift.findOne({ applications: application._id }).populate(
+      ["applications"]
+    )
+    if (!lift) {
+      throw new Error("LiftNotFound")
+    }
+
+    if (lift.status !== "open" && lift.status !== "ready") {
+      throw new Error("LiftAlreadyStartedOrCanceled")
+    }
+
+    if (
+      application.status === "rejected" ||
+      application.status === "canceled"
+    ) {
+      throw new Error("ApplicationRejectedCanceled")
+    }
+
+    if (application.status === "accepted" && lift.occupiedSeats > 0) {
+      await Lift.updateOne({ _id: lift._id }, { $inc: { occupiedSeats: -1 } })
+      if (
+        lift.occupiedSeats === lift.providedSeats &&
+        lift.status === "ready"
+      ) {
+        await Lift.updateOne({ _id: lift._id }, { status: "open" })
+      }
+    }
+    await Application.updateOne(
+      { _id: application._id },
+      { status: "canceled" }
+    )
+  }
+
   //TODO DECIDIR SE PERMITIMOS ISTO OU NAO OU, P.EX, SÓ O ADMIN PARA FINS DE ARCO QUE A USARIA POR REQUISIÇÃO
   async delete(ca) {
     const application = await Application.findOne({ ca: ca })
