@@ -3,10 +3,27 @@ import User from "../models/userModel.js"
 import Car from "../models/carModel.js"
 import Application from "../models/applicationModel.js"
 import logger from "../logger.js"
+import axios from "axios"
 
 class LiftService {
   async create(lift) {
     logger.info("LiftService - create")
+
+    const fullStartLocation = `${lift.startPoint.district}/${lift.startPoint.municipality}/${lift.startPoint.parish}`;
+    
+    const fullEndLocation = `${lift.endPoint.district}/${lift.endPoint.municipality}/${lift.endPoint.parish}`;
+
+    if (fullStartLocation === fullEndLocation) {
+      throw new Error("MatchingLocations")
+    }
+
+    const isValidStart = await this.getGeoValidation(lift.startPoint)
+
+    const isValidEnd = await this.getGeoValidation(lift.endPoint)
+
+    if (!(isValidStart && isValidEnd)) {
+      throw new Error("InvalidLocation")
+    }
 
     await lift.save()
     await lift.populate([
@@ -24,7 +41,44 @@ class LiftService {
         path: "car",
       },
     ])
+
     return lift
+  }
+
+  async getGeoValidation(location) {
+    try {
+      logger.debug("LiftService - getGeoValidation")
+
+      const districtResponse = await axios.get(
+        `https://json.geoapi.pt/distrito/${encodeURIComponent(
+          location.district
+        )}`
+      )
+
+      if (districtResponse.status !== 200) return false
+
+      const foundMunicipio = districtResponse.data.municipios.find(
+        (m) => m.nome.toLowerCase() === location.municipality
+      )
+      if (!foundMunicipio) return false
+
+      const municipalityResponse = await axios.get(
+        `https://json.geoapi.pt/municipio/${encodeURIComponent(
+          location.municipality
+        )}`
+      )
+
+      if (municipalityResponse.status !== 200) return false
+
+      const foundParish = municipalityResponse.data.geojsons.freguesias.find(
+        (f) => f.properties.Freguesia.toLowerCase() === location.parish
+      )
+
+      return !!foundParish
+    } catch (err) {
+      logger.debug("LiftService - getGeoValidation - err", err)
+      return false
+    }
   }
 
   async list() {

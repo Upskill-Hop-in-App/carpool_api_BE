@@ -2,7 +2,6 @@ import { Schema, model } from "mongoose"
 
 const LiftSchema = new Schema(
   {
-    //TODO acrescentar field STATUS!
     cl: {
       type: String,
       unique: true,
@@ -24,16 +23,56 @@ const LiftSchema = new Schema(
       required: true,
     },
     startPoint: {
-      type: String,
+      type: new Schema(
+        {
+          district: {
+            type: String,
+            required: true,
+            lowercase: true,
+            set: (value) => value.replace(/\s+/g, " ").trim(),
+          },
+          municipality: {
+            type: String,
+            required: true,
+            lowercase: true,
+            set: (value) => value.replace(/\s+/g, " ").trim(),
+          },
+          parish: {
+            type: String,
+            required: true,
+            lowercase: true,
+            set: (value) => value.replace(/\s+/g, " ").trim(),
+          },
+        },
+        { _id: false }
+      ),
       required: true,
-      lowercase: true,
-      set: (value) => value.replace(/\s+/g, " ").trim(),
     },
     endPoint: {
-      type: String,
+      type: new Schema(
+        {
+          district: {
+            type: String,
+            required: true,
+            lowercase: true,
+            set: (value) => value.replace(/\s+/g, " ").trim(),
+          },
+          municipality: {
+            type: String,
+            required: true,
+            lowercase: true,
+            set: (value) => value.replace(/\s+/g, " ").trim(),
+          },
+          parish: {
+            type: String,
+            required: true,
+            lowercase: true,
+            set: (value) => value.replace(/\s+/g, " ").trim(),
+          },
+        },
+        { _id: false }
+      ),
       required: true,
-      lowercase: true,
-      set: (value) => value.replace(/\s+/g, " ").trim(),
     },
     schedule: {
       type: String,
@@ -67,7 +106,7 @@ const LiftSchema = new Schema(
     liftStatus: {
       type: String,
       default: "open",
-      enum: ["open", "inProgress", "finished", "closed"],
+      enum: ["open", "ready", "inProgress", "finished", "closed", "canceled"],
     },
     receivedDriverRatings: {
       type: Number,

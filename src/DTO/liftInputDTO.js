@@ -18,8 +18,12 @@ class LiftInputDTO {
       !cl ||
       !driver ||
       !car ||
-      !startPoint ||
-      !endPoint ||
+      !startPoint.district ||
+      !startPoint.municipality ||
+      !startPoint.parish ||
+      !endPoint.district ||
+      !endPoint.municipality ||
+      !endPoint.parish ||
       !schedule ||
       price === undefined ||
       !providedSeats

@@ -16,8 +16,16 @@ class LiftOutputDTO {
       color: lift.car?.color || null,
       plate: lift.car?.plate || null,
     }
-    this.startPoint = lift.startPoint
-    this.endPoint = lift.endPoint
+    this.startPoint = {
+      district: lift.startPoint.district || null,
+      municipality: lift.startPoint.municipality || null,
+      parish: lift.startPoint.parish || null,
+    }
+    this.endPoint = {
+      district: lift.endPoint.district || null,
+      municipality: lift.endPoint.municipality || null,
+      parish: lift.endPoint.parish || null,
+    }
     this.schedule = lift.schedule
     this.price = lift.price
     this.providedSeats = lift.providedSeats

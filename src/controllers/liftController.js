@@ -32,7 +32,7 @@ class LiftController {
       const outputDTO = new LiftOutputDTO(savedLift)
       res.status(201).json({ message: MESSAGES.LIFT_CREATED, data: outputDTO })
     } catch (err) {
-      logger.error("LiftController - Error creating lift: ", err.message)
+      logger.error("LiftController - Error creating lift: ", err)
       if (err.name === "ValidationError") {
         let errorMessage = `${MESSAGES.VALIDATION_ERROR}: `
         for (let field in err.errors) {
@@ -54,6 +54,14 @@ class LiftController {
       } else if (err.code === 11000) {
         res.status(400).json({
           error: MESSAGES.DUPLICATE_LIFT,
+        })
+      } else if(err.message ==="MatchingLocations") {
+        res.status(400).json({
+          error: MESSAGES.MATCHING_START_END,
+        })
+      } else if(err.message ==="InvalidLocation") {
+        res.status(400).json({
+          error: MESSAGES.INVALID_LOCATION,
         })
       } else {
         res.status(500).json({ error: MESSAGES.FAILED_TO_CREATE_LIFT })

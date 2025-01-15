@@ -34,6 +34,8 @@ export const MESSAGES = {
   /* -------------------------------------------------------------------------- */
 
   /* ----------------------- Lift Error messages ----------------------- */
+  FAILED_TO_RETRIEVE_GEO_VALIDATION_INFO:
+    "An error occured while sending request to GEO API",
   DRIVER_NOT_FOUND_BY_CODE: "No driver matches the given username",
   CAR_NOT_FOUND_BY_CODE: "No car matches the given code",
   DUPLICATE_LIFT: "Duplicate lift code or lift name. Please use unique values.",
@@ -48,6 +50,8 @@ export const MESSAGES = {
   FAILED_TO_DELETE_LIFT: "Failed to delete lift",
   APPLICATION_ASSOCIATED:
     "Failed to delete because there are applications associated",
+  MATCHING_START_END: "Start and end locations are the same",
+  INVALID_LOCATION: "Invalid start/endPoint",
   /* -------------------------------------------------------------------------- */
 
   /* ---------------------- Car Success messages ---------------------- */
