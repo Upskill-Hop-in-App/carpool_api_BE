@@ -9,9 +9,9 @@ class LiftService {
   async create(lift) {
     logger.info("LiftService - create")
 
-    const fullStartLocation = `${lift.startPoint.district}/${lift.startPoint.municipality}/${lift.startPoint.parish}`;
-    
-    const fullEndLocation = `${lift.endPoint.district}/${lift.endPoint.municipality}/${lift.endPoint.parish}`;
+    const fullStartLocation = `${lift.startPoint.district}/${lift.startPoint.municipality}/${lift.startPoint.parish}`
+
+    const fullEndLocation = `${lift.endPoint.district}/${lift.endPoint.municipality}/${lift.endPoint.parish}`
 
     if (fullStartLocation === fullEndLocation) {
       throw new Error("MatchingLocations")
@@ -140,7 +140,6 @@ class LiftService {
       schedule,
       price,
       providedSeats,
-      occupiedSeats,
     } = data
 
     const lift = await Lift.findOne({ cl: code })
@@ -148,17 +147,34 @@ class LiftService {
       throw new Error("LiftNotFound")
     }
 
-    const driverDoc = await User.findOne({ _id: driver })
-    if (!driverDoc && driver !== undefined) {
-      throw new Error("DriverNotFound")
+    if (
+      JSON.stringify(data.startPoint) !== JSON.stringify(lift.startPoint) ||
+      JSON.stringify(data.endPoint) !== JSON.stringify(lift.endPoint)
+    ) {
+      const fullStartLocation = `${data.startPoint.district}/${data.startPoint.municipality}/${data.startPoint.parish}`
+      const fullEndLocation = `${data.endPoint.district}/${data.endPoint.municipality}/${data.endPoint.parish}`
+      if (fullStartLocation === fullEndLocation) {
+        throw new Error("MatchingLocations")
+      }
+
+      const isValidStart = await this.getGeoValidation(data.startPoint)
+
+      const isValidEnd = await this.getGeoValidation(data.endPoint)
+
+      if (!(isValidStart && isValidEnd)) {
+        throw new Error("InvalidLocation")
+      }
     }
 
-    const carDoc = await Car.findOne({ _id: car })
-    if (!carDoc && car !== undefined) {
-      throw new Error("CarNotFound")
-    }
+    lift.cl = cl
+    lift.driver = driver
+    lift.car = car
+    lift.startPoint = startPoint
+    lift.endPoint = endPoint
+    lift.schedule = schedule
+    lift.price = price
+    lift.providedSeats = providedSeats
 
-    Object.assign(lift, data)
     await lift.save()
 
     return lift.populate([

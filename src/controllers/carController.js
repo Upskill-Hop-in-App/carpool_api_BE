@@ -116,7 +116,8 @@ class CarController {
         color,
         plate,
       });
-      const car = await CarService.update(req.params.cc, inputDTO);
+      const carModel = await inputDTO.toCar()
+      const car = await CarService.update(req.params.cc, carModel);
       const outputDTO = new CarOutputDTO(car);
       res.status(201).json({ message: MESSAGES.CAR_UPDATED, data: outputDTO });
     } catch (err) {

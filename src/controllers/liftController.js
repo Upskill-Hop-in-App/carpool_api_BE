@@ -136,11 +136,12 @@ class LiftController {
         providedSeats,
         occupiedSeats,
       })
-      const lift = await LiftService.update(req.params.cl, inputDTO)
+      const liftModel = await inputDTO.toLift()
+      const lift = await LiftService.update(req.params.cl, liftModel)
       const outputDTO = new LiftOutputDTO(lift)
       res.status(201).json({ message: MESSAGES.LIFT_UPDATED, data: outputDTO })
     } catch (err) {
-      logger.error("LiftController - Error updating lift: ", err.message)
+      logger.error("LiftController - Error updating lift: ", err)
       if (err.name === "ValidationError") {
         let errorMessage = `${MESSAGES.VALIDATION_ERROR}: `
         for (let field in err.errors) {
@@ -162,6 +163,14 @@ class LiftController {
       } else if (err.code === 11000) {
         res.status(400).json({
           error: MESSAGES.DUPLICATE_LIFT,
+        })
+      } else if(err.message ==="MatchingLocations") {
+        res.status(400).json({
+          error: MESSAGES.MATCHING_START_END,
+        })
+      } else if(err.message ==="InvalidLocation") {
+        res.status(400).json({
+          error: MESSAGES.INVALID_LOCATION,
         })
       } else {
         res.status(500).json({ error: MESSAGES.FAILED_TO_UPDATE_LIFT })
