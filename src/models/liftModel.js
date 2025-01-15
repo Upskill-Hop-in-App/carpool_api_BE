@@ -61,7 +61,7 @@ const LiftSchema = new Schema(
     status: {
       type: String,
       default: "open",
-      enum: ["open", "inProgress", "finished", "closed"],
+      enum: ["open", "ready", "inProgress", "finished", "closed", "canceled"],
     },
   },
   { collection: "lifts", timestamps: true }

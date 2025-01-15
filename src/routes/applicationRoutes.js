@@ -26,5 +26,7 @@ router.get(
   "/filter/username/:username",
   ApplicationController.filterApplications
 )
+router.put("/accept/:ca", ApplicationController.accept)
+router.delete("/:ca", ApplicationController.delete)
 
 export { router as applicationRoutes }

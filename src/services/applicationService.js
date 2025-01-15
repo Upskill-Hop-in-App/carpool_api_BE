@@ -23,9 +23,14 @@ class ApplicationService {
       throw new Error("LiftStatusNotOpen")
     }
 
+    if (liftDoc.occupiedSeats === liftDoc.providedSeats) {
+      throw new Error("LiftIsFull")
+    }
+
     const sameApplication = await Application.findOne({
       passenger: passengerDoc._id,
       lift: liftDoc._id,
+      status: { $in: ["accepted", "pending"] },
     })
     if (sameApplication) {
       throw new Error("ApplicationAlreadyExists")
@@ -321,6 +326,87 @@ class ApplicationService {
     if (filteredApplications.length === 0) throw new Error("NoApplicationFound")
 
     return filteredApplications
+  }
+
+  async acceptApplication(ca) {
+    const application = await Application.findOne({ ca }).populate(["lift"])
+    if (!application) {
+      throw new Error("ApplicationNotFound")
+    }
+
+    if (application.status !== "pending") {
+      throw new Error("StatusNotPending")
+    }
+
+    const lift = await Lift.findOne({
+      _id: application.lift._id,
+    }).populate("applications")
+    if (!lift) {
+      throw new Error("LiftNotFound")
+    }
+
+    if (lift.occupiedSeats === lift.providedSeats) {
+      throw new Error("LiftIsFull")
+    }
+
+    if (lift.status !== "open") {
+      throw new Error("LiftNotOpen")
+    }
+
+    await Application.updateOne(
+      { _id: application._id },
+      { status: "accepted" }
+    )
+
+    await Lift.updateOne({ _id: lift._id }, { $inc: { occupiedSeats: 1 } })
+
+    const isLiftFull = lift.occupiedSeats + 1 === lift.providedSeats
+    if (isLiftFull) {
+      await Application.updateMany(
+        {
+          _id: { $in: lift.applications },
+          status: { $eq: "pending" },
+        },
+        { status: "rejected" }
+      )
+      await Lift.updateOne(
+        {
+          _id: lift._id,
+        },
+        { status: "ready" }
+      )
+    }
+  }
+
+  //TODO DECIDIR SE PERMITIMOS ISTO OU NAO OU, P.EX, SÓ O ADMIN PARA FINS DE ARCO QUE A USARIA POR REQUISIÇÃO
+  async delete(ca) {
+    const application = await Application.findOne({ ca: ca })
+    if (!application) {
+      throw new Error("ApplicationNotFound")
+    }
+
+    const lift = await Lift.findOne({ applications: application._id }).populate(
+      ["applications"]
+    )
+    if (!lift) {
+      throw new Error("LiftNotFound")
+    }
+
+    if (lift.status !== "open" && lift.status !== "ready") {
+      throw new Error("LiftAlreadyStartedOrCanceled")
+    }
+
+    if (application.status === "accepted" && lift.occupiedSeats > 0) {
+      lift.occupiedSeats -= 1
+    }
+
+    lift.applications = lift.applications.filter(
+      (app_id) => !app_id.equals(application._id)
+    )
+
+    await lift.save()
+
+    await application.deleteOne()
   }
 }
 

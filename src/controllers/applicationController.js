@@ -6,7 +6,6 @@ import { MESSAGES } from "../utils/responseMessages.js"
 
 class ApplicationController {
   //TODO criar validação para não deixar criar application se o status da lift não for XXXX
-  //TODO acertar as mensagens de erro
   //TODO acrescentar outras validações
 
   async createApplication(req, res) {
@@ -52,6 +51,10 @@ class ApplicationController {
       } else if (err.message === "LiftStatusNotOpen") {
         res.status(400).json({
           error: MESSAGES.LIFT_STATUS_NOT_OPEN,
+        })
+      } else if (err.message === "LiftIsFull") {
+        res.status(400).json({
+          error: MESSAGES.LIFT_IS_FULL,
         })
       } else if (err.code === 11000) {
         res.status(400).json({
@@ -317,6 +320,49 @@ class ApplicationController {
         res.status(400).json({ error: MESSAGES.INVALID_STATUS })
       } else {
         res.status(500).json({ error: MESSAGES.FAILED_TO_RETRIEVE_APPLICATION })
+      }
+    }
+  }
+
+  async accept(req, res) {
+    try {
+      logger.info(`PUT: /api/applications/accept/${req.params.ca}`)
+      await ApplicationService.acceptApplication(req.params.ca)
+      res.status(200).json({ message: MESSAGES.APPLICATION_ACCEPTED_SUCCESS })
+    } catch (err) {
+      logger.error("applicationController - acceptApplication", err)
+      if (err.message === "ApplicationNotFound") {
+        res.status(400).json({ error: MESSAGES.APPLICATION_NOT_FOUND })
+      } else if (err.message === "StatusNotPending") {
+        res.status(400).json({ error: MESSAGES.STATUS_NOT_PENDING })
+      } else if (err.message === "LiftNotFound") {
+        res.status(400).json({ error: MESSAGES.LIFT_NOT_FOUND })
+      } else if (err.message === "LiftIsFull") {
+        res.status(400).json({ error: MESSAGES.LIFT_IS_FULL })
+      } else if (err.message === "LiftNotOpen") {
+        res
+          .status(400)
+          .json({ error: MESSAGES.LIFT_NOT_ACCEPTING_APPLICATIONS })
+      } else {
+        res.status(500).json({ error: MESSAGES.FAILED_TO_ACCEPT_APPLICATION })
+      }
+    }
+  }
+
+  async delete(req, res) {
+    try {
+      logger.info(`DELETE: /api/applications/${req.params.ca}`)
+      await ApplicationService.delete(req.params.ca)
+      res.status(200).json({ message: MESSAGES.APPLICATION_DELETED_SUCCESS })
+    } catch (err) {
+      if (err.message === "ApplicationNotFound") {
+        res.status(400).json({ error: MESSAGES.APPLICATION_NOT_FOUND })
+      } else if (err.message === "LifNotFound") {
+        res.status(400).json({ error: MESSAGES.LIFT_NOT_FOUND })
+      } else if (err.message === "LiftAlreadyStartedOrCanceled") {
+        res.status(400).json({ error: MESSAGES.LIFT_STARTED_OR_CANCELED })
+      } else {
+        res.status(500).json({ error: MESSAGES.FAILED_TO_DELETE_APPLICATION })
       }
     }
   }

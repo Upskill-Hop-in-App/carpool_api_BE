@@ -42,6 +42,7 @@ export const MESSAGES = {
   DUPLICATE_LIFT: "Duplicate lift code or lift name. Please use unique values.",
   NO_LIFTS_FOUND: "No lifts exist",
   FAILED_TO_CREATE_LIFT: "Failed to create lift",
+  LIFT_NOT_FOUND: "Lift not found",
   LIFT_NOT_FOUND_BY_CODE: "No lifts match the given code",
   FAILED_TO_RETRIEVE_LIFTS: "Failed to retrieve lifts",
   FAILED_TO_RETRIEVE_LIFT_BY_CODE: "Failed to retrieve lift by code",
@@ -55,6 +56,8 @@ export const MESSAGES = {
   APPLICATION_CREATED_SUCCESS: "Application created successfully!",
   APPLICATIONS_RETRIEVED_SUCCSESS: "Applications retrieved successfully!",
   APPLICATION_RETRIEVED_BY_CODE: "Application retrieved by code",
+  APPLICATION_DELETED_SUCCESS: "Application deleted successfully!",
+  APPLICATION_ACCEPTED_SUCCESS: "Application accepted successfully!",
   /* -------------------------------------------------------------------------- */
 
   /* ----------------------- Application Error messages ----------------------- */
@@ -67,6 +70,12 @@ export const MESSAGES = {
   LIFT_STATUS_NOT_OPEN: "You can only apply for a lift with 'open' status",
   FAILED_TO_RETRIEVE_APPLICATION: "Failed to retrieve applications",
   INVALID_STATUS: "Invalid status. Try 'pending', 'rejected' or 'accepted'",
+  LIFT_STARTED_OR_CANCELED: "Lift already started or was canceled",
+  LIFT_NOT_ACCEPTING_APPLICATIONS: "Lift is not accepting more applications",
+  FAILED_TO_DELETE_APPLICATION: "Failed to delete application",
+  LIFT_IS_FULL: "The lift is full.",
+  STATUS_NOT_PENDING: "Application status is not 'pending'",
+  FAILED_TO_ACCEPT_APPLICATION: "Failed to accept application",
 
   /* -------------------------------------------------------------------------- */
 }
