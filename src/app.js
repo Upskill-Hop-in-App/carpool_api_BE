@@ -6,6 +6,7 @@ import express from "express"
 import { userRoutes } from "./routes/userRoutes.js"
 import logger from "./logger.js"
 import { liftRoutes } from "./routes/liftRoutes.js"
+import { carRoutes } from "./routes/carRoutes.js"
 import { applicationRoutes } from "./routes/applicationRoutes.js"
 
 const requiredEnvVars = [
@@ -72,7 +73,7 @@ const server = app.listen(port, () => {
 app.use("/api/auth", userRoutes)
 
 app.use("/api/lifts", liftRoutes)
-app.use("/api/lifts", liftRoutes)
+app.use("/api/cars", carRoutes)
 app.use("/api/applications", applicationRoutes)
 
 export { app, server }

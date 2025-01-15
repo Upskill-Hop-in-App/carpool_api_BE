@@ -10,7 +10,7 @@ class LiftController {
       const {
         cl,
         driver,
-        /* car, */
+        car,
         startPoint,
         endPoint,
         schedule,
@@ -20,7 +20,7 @@ class LiftController {
       const inputDTO = new LiftInputDTO({
         cl,
         driver,
-        /* car, */
+        car,
         startPoint,
         endPoint,
         schedule,
@@ -109,7 +109,7 @@ class LiftController {
       const {
         cl,
         driver,
-        // car,
+        car,
         startPoint,
         endPoint,
         schedule,
@@ -120,7 +120,7 @@ class LiftController {
       const inputDTO = new LiftInputDTO({
         cl,
         driver,
-        // car,
+        car,
         startPoint,
         endPoint,
         schedule,

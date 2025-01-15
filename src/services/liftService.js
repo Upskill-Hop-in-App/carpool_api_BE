@@ -1,34 +1,29 @@
 import Lift from "../models/liftModel.js"
 import User from "../models/userModel.js"
-// import Car from "../models/carModel.js";
+import Car from "../models/carModel.js"
 import Application from "../models/applicationModel.js"
 import logger from "../logger.js"
 
 class LiftService {
   async create(lift) {
     logger.info("LiftService - create")
-    const {
-      cl,
-      driver,
-      startPoint,
-      endPoint,
-      schedule,
-      price,
-      providedSeats,
-      occupiedSeats,
-    } = lift
 
-    const driverDoc = await User.findOne({ _id: driver })
-    if (!driverDoc && driver !== undefined) {
-      throw new Error("DriverNotFound")
-    }
-
-    /* const carDoc = await Car.findOne({ cc: car })
-    if (!carDoc && car !== undefined) {
-      throw new Error("CarNotFound")
-    } */
     await lift.save()
-    await lift.populate("driver")
+    await lift.populate([
+      {
+        path: "driver",
+      },
+      {
+        path: "applications",
+        populate: {
+          path: "passenger",
+          model: "User",
+        },
+      },
+      {
+        path: "car",
+      },
+    ])
     return lift
   }
 
@@ -44,6 +39,9 @@ class LiftService {
           path: "passenger",
           model: "User",
         },
+      },
+      {
+        path: "car",
       },
     ])
 
@@ -66,6 +64,9 @@ class LiftService {
           model: "User",
         },
       },
+      {
+        path: "car",
+      },
     ])
 
     if (!lift) {
@@ -78,7 +79,9 @@ class LiftService {
     logger.info("LiftService - update")
     const {
       cl,
-      /* driver, car, */ startPoint,
+      driver,
+      car,
+      startPoint,
       endPoint,
       schedule,
       price,
@@ -91,20 +94,34 @@ class LiftService {
       throw new Error("LiftNotFound")
     }
 
-    const driverDoc = await User.findOne({ username: driver })
+    const driverDoc = await User.findOne({ _id: driver })
     if (!driverDoc && driver !== undefined) {
       throw new Error("DriverNotFound")
     }
 
-    /* const carDoc = await Car.findOne({ cc: car })
+    const carDoc = await Car.findOne({ _id: car })
     if (!carDoc && car !== undefined) {
       throw new Error("CarNotFound")
-    } */
+    }
 
     Object.assign(lift, data)
     await lift.save()
 
-    return lift
+    return lift.populate([
+      {
+        path: "driver",
+      },
+      {
+        path: "applications",
+        populate: {
+          path: "passenger",
+          model: "User",
+        },
+      },
+      {
+        path: "car",
+      },
+    ])
   }
   async delete(cl) {
     logger.info("LiftService - delete")
