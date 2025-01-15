@@ -110,5 +110,6 @@ export const MESSAGES = {
   FAILED_TO_RETRIEVE_CAR_BY_CODE: "Failed to retrieve car by code",
   FAILED_TO_UPDATE_CAR: "Failed to update car",
   FAILED_TO_DELETE_CAR: "Failed to delete car",
+  FAILED_TO_RETRIEVE_VALIDATION_INFO: "Failed to retrieve validation info",
   /* -------------------------------------------------------------------------- */
 }
