@@ -30,7 +30,7 @@ class UserController {
     const { email, password, username } = req.body
     try {
       const inputDTO = new UserInputDTO(req.body)
-      const user = await inputDTO.toUser()
+      const user = await inputDTO.toUser(role)
       const emailExists = await UserService.checkEmailExists(user.email)
       const usernameExists = await UserService.checkUsernameExists(
         user.username
@@ -39,7 +39,7 @@ class UserController {
       if (emailExists || usernameExists) {
         res.status(400).json({ error: MESSAGES.DUPLICATE_EMAIL_OR_USERNAME })
       } else {
-        const saveMongo = UserService.saveUserMongo(user, role)
+        const saveMongo = UserService.saveUserMongo(user)
         const saveSQL = UserService.saveUserSQL(
           email,
           username,
@@ -52,7 +52,7 @@ class UserController {
 
         await Promise.all([saveMongo, saveSQL])
 
-        res.status(201).json({ message: `${role} registered successfully` })
+        res.status(201).json({ message: MESSAGES.REGISTER_SUCCESS })
       }
     } catch (err) {
       logger.error(`UserController - Error registering ${role} - `, err)

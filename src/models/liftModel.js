@@ -12,22 +12,62 @@ const LiftSchema = new Schema(
       ref: "User",
       required: true,
     },
-    // car: {
-    //   type: Schema.Types.ObjectId,
-    //   ref: "Car",
-    //   required: true,
-    // },
-    startPoint: {
-      type: String,
+    car: {
+      type: Schema.Types.ObjectId,
+      ref: "Car",
       required: true,
-      lowercase: true,
-      set: (value) => value.replace(/\s+/g, " ").trim(),
+    },
+    startPoint: {
+      type: new Schema(
+        {
+          district: {
+            type: String,
+            required: true,
+            lowercase: true,
+            set: (value) => value.replace(/\s+/g, " ").trim(),
+          },
+          municipality: {
+            type: String,
+            required: true,
+            lowercase: true,
+            set: (value) => value.replace(/\s+/g, " ").trim(),
+          },
+          parish: {
+            type: String,
+            required: true,
+            lowercase: true,
+            set: (value) => value.replace(/\s+/g, " ").trim(),
+          },
+        },
+        { _id: false }
+      ),
+      required: true,
     },
     endPoint: {
-      type: String,
+      type: new Schema(
+        {
+          district: {
+            type: String,
+            required: true,
+            lowercase: true,
+            set: (value) => value.replace(/\s+/g, " ").trim(),
+          },
+          municipality: {
+            type: String,
+            required: true,
+            lowercase: true,
+            set: (value) => value.replace(/\s+/g, " ").trim(),
+          },
+          parish: {
+            type: String,
+            required: true,
+            lowercase: true,
+            set: (value) => value.replace(/\s+/g, " ").trim(),
+          },
+        },
+        { _id: false }
+      ),
       required: true,
-      lowercase: true,
-      set: (value) => value.replace(/\s+/g, " ").trim(),
     },
     schedule: {
       type: String,
@@ -62,6 +102,13 @@ const LiftSchema = new Schema(
       type: String,
       default: "open",
       enum: ["open", "ready", "inProgress", "finished", "closed", "canceled"],
+    },
+    receivedDriverRatings: {
+      type: Number,
+      default: null,
+      validate: {
+        validator: (rating) => (rating >= 1 && rating <= 5) || rating === null,
+      },
     },
   },
   { collection: "lifts", timestamps: true }

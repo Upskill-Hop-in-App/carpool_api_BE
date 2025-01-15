@@ -53,17 +53,24 @@ class UserService {
     return await User.findOne({ username: username })
   }
 
-  async saveUserMongo(data, role) {
+  async saveUserMongo(data) {
     logger.info("userService - saveUserMongo")
-    const { email, name, username, contact, driverRating, passengerRating } =
-      data
+    const {
+      email,
+      name,
+      username,
+      contact,
+      role,
+      driverRating,
+      passengerRating,
+    } = data
     try {
       const user = new User({
         email,
         name,
         username,
         contact,
-        role: role,
+        role,
         driverRating,
         passengerRating,
       })

@@ -13,13 +13,14 @@ class UserInputDTO {
     this.contact = contact
   }
 
-  async toUser() {
+  async toUser(role) {
     logger.debug("userInputDTO - toUser")
     return new User({
       email: this.email,
       name: this.name,
       username: this.username,
       contact: this.contact,
+      role: role,
     })
   }
 }

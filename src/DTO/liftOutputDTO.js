@@ -8,9 +8,24 @@ class LiftOutputDTO {
       contact: lift.driver?.contact || null,
       driverRating: lift.driver?.driverRating || null,
     }
-    // this.car = lift.car?.cc || lift.car;
-    this.startPoint = lift.startPoint
-    this.endPoint = lift.endPoint
+    this.car = {
+      cc: lift.car?.cc || null,
+      brand: lift.car?.brand || null,
+      model: lift.car?.model || null,
+      year: lift.car?.year || null,
+      color: lift.car?.color || null,
+      plate: lift.car?.plate || null,
+    }
+    this.startPoint = {
+      district: lift.startPoint.district || null,
+      municipality: lift.startPoint.municipality || null,
+      parish: lift.startPoint.parish || null,
+    }
+    this.endPoint = {
+      district: lift.endPoint.district || null,
+      municipality: lift.endPoint.municipality || null,
+      parish: lift.endPoint.parish || null,
+    }
     this.schedule = lift.schedule
     this.price = lift.price
     this.providedSeats = lift.providedSeats

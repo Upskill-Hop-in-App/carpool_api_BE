@@ -19,6 +19,7 @@ class ApplicationController {
       })
       const applicationModel = await inputDTO.toApplication()
       const savedApplication = await ApplicationService.create(applicationModel)
+
       const outputDTO = new ApplicationOutputDTO(savedApplication)
       res.status(201).json({
         message: MESSAGES.APPLICATION_CREATED_SUCCESS,
