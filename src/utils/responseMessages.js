@@ -37,11 +37,14 @@ export const MESSAGES = {
   DRIVER_NOT_FOUND_BY_CODE: "No driver matches the given username",
   CAR_NOT_FOUND_BY_CODE: "No car matches the given code",
   DUPLICATE_LIFT: "Duplicate lift code or lift name. Please use unique values.",
+  DUPLICATE_LIFT: "Duplicate lift code or lift name. Please use unique values.",
   NO_LIFTS_FOUND: "No lifts exist",
   FAILED_TO_CREATE_LIFT: "Failed to create lift",
   LIFT_NOT_FOUND_BY_CODE: "No lifts match the given code",
   FAILED_TO_RETRIEVE_LIFTS: "Failed to retrieve lifts",
   FAILED_TO_RETRIEVE_LIFT_BY_CODE: "Failed to retrieve lift by code",
+  INVALID_CAR: "Car brand/model/year not valid",
+  FAILED_TO_RETRIEVE_VALIDATION_INFO: "Failed to retrieve validation for car",
   FAILED_TO_UPDATE_LIFT: "Failed to update lift",
   FAILED_TO_DELETE_LIFT: "Failed to delete lift",
   APPLICATION_ASSOCIATED:
@@ -65,5 +68,26 @@ export const MESSAGES = {
   FAILED_TO_RETRIEVE_APPLICATION: "Failed to retrieve applications",
   INVALID_STATUS: "Invalid status. Try 'pending', 'rejected' or 'accepted'",
 
+  /* -------------------------------------------------------------------------- */
+
+  /* ---------------------- Car Success messages ---------------------- */
+  CAR_CREATED: "Car created successfully",
+  CAR_RETRIEVED_BY_CODE: "Car retrieved by code",
+  CAR_UPDATED: "Car updated successfully",
+  CAR_DELETED: "Car deleted successfully",
+  CARS_RETRIEVED: "Cars retrieved successfully",
+  /* -------------------------------------------------------------------------- */
+
+  /* ----------------------- Car Error messages ----------------------- */
+  DRIVER_NOT_FOUND: "No driver matches the given username",
+  CAR_NOT_FOUND_BY_CODE: "No car matches the given code",
+  DUPLICATE_CAR: "Duplicate car code or car name. Please use unique values.",
+  NO_CARS_FOUND: "No cars exist",
+  FAILED_TO_CREATE_CAR: "Failed to create car",
+  CAR_NOT_FOUND_BY_CODE: "No cars match the given code",
+  FAILED_TO_RETRIEVE_CARS: "Failed to retrieve cars",
+  FAILED_TO_RETRIEVE_CAR_BY_CODE: "Failed to retrieve car by code",
+  FAILED_TO_UPDATE_CAR: "Failed to update car",
+  FAILED_TO_DELETE_CAR: "Failed to delete car",
   /* -------------------------------------------------------------------------- */
 }
