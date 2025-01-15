@@ -26,7 +26,7 @@ class ApplicationController {
         data: outputDTO,
       })
     } catch (err) {
-      logger.error("LiftController - Error creating application", err.message)
+      logger.error("LiftController - Error creating application", err)
       if (err.name === "ValidationError") {
         let errorMessage = `${MESSAGES.VALIDATION_ERROR}: `
         for (let field in err.errors) {
@@ -77,7 +77,7 @@ class ApplicationController {
     } catch (err) {
       logger.error(
         "ApplicationController - Failed to retrieve applications: ",
-        err.message
+        err
       )
       if (err.message === "NoApplicationFound") {
         res.status(404).json({ error: MESSAGES.NO_APPLICATIONS_FOUND })
@@ -99,7 +99,7 @@ class ApplicationController {
     } catch (err) {
       logger.error(
         "ApplicationController - Failed to retrieve application by code: ",
-        err.message
+        err
       )
       if (err.message === "ApplicationNotFound") {
         res.status(404).json({ error: MESSAGES.APPLICATION_NOT_FOUND })
@@ -126,7 +126,7 @@ class ApplicationController {
     } catch (err) {
       logger.error(
         "ApplicationController - Failed to retrieve applications: ",
-        err.message
+        err
       )
       if (err.message === "UserNotFound") {
         res.status(404).json({ error: MESSAGES.USER_NOT_FOUND })
@@ -215,7 +215,7 @@ class ApplicationController {
     } catch (err) {
       logger.error(
         "ApplicationController - Failed to retrieve applications: ",
-        err.message
+        err
       )
       if (err.message === "UserNotFound") {
         res.status(404).json({ error: MESSAGES.USER_NOT_FOUND })
@@ -263,7 +263,6 @@ class ApplicationController {
     }
   }
 
-  //TODO Acrescentar mais campos possiveis de filtro e fazer filtro a iniciar ja com um filtro por username
   async filterApplications(req, res) {
     try {
       logger.info(`GET:/api/applications/filter/${req.query}`)
@@ -275,12 +274,50 @@ class ApplicationController {
         message: MESSAGES.APPLICATIONS_RETRIEVED_SUCCSESS,
         data: outputDTO,
       })
-    } catch (error) {
+    } catch (err) {
       logger.error(
         "ApplicationController - Failed to filter applications:",
-        error.message
+        err
       )
-      res.status(500).json({ error: MESSAGES.FAILED_TO_RETRIEVE_APPLICATION })
+      if (err.message === "NoApplicationFound") {
+        res.status(404).json({ error: MESSAGES.NO_APPLICATIONS_FOUND })
+      } else if (err.message === "InvalidStatus") {
+        res.status(400).json({ error: MESSAGES.INVALID_STATUS })
+      } else {
+        res.status(500).json({ error: MESSAGES.FAILED_TO_RETRIEVE_APPLICATION })
+      }
+    }
+  }
+
+  async filterApplicationsByUsername(req, res) {
+    try {
+      logger.info(`GET:/api/applications/filter/${req.params.username}`)
+
+      const username = req.params.username
+      const filters = req.query
+
+      const applications =
+        await ApplicationService.filterApplicationsByUsername(username, filters)
+
+      const outputDTO = applications.map((app) => new ApplicationOutputDTO(app))
+      res.status(200).json({
+        message: MESSAGES.APPLICATIONS_RETRIEVED_SUCCSESS,
+        data: outputDTO,
+      })
+    } catch (err) {
+      logger.error(
+        "ApplicationController - Failed to filter applications by username",
+        err
+      )
+      if (err.message === "NoApplicationFound") {
+        res.status(404).json({ error: MESSAGES.NO_APPLICATIONS_FOUND })
+      } else if (err.message === "UserNotFound") {
+        res.status(400).json({ error: MESSAGES.USER_NOT_FOUND })
+      } else if (err.message === "InvalidStatus") {
+        res.status(400).json({ error: MESSAGES.INVALID_STATUS })
+      } else {
+        res.status(500).json({ error: MESSAGES.FAILED_TO_RETRIEVE_APPLICATION })
+      }
     }
   }
 }

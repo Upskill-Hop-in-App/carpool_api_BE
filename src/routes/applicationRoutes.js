@@ -22,5 +22,9 @@ router.get(
   ApplicationController.getApplicationsByEmailAndStatus
 )
 router.get("/filter", ApplicationController.filterApplications)
+router.get(
+  "/filter/username/:username",
+  ApplicationController.filterApplications
+)
 
 export { router as applicationRoutes }

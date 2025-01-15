@@ -11,7 +11,7 @@ class UserController {
       const role = "admin"
       await this.register(req, res, role)
     } catch (err) {
-      logger.error("UserController - Error registering admin - ", err.message)
+      logger.error("UserController - Error registering admin - ", err)
     }
   }
 
@@ -21,7 +21,7 @@ class UserController {
       const role = "client"
       await this.register(req, res, role)
     } catch (err) {
-      logger.error("UserController - Error registering client - ", err.message)
+      logger.error("UserController - Error registering client - ", err)
     }
   }
 
@@ -46,7 +46,7 @@ class UserController {
           password,
           role
         ).catch((err) => {
-          logger.error(`Error saving ${role} in SQLite:`, err.message)
+          logger.error(`Error saving ${role} in SQLite:`, err)
           throw err
         })
 
@@ -55,7 +55,7 @@ class UserController {
         res.status(201).json({ message: `${role} registered successfully` })
       }
     } catch (err) {
-      logger.error(`UserController - Error registering ${role} - `, err.message)
+      logger.error(`UserController - Error registering ${role} - `, err)
 
       if (err.name === "ValidationError") {
         let errorMessage = "Validation Error: "
@@ -104,13 +104,13 @@ class UserController {
         password,
         user
       ).catch((err) => {
-        logger.error(`Error updating user in SQLite:`, err.message)
+        logger.error(`Error updating user in SQLite:`, err)
         throw err
       })
       await Promise.all([updateMongo, updateSQL])
       res.status(201).json({ message: MESSAGES.USER_UPDATED_SUCCESS })
     } catch (err) {
-      logger.error(`Error updating user:`, err.message)
+      logger.error(`Error updating user:`, err)
       if (err.name === "ValidationError") {
         let errorMessage = "Validation Error: "
         for (const field in err.errors) {
@@ -155,7 +155,7 @@ class UserController {
       await UserService.updatePassword(req.params.username, password)
       res.status(200).json({ message: MESSAGES.PASSWORD_UPDATED_SUCCESS })
     } catch (err) {
-      logger.error(`Error updating password`, err.message)
+      logger.error(`Error updating password`, err)
       res.status(500).json({
         error: MESSAGES.ERROR_UPDATING_PASSWORD,
         details: err,
@@ -171,7 +171,7 @@ class UserController {
     } catch (err) {
       logger.error(
         "UserController - Error updating driverRating - ",
-        err.message
+        err
       )
     }
   }
@@ -184,7 +184,7 @@ class UserController {
     } catch (err) {
       logger.error(
         "UserController - Error updating passengerRating - ",
-        err.message
+        err
       )
     }
   }
@@ -208,7 +208,7 @@ class UserController {
       await UserService.updateRating(user, ratingModel, ratingValue)
       res.status(200).json({ message: `${ratingModel} updated successfully!` })
     } catch (err) {
-      logger.error(`userController - updateRating`, err.message)
+      logger.error(`userController - updateRating`, err)
       if (err.message === "RatingMustBe1To5")
         res.status(400).json({ error: MESSAGES.RATING_MUST_1_TO_5 })
       else {
@@ -243,11 +243,46 @@ class UserController {
       await Promise.all([deleteMongo, deleteSQL])
       res.status(200).json({ message: MESSAGES.USER_DELETED_SUCCESS })
     } catch (err) {
-      logger.error(`Error deleting user`, err.message)
+      logger.error(`Error deleting user`, err)
       res.status(500).json({
         error: MESSAGES.ERROR_DELETING_USER,
         details: err.message,
       })
+    }
+  }
+
+  anonymize = async (req, res) => {
+    logger.info(`PUT: /api/auth/delete/${req.params.username}`)
+    try {
+      const username = req.params.username
+
+      const userMongo = await UserService.findUserMongo(username)
+      if (!userMongo) {
+        res.status(404).json({ error: MESSAGES.USER_NOT_FOUND })
+        return
+      }
+
+      const userSQL = await UserService.checkUsernameExists(username)
+      if (!userSQL) {
+        res.status(404).json({ error: MESSAGES.USER_NOT_FOUND })
+        return
+      }
+
+      await UserService.anonymizeUser(userMongo)
+
+      res.status(200).json({ message: MESSAGES.USER_ANONYMIZED_SUCCESS })
+    } catch (err) {
+      logger.error(`Error deleting user`, err)
+      if (err.message === "UserNotFound") {
+        res.status(400).json({ error: MESSAGES.USER_NOT_FOUND })
+      } else if (err.message === "UserAlreadyAnonym") {
+        res.status(400).json({ error: MESSAGES.USER_ALREADY_ANONYM })
+      } else {
+        res.status(500).json({
+          error: MESSAGES.ERROR_ANONYMIZING_USER,
+          details: err.message,
+        })
+      }
     }
   }
 }

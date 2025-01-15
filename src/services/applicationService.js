@@ -36,15 +36,32 @@ class ApplicationService {
       { _id: liftDoc._id },
       { $push: { applications: application._id } }
     )
-    await application.populate(["passenger", "lift"])
+    await application.populate([
+      {
+        path: "passenger",
+      },
+      {
+        path: "lift",
+        populate: {
+          path: "driver",
+        },
+      },
+    ])
     return application
   }
 
   async list() {
     logger.info("ApplicationService - list")
     const applications = await Application.find().populate([
-      "passenger",
-      "lift",
+      {
+        path: "passenger",
+      },
+      {
+        path: "lift",
+        populate: {
+          path: "driver",
+        },
+      },
     ])
 
     if (applications.length === 0) {
@@ -56,8 +73,15 @@ class ApplicationService {
   async listByCode(code) {
     logger.info("ApplicationService - listByCode")
     const application = await Application.findOne({ ca: code }).populate([
-      "passenger",
-      "lift",
+      {
+        path: "passenger",
+      },
+      {
+        path: "lift",
+        populate: {
+          path: "driver",
+        },
+      },
     ])
 
     if (!application) {
@@ -76,7 +100,17 @@ class ApplicationService {
 
     const applications = await Application.find({
       passenger: user._id,
-    }).populate(["passenger", "lift"])
+    }).populate([
+      {
+        path: "passenger",
+      },
+      {
+        path: "lift",
+        populate: {
+          path: "driver",
+        },
+      },
+    ])
 
     if (applications.length === 0) {
       throw new Error("NoApplicationFound")
@@ -95,8 +129,15 @@ class ApplicationService {
     }
 
     const applications = await Application.find({ status: status }).populate([
-      "passenger",
-      "lift",
+      {
+        path: "passenger",
+      },
+      {
+        path: "lift",
+        populate: {
+          path: "driver",
+        },
+      },
     ])
 
     if (applications.length === 0) {
@@ -123,7 +164,17 @@ class ApplicationService {
     const applications = await Application.find({
       passenger: user._id,
       status: status,
-    }).populate(["passenger", "lift"])
+    }).populate([
+      {
+        path: "passenger",
+      },
+      {
+        path: "lift",
+        populate: {
+          path: "driver",
+        },
+      },
+    ])
 
     if (applications.length === 0) {
       throw new Error("NoApplicationFound")
@@ -136,13 +187,8 @@ class ApplicationService {
 
     const query = {}
 
-    //Filtrar campos mais acessíveis de documentos Application
+    //Filtrar campos maxdepth -1 do documento applications
     if (filters.ca) query.ca = filters.ca
-    // if (filters.passenger) {
-    //   const passenger = await User.findOne({ username: filters.passenger })
-    //   if (!passenger) throw new Error("PassengerNotFound")
-    //   query.passenger = passenger.username
-    // }
     if (filters.status) {
       const validStatuses = ["pending", "accepted", "rejected"]
       if (!validStatuses.includes(filters.status))
@@ -153,20 +199,35 @@ class ApplicationService {
     const sort = filters.sort || { createdAt: -1 }
 
     const applications = await Application.find(query)
-      .populate(["passenger", "lift"])
+      .populate([
+        {
+          path: "passenger",
+        },
+        {
+          path: "lift",
+          populate: {
+            path: "driver",
+          },
+        },
+      ])
       .sort(sort)
 
+    // Filtrar campos abaixo de depth -1
     const filteredApplications = applications.filter((application) => {
       if (
-        filters.liftStartPoint &&
-        application.lift?.startPoint !== filters.liftStartPoint
+        filters.startPoint &&
+        application.lift?.startPoint !== filters.startPoint
       ) {
         return false
       }
 
+      if (filters.endPoint && application.lift?.endPoint !== filters.endPoint) {
+        return false
+      }
+
       if (
-        filters.liftDriver &&
-        application.lift?.driver !== filters.liftDriver
+        filters.driver &&
+        application.lift?.driver.username !== filters.driver
       ) {
         return false
       }
@@ -174,6 +235,82 @@ class ApplicationService {
       if (
         filters.username &&
         application.passenger?.username !== filters.username
+      ) {
+        return false
+      }
+
+      if (
+        filters.driverRating &&
+        application.lift?.driver?.driverRating !== Number(filters.driverRating)
+      ) {
+        return false
+      }
+
+      return true
+    })
+
+    if (filteredApplications.length === 0) throw new Error("NoApplicationFound")
+
+    return filteredApplications
+  }
+
+  async filterApplicationsByUsername(username, filters) {
+    logger.info("ApplicationService - filterApplicationsByUsername")
+
+    const user = await User.findOne({ username: username })
+    if (!user) {
+      throw new Error("UserNotFound")
+    }
+
+    //Garantir que o ponto de partida é um filtro por username dos params
+    const query = { "passenger.username": username }
+
+    if (filters.ca) query.ca = filters.ca
+    if (filters.status) {
+      const validStatuses = ["pending", "accepted", "rejected"]
+      if (!validStatuses.includes(filters.status))
+        throw new Error("InvalidStatus")
+      query.status = filters.status
+    }
+
+    const sort = filters.sort || { createdAt: -1 }
+
+    const applications = await Application.find(query)
+      .populate([
+        {
+          path: "passenger",
+        },
+        {
+          path: "lift",
+          populate: {
+            path: "driver",
+          },
+        },
+      ])
+      .sort(sort)
+
+    const filteredApplications = applications.filter((application) => {
+      if (
+        filters.startPoint &&
+        application.lift?.startPoint !== filters.startPoint
+      ) {
+        return false
+      }
+
+      if (filters.endPoint && application.lift?.endPoint !== filters.endPoint) {
+        return false
+      }
+
+      if (
+        filters.driver &&
+        application.lift?.driver.username !== filters.driver
+      ) {
+        return false
+      }
+
+      if (
+        filters.driverRating &&
+        application.lift?.driver?.driverRating !== Number(filters.driverRating)
       ) {
         return false
       }

@@ -2,16 +2,10 @@ import { Schema, model } from "mongoose"
 
 const LiftSchema = new Schema(
   {
-    //TODO acrescentar field STATUS!
     cl: {
       type: String,
       unique: true,
       required: true,
-      match: [
-        /^[A-Za-z]{2}[1-9]{3}$/,
-        "Lift code must be exactly 2 letters followed by 3 numbers",
-      ],
-      lowercase: true,
     },
     driver: {
       type: Schema.Types.ObjectId,
@@ -63,6 +57,11 @@ const LiftSchema = new Schema(
         message:
           "Occupied seats ({VALUE}) can't be greater than provided seats",
       },
+    },
+    status: {
+      type: String,
+      default: "open",
+      enum: ["open", "inProgress", "finished", "closed"],
     },
   },
   { collection: "lifts", timestamps: true }

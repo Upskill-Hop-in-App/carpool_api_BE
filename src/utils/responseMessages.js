@@ -1,9 +1,10 @@
 export const MESSAGES = {
   /* -------------------------- User Success messages ------------------------- */
-  USER_UPDATED_SUCCESS: "User updated successfully",
-  PASSWORD_UPDATED_SUCCESS: "Password updated successfully",
+  USER_UPDATED_SUCCESS: "User updated successfully!",
+  PASSWORD_UPDATED_SUCCESS: "Password updated successfully!",
   REGISTER_SUCCESS: "Registered successfully!",
-  USER_DELETED_SUCCESS: "User deleted successfully.",
+  USER_DELETED_SUCCESS: "User deleted successfully!",
+  USER_ANONYMIZED_SUCCESS: "User anonymized successfully!",
   /* -------------------------------------------------------------------------- */
 
   /* --------------------------- User Error messages -------------------------- */
@@ -17,7 +18,9 @@ export const MESSAGES = {
   REGISTER_FAILED: "Failed to register",
   ALREADY_REGISTERED: "You're already registered",
   RATING_MUST_1_TO_5: "Rating must be a number between 1 and 5.",
-  ERROR_DELETING_USER: "Error deleting user.",
+  ERROR_DELETING_USER: "Error deleting user",
+  ERROR_ANONYMIZING_USER: "Error anonymizing user",
+  USER_ALREADY_ANONYM: "User has already been anonymized before",
   /* -------------------------------------------------------------------------- */
 
   /* -------------------------- Common Error messages ------------------------- */
