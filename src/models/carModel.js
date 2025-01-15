@@ -43,6 +43,7 @@ const CarSchema = new Schema(
       type: String,
       unique: true,
       required: true,
+      lowercase: true,
       validate: {
         validator: function (v) {
           const isOldPlate = this.year < 2000
