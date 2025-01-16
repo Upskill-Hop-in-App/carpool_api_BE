@@ -195,7 +195,7 @@ class ApplicationService {
     //Filtrar campos maxdepth -1 do documento applications
     if (filters.ca) query.ca = filters.ca
     if (filters.status) {
-      const validStatuses = ["pending", "accepted", "rejected"]
+      const validStatuses = ["pending", "accepted", "rejected", "canceled"]
       if (!validStatuses.includes(filters.status))
         throw new Error("InvalidStatus")
       query.status = filters.status
@@ -220,13 +220,45 @@ class ApplicationService {
     // Filtrar campos abaixo de depth -1
     const filteredApplications = applications.filter((application) => {
       if (
-        filters.startPoint &&
-        application.lift?.startPoint !== filters.startPoint
+        filters.startPointDistrict &&
+        application.lift?.startPoint.district !== filters.startPointDistrict
       ) {
         return false
       }
 
-      if (filters.endPoint && application.lift?.endPoint !== filters.endPoint) {
+      if (
+        filters.startPointMunicipality &&
+        application.lift?.startPoint.municipality !==
+          filters.startPointMunicipality
+      ) {
+        return false
+      }
+
+      if (
+        filters.startPointParish &&
+        application.lift?.startPoint.parish !== filters.startPointParish
+      ) {
+        return false
+      }
+
+      if (
+        filters.endPointDistrict &&
+        application.lift?.endPoint.district !== filters.endPointDistrict
+      ) {
+        return false
+      }
+
+      if (
+        filters.endPointMunicipality &&
+        application.lift?.endPoint.municipality !== filters.endPointMunicipality
+      ) {
+        return false
+      }
+
+      if (
+        filters.endPointParish &&
+        application.lift?.endPoint.parish !== filters.endPointParish
+      ) {
         return false
       }
 
@@ -268,11 +300,11 @@ class ApplicationService {
     }
 
     //Garantir que o ponto de partida é um filtro por username dos params
-    const query = { "passenger.username": username }
+    const query = { passenger: user._id }
 
     if (filters.ca) query.ca = filters.ca
     if (filters.status) {
-      const validStatuses = ["pending", "accepted", "rejected"]
+      const validStatuses = ["pending", "accepted", "rejected", "canceled"]
       if (!validStatuses.includes(filters.status))
         throw new Error("InvalidStatus")
       query.status = filters.status
@@ -296,13 +328,45 @@ class ApplicationService {
 
     const filteredApplications = applications.filter((application) => {
       if (
-        filters.startPoint &&
-        application.lift?.startPoint !== filters.startPoint
+        filters.startPointDistrict &&
+        application.lift?.startPoint.district !== filters.startPointDistrict
       ) {
         return false
       }
 
-      if (filters.endPoint && application.lift?.endPoint !== filters.endPoint) {
+      if (
+        filters.startPointMunicipality &&
+        application.lift?.startPoint.municipality !==
+          filters.startPointMunicipality
+      ) {
+        return false
+      }
+
+      if (
+        filters.startPointParish &&
+        application.lift?.startPoint.parish !== filters.startPointParish
+      ) {
+        return false
+      }
+
+      if (
+        filters.endPointDistrict &&
+        application.lift?.endPoint.district !== filters.endPointDistrict
+      ) {
+        return false
+      }
+
+      if (
+        filters.endPointMunicipality &&
+        application.lift?.endPoint.municipality !== filters.endPointMunicipality
+      ) {
+        return false
+      }
+
+      if (
+        filters.endPointParish &&
+        application.lift?.endPoint.parish !== filters.endPointParish
+      ) {
         return false
       }
 

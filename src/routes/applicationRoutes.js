@@ -24,7 +24,7 @@ router.get(
 router.get("/filter", ApplicationController.filterApplications)
 router.get(
   "/filter/username/:username",
-  ApplicationController.filterApplications
+  ApplicationController.filterApplicationsByUsername
 )
 router.put("/accept/:ca", ApplicationController.accept)
 router.put("/reject/:ca", ApplicationController.reject)
