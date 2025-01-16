@@ -5,6 +5,7 @@ export const MESSAGES = {
   REGISTER_SUCCESS: "Registered successfully!",
   USER_DELETED_SUCCESS: "User deleted successfully!",
   USER_ANONYMIZED_SUCCESS: "User anonymized successfully!",
+  RATING_SUCCESS: "Rating updated successfully!",
   /* -------------------------------------------------------------------------- */
 
   /* --------------------------- User Error messages -------------------------- */

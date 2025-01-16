@@ -108,7 +108,7 @@ class UserController {
         throw err
       })
       await Promise.all([updateMongo, updateSQL])
-      res.status(201).json({ message: MESSAGES.USER_UPDATED_SUCCESS })
+      res.status(200).json({ message: MESSAGES.USER_UPDATED_SUCCESS })
     } catch (err) {
       logger.error(`Error updating user:`, err)
       if (err.name === "ValidationError") {
@@ -206,7 +206,7 @@ class UserController {
       }
 
       await UserService.updateRating(user, ratingModel, ratingValue)
-      res.status(200).json({ message: `${ratingModel} updated successfully!` })
+      res.status(200).json({ message: MESSAGES.RATING_SUCCESS })
     } catch (err) {
       logger.error(`userController - updateRating`, err)
       if (err.message === "RatingMustBe1To5")
