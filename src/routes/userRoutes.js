@@ -9,6 +9,7 @@ router.put("/profile/:username", UserController.update)
 router.put("/password/:username", UserController.updatePassword)
 router.put("/driverRating/:username", UserController.updateDriverRating)
 router.put("/passengerRating/:username", UserController.updatePassengerRating)
+router.put("/delete/:username", UserController.anonymize)
 router.delete("/:username", UserController.delete)
 
 export { router as userRoutes }

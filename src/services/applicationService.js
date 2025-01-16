@@ -23,9 +23,14 @@ class ApplicationService {
       throw new Error("LiftStatusNotOpen")
     }
 
+    if (liftDoc.occupiedSeats === liftDoc.providedSeats) {
+      throw new Error("LiftIsFull")
+    }
+
     const sameApplication = await Application.findOne({
       passenger: passengerDoc._id,
       lift: liftDoc._id,
+      status: { $in: ["accepted", "pending"] },
     })
     if (sameApplication) {
       throw new Error("ApplicationAlreadyExists")
@@ -36,15 +41,32 @@ class ApplicationService {
       { _id: liftDoc._id },
       { $push: { applications: application._id } }
     )
-    await application.populate(["passenger", "lift"])
+    await application.populate([
+      {
+        path: "passenger",
+      },
+      {
+        path: "lift",
+        populate: {
+          path: "driver",
+        },
+      },
+    ])
     return application
   }
 
   async list() {
     logger.info("ApplicationService - list")
     const applications = await Application.find().populate([
-      "passenger",
-      "lift",
+      {
+        path: "passenger",
+      },
+      {
+        path: "lift",
+        populate: {
+          path: "driver",
+        },
+      },
     ])
 
     if (applications.length === 0) {
@@ -56,8 +78,15 @@ class ApplicationService {
   async listByCode(code) {
     logger.info("ApplicationService - listByCode")
     const application = await Application.findOne({ ca: code }).populate([
-      "passenger",
-      "lift",
+      {
+        path: "passenger",
+      },
+      {
+        path: "lift",
+        populate: {
+          path: "driver",
+        },
+      },
     ])
 
     if (!application) {
@@ -76,7 +105,17 @@ class ApplicationService {
 
     const applications = await Application.find({
       passenger: user._id,
-    }).populate(["passenger", "lift"])
+    }).populate([
+      {
+        path: "passenger",
+      },
+      {
+        path: "lift",
+        populate: {
+          path: "driver",
+        },
+      },
+    ])
 
     if (applications.length === 0) {
       throw new Error("NoApplicationFound")
@@ -95,8 +134,15 @@ class ApplicationService {
     }
 
     const applications = await Application.find({ status: status }).populate([
-      "passenger",
-      "lift",
+      {
+        path: "passenger",
+      },
+      {
+        path: "lift",
+        populate: {
+          path: "driver",
+        },
+      },
     ])
 
     if (applications.length === 0) {
@@ -123,7 +169,17 @@ class ApplicationService {
     const applications = await Application.find({
       passenger: user._id,
       status: status,
-    }).populate(["passenger", "lift"])
+    }).populate([
+      {
+        path: "passenger",
+      },
+      {
+        path: "lift",
+        populate: {
+          path: "driver",
+        },
+      },
+    ])
 
     if (applications.length === 0) {
       throw new Error("NoApplicationFound")
@@ -136,13 +192,8 @@ class ApplicationService {
 
     const query = {}
 
-    //Filtrar campos mais acessíveis de documentos Application
+    //Filtrar campos maxdepth -1 do documento applications
     if (filters.ca) query.ca = filters.ca
-    // if (filters.passenger) {
-    //   const passenger = await User.findOne({ username: filters.passenger })
-    //   if (!passenger) throw new Error("PassengerNotFound")
-    //   query.passenger = passenger.username
-    // }
     if (filters.status) {
       const validStatuses = ["pending", "accepted", "rejected"]
       if (!validStatuses.includes(filters.status))
@@ -153,20 +204,35 @@ class ApplicationService {
     const sort = filters.sort || { createdAt: -1 }
 
     const applications = await Application.find(query)
-      .populate(["passenger", "lift"])
+      .populate([
+        {
+          path: "passenger",
+        },
+        {
+          path: "lift",
+          populate: {
+            path: "driver",
+          },
+        },
+      ])
       .sort(sort)
 
+    // Filtrar campos abaixo de depth -1
     const filteredApplications = applications.filter((application) => {
       if (
-        filters.liftStartPoint &&
-        application.lift?.startPoint !== filters.liftStartPoint
+        filters.startPoint &&
+        application.lift?.startPoint !== filters.startPoint
       ) {
         return false
       }
 
+      if (filters.endPoint && application.lift?.endPoint !== filters.endPoint) {
+        return false
+      }
+
       if (
-        filters.liftDriver &&
-        application.lift?.driver !== filters.liftDriver
+        filters.driver &&
+        application.lift?.driver.username !== filters.driver
       ) {
         return false
       }
@@ -178,12 +244,235 @@ class ApplicationService {
         return false
       }
 
+      if (
+        filters.driverRating &&
+        application.lift?.driver?.driverRating !== Number(filters.driverRating)
+      ) {
+        return false
+      }
+
       return true
     })
 
     if (filteredApplications.length === 0) throw new Error("NoApplicationFound")
 
     return filteredApplications
+  }
+
+  async filterApplicationsByUsername(username, filters) {
+    logger.info("ApplicationService - filterApplicationsByUsername")
+
+    const user = await User.findOne({ username: username })
+    if (!user) {
+      throw new Error("UserNotFound")
+    }
+
+    //Garantir que o ponto de partida é um filtro por username dos params
+    const query = { "passenger.username": username }
+
+    if (filters.ca) query.ca = filters.ca
+    if (filters.status) {
+      const validStatuses = ["pending", "accepted", "rejected"]
+      if (!validStatuses.includes(filters.status))
+        throw new Error("InvalidStatus")
+      query.status = filters.status
+    }
+
+    const sort = filters.sort || { createdAt: -1 }
+
+    const applications = await Application.find(query)
+      .populate([
+        {
+          path: "passenger",
+        },
+        {
+          path: "lift",
+          populate: {
+            path: "driver",
+          },
+        },
+      ])
+      .sort(sort)
+
+    const filteredApplications = applications.filter((application) => {
+      if (
+        filters.startPoint &&
+        application.lift?.startPoint !== filters.startPoint
+      ) {
+        return false
+      }
+
+      if (filters.endPoint && application.lift?.endPoint !== filters.endPoint) {
+        return false
+      }
+
+      if (
+        filters.driver &&
+        application.lift?.driver.username !== filters.driver
+      ) {
+        return false
+      }
+
+      if (
+        filters.driverRating &&
+        application.lift?.driver?.driverRating !== Number(filters.driverRating)
+      ) {
+        return false
+      }
+
+      return true
+    })
+
+    if (filteredApplications.length === 0) throw new Error("NoApplicationFound")
+
+    return filteredApplications
+  }
+
+  async acceptApplication(ca) {
+    const application = await Application.findOne({ ca }).populate(["lift"])
+    if (!application) {
+      throw new Error("ApplicationNotFound")
+    }
+
+    if (application.status !== "pending") {
+      throw new Error("StatusNotPending")
+    }
+
+    const lift = await Lift.findOne({
+      _id: application.lift._id,
+    }).populate("applications")
+    if (!lift) {
+      throw new Error("LiftNotFound")
+    }
+
+    if (lift.occupiedSeats === lift.providedSeats) {
+      throw new Error("LiftIsFull")
+    }
+
+    if (lift.status !== "open") {
+      throw new Error("LiftNotOpen")
+    }
+
+    await Application.updateOne(
+      { _id: application._id },
+      { status: "accepted" }
+    )
+
+    await Lift.updateOne({ _id: lift._id }, { $inc: { occupiedSeats: 1 } })
+
+    const isLiftFull = lift.occupiedSeats + 1 === lift.providedSeats
+    if (isLiftFull) {
+      await Application.updateMany(
+        {
+          _id: { $in: lift.applications },
+          status: { $eq: "pending" },
+        },
+        { status: "rejected" }
+      )
+      await Lift.updateOne(
+        {
+          _id: lift._id,
+        },
+        { status: "ready" }
+      )
+    }
+  }
+
+  async rejectApplication(ca) {
+    const application = await Application.findOne({ ca }).populate(["lift"])
+    if (!application) {
+      throw new Error("ApplicationNotFound")
+    }
+
+    if (application.status !== "pending") {
+      throw new Error("StatusNotPending")
+    }
+
+    const lift = await Lift.findOne({
+      _id: application.lift._id,
+    }).populate("applications")
+    if (!lift) {
+      throw new Error("LiftNotFound")
+    }
+
+    if (lift.status !== "open") {
+      throw new Error("LiftNotOpen")
+    }
+
+    await Application.updateOne(
+      { _id: application._id },
+      { status: "rejected" }
+    )
+  }
+
+  async cancelApplication(ca) {
+    const application = await Application.findOne({ ca: ca })
+    if (!application) {
+      throw new Error("ApplicationNotFound")
+    }
+
+    const lift = await Lift.findOne({ applications: application._id }).populate(
+      ["applications"]
+    )
+    if (!lift) {
+      throw new Error("LiftNotFound")
+    }
+
+    if (lift.status !== "open" && lift.status !== "ready") {
+      throw new Error("LiftAlreadyStartedOrCanceled")
+    }
+
+    if (
+      application.status === "rejected" ||
+      application.status === "canceled"
+    ) {
+      throw new Error("ApplicationRejectedCanceled")
+    }
+
+    if (application.status === "accepted" && lift.occupiedSeats > 0) {
+      await Lift.updateOne({ _id: lift._id }, { $inc: { occupiedSeats: -1 } })
+      if (
+        lift.occupiedSeats === lift.providedSeats &&
+        lift.status === "ready"
+      ) {
+        await Lift.updateOne({ _id: lift._id }, { status: "open" })
+      }
+    }
+    await Application.updateOne(
+      { _id: application._id },
+      { status: "canceled" }
+    )
+  }
+
+  //TODO DECIDIR SE PERMITIMOS ISTO OU NAO OU, P.EX, SÓ O ADMIN PARA FINS DE ARCO QUE A USARIA POR REQUISIÇÃO
+  async delete(ca) {
+    const application = await Application.findOne({ ca: ca })
+    if (!application) {
+      throw new Error("ApplicationNotFound")
+    }
+
+    const lift = await Lift.findOne({ applications: application._id }).populate(
+      ["applications"]
+    )
+    if (!lift) {
+      throw new Error("LiftNotFound")
+    }
+
+    if (lift.status !== "open" && lift.status !== "ready") {
+      throw new Error("LiftAlreadyStartedOrCanceled")
+    }
+
+    if (application.status === "accepted" && lift.occupiedSeats > 0) {
+      lift.occupiedSeats -= 1
+    }
+
+    lift.applications = lift.applications.filter(
+      (app_id) => !app_id.equals(application._id)
+    )
+
+    await lift.save()
+
+    await application.deleteOne()
   }
 }
 

@@ -1,9 +1,10 @@
 export const MESSAGES = {
   /* -------------------------- User Success messages ------------------------- */
-  USER_UPDATED_SUCCESS: "User updated successfully",
-  PASSWORD_UPDATED_SUCCESS: "Password updated successfully",
+  USER_UPDATED_SUCCESS: "User updated successfully!",
+  PASSWORD_UPDATED_SUCCESS: "Password updated successfully!",
   REGISTER_SUCCESS: "Registered successfully!",
-  USER_DELETED_SUCCESS: "User deleted successfully.",
+  USER_DELETED_SUCCESS: "User deleted successfully!",
+  USER_ANONYMIZED_SUCCESS: "User anonymized successfully!",
   /* -------------------------------------------------------------------------- */
 
   /* --------------------------- User Error messages -------------------------- */
@@ -17,7 +18,9 @@ export const MESSAGES = {
   REGISTER_FAILED: "Failed to register",
   ALREADY_REGISTERED: "You're already registered",
   RATING_MUST_1_TO_5: "Rating must be a number between 1 and 5.",
-  ERROR_DELETING_USER: "Error deleting user.",
+  ERROR_DELETING_USER: "Error deleting user",
+  ERROR_ANONYMIZING_USER: "Error anonymizing user",
+  USER_ALREADY_ANONYM: "User has already been anonymized before",
   /* -------------------------------------------------------------------------- */
 
   /* -------------------------- Common Error messages ------------------------- */
@@ -42,6 +45,7 @@ export const MESSAGES = {
   DUPLICATE_LIFT: "Duplicate lift code or lift name. Please use unique values.",
   NO_LIFTS_FOUND: "No lifts exist",
   FAILED_TO_CREATE_LIFT: "Failed to create lift",
+  LIFT_NOT_FOUND: "Lift not found",
   LIFT_NOT_FOUND_BY_CODE: "No lifts match the given code",
   FAILED_TO_RETRIEVE_LIFTS: "Failed to retrieve lifts",
   FAILED_TO_RETRIEVE_LIFT_BY_CODE: "Failed to retrieve lift by code",
@@ -59,6 +63,10 @@ export const MESSAGES = {
   APPLICATION_CREATED_SUCCESS: "Application created successfully!",
   APPLICATIONS_RETRIEVED_SUCCSESS: "Applications retrieved successfully!",
   APPLICATION_RETRIEVED_BY_CODE: "Application retrieved by code",
+  APPLICATION_DELETED_SUCCESS: "Application deleted successfully!",
+  APPLICATION_ACCEPTED_SUCCESS: "Application accepted successfully!",
+  APPLICATION_REJECTED_SUCCESS: "Application rejected successfully!",
+  APPLICATION_CANCELED_SUCCESS: "Application canceled successfully!",
   /* -------------------------------------------------------------------------- */
 
   /* ----------------------- Application Error messages ----------------------- */
@@ -71,6 +79,15 @@ export const MESSAGES = {
   LIFT_STATUS_NOT_OPEN: "You can only apply for a lift with 'open' status",
   FAILED_TO_RETRIEVE_APPLICATION: "Failed to retrieve applications",
   INVALID_STATUS: "Invalid status. Try 'pending', 'rejected' or 'accepted'",
+  LIFT_STARTED_OR_CANCELED: "Lift already started or was canceled",
+  LIFT_NOT_ACCEPTING_APPLICATIONS: "Lift is not accepting more applications",
+  FAILED_TO_DELETE_APPLICATION: "Failed to delete application",
+  LIFT_IS_FULL: "The lift is full.",
+  STATUS_NOT_PENDING: "Application status is not 'pending'",
+  FAILED_TO_ACCEPT_APPLICATION: "Failed to accept application",
+  APPLICATION_ALREADY_REJECTED_CANCELED:
+    "Application status is already rejected or canceled.",
+  FAILED_TO_CANCEL_APPLICATION: "Failed to cancel application.",
 
   /* -------------------------------------------------------------------------- */
 
@@ -93,5 +110,6 @@ export const MESSAGES = {
   FAILED_TO_RETRIEVE_CAR_BY_CODE: "Failed to retrieve car by code",
   FAILED_TO_UPDATE_CAR: "Failed to update car",
   FAILED_TO_DELETE_CAR: "Failed to delete car",
+  FAILED_TO_RETRIEVE_VALIDATION_INFO: "Failed to retrieve validation info",
   /* -------------------------------------------------------------------------- */
 }

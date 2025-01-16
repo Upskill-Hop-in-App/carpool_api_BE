@@ -1,11 +1,11 @@
 import Lift from "../models/liftModel.js"
 import User from "../models/userModel.js"
 import logger from "../logger.js"
+import { v4 as uuidv4 } from "uuid"
 import Car from "../models/carModel.js"
 
 class LiftInputDTO {
   constructor({
-    cl,
     driver,
     car,
     startPoint,
@@ -15,7 +15,6 @@ class LiftInputDTO {
     providedSeats,
   }) {
     if (
-      !cl ||
       !driver ||
       !car ||
       !startPoint.district ||
@@ -31,7 +30,6 @@ class LiftInputDTO {
       throw new Error("MissingRequiredFields")
     }
 
-    this.cl = cl
     this.driver = driver
     this.car = car
     this.startPoint = startPoint
@@ -61,7 +59,7 @@ class LiftInputDTO {
     }
 
     return new Lift({
-      cl: this.cl,
+      cl: uuidv4(),
       driver: liftDriver._id,
       car: liftCar._id,
       startPoint: this.startPoint,
