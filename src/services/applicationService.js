@@ -19,6 +19,11 @@ class ApplicationService {
       throw new Error("LiftNotFound")
     }
 
+    const driverDoc = await User.findOne({ _id: liftDoc.driver })
+    if (driverDoc._id.equals(passengerDoc._id)) {
+      throw new Error("DriverIsPassenger")
+    }
+
     if (liftDoc.status !== "open") {
       throw new Error("LiftStatusNotOpen")
     }

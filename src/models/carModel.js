@@ -6,11 +6,6 @@ const CarSchema = new Schema(
       type: String,
       unique: true,
       required: true,
-      match: [
-        /^[A-Za-z]{2}[1-9]{2}$/,
-        "Car code must be exactly 2 letters followed by 2 numbers",
-      ],
-      lowercase: true,
     },
     brand: {
       type: String,

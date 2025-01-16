@@ -46,6 +46,10 @@ class ApplicationController {
         res.status(400).json({
           error: MESSAGES.DUPLICATE_APPLICATION,
         })
+      } else if (err.message === "DriverIsPassenger") {
+        res.status(400).json({
+          error: MESSAGES.DRIVER_IS_PASSENGER,
+        })
       } else if (err.message === "LiftStatusNotOpen") {
         res.status(400).json({
           error: MESSAGES.LIFT_STATUS_NOT_OPEN,

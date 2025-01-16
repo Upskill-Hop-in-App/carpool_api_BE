@@ -90,6 +90,7 @@ export const MESSAGES = {
   APPLICATION_ALREADY_REJECTED_CANCELED:
     "Application status is already rejected or canceled.",
   FAILED_TO_CANCEL_APPLICATION: "Failed to cancel application.",
+  DRIVER_IS_PASSENGER: "Driver cannot apply as a passenger to their lift",
 
   /* -------------------------------------------------------------------------- */
 
