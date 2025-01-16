@@ -381,6 +381,12 @@ class ApplicationService {
         { status: "ready" }
       )
     }
+
+    const acceptedApplication = await Application.findOne({ ca }).populate([
+      "lift",
+    ])
+
+    return acceptedApplication
   }
 
   async rejectApplication(ca) {
@@ -408,6 +414,12 @@ class ApplicationService {
       { _id: application._id },
       { status: "rejected" }
     )
+
+    const rejectedApplication = await Application.findOne({ ca }).populate([
+      "lift",
+    ])
+
+    return rejectedApplication
   }
 
   async cancelApplication(ca) {
@@ -447,6 +459,12 @@ class ApplicationService {
       { _id: application._id },
       { status: "canceled" }
     )
+
+    const canceledApplication = await Application.findOne({ ca }).populate([
+      "lift",
+    ])
+
+    return canceledApplication
   }
 
   //TODO DECIDIR SE PERMITIMOS ISTO OU NAO OU, P.EX, SÓ O ADMIN PARA FINS DE ARCO QUE A USARIA POR REQUISIÇÃO
