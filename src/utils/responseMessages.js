@@ -59,6 +59,7 @@ export const MESSAGES = {
   INVALID_LOCATION: "Invalid start/endPoint",
   INVALID_DATE_FORMAT: "Invalid date format, please use dd/mm/aaaa",
   DATE_IN_PAST: "The selected date is in the past",
+  INVALID_QUERY_LIFTS: "Invalid query parameter",
   /* -------------------------------------------------------------------------- */
 
   /* ---------------------- Application Success messages ---------------------- */
@@ -113,5 +114,7 @@ export const MESSAGES = {
   FAILED_TO_UPDATE_CAR: "Failed to update car",
   FAILED_TO_DELETE_CAR: "Failed to delete car",
   FAILED_TO_RETRIEVE_VALIDATION_INFO: "Failed to retrieve validation info",
+  INVALID_QUERY_CARS:
+    "Invalid query parameter, try: cc/brand/model/year/user/color/plate",
   /* -------------------------------------------------------------------------- */
 }

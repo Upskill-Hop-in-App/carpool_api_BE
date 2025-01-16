@@ -53,23 +53,23 @@ class LiftController {
         res.status(400).json({
           error: MESSAGES.DUPLICATE_LIFT,
         })
-      } else if(err.message === "FailedCarValidation") {
+      } else if (err.message === "FailedCarValidation") {
         res.status(400).json({
           error: MESSAGES.FAILED_TO_COMMUNICATE_WITH_CARS,
         })
-      } else if(err.message ==="MatchingLocations") {
+      } else if (err.message === "MatchingLocations") {
         res.status(400).json({
           error: MESSAGES.MATCHING_START_END,
         })
-      } else if(err.message ==="InvalidLocation") {
+      } else if (err.message === "InvalidLocation") {
         res.status(400).json({
           error: MESSAGES.INVALID_LOCATION,
         })
-      } else if(err.message ==="InvalidDateFormat") {
+      } else if (err.message === "InvalidDateFormat") {
         res.status(400).json({
           error: MESSAGES.INVALID_DATE_FORMAT,
         })
-      } else if(err.message ==="DateInPast") {
+      } else if (err.message === "DateInPast") {
         res.status(400).json({
           error: MESSAGES.DATE_IN_PAST,
         })
@@ -117,6 +117,34 @@ class LiftController {
         res
           .status(500)
           .json({ error: MESSAGES.FAILED_TO_RETRIEVE_LIFT_BY_CODE })
+      }
+    }
+  }
+
+  async filterLifts(req, res) {
+    try {
+      logger.info(`GET:/api/lifts/filter/${req.query}`)
+
+      const filters = req.query
+
+      const lifts = await LiftService.filterLifts(filters)
+      const outputDTO = lifts.map((lift) => new LiftOutputDTO(lift))
+      res.status(200).json({
+        message: MESSAGES.LIFTS_RETRIEVED,
+        data: outputDTO,
+      })
+    } catch (err) {
+      logger.error("LiftController - Failed to filter lifts:", err)
+      if (err.message === "NoLiftFound") {
+        res.status(404).json({ error: MESSAGES.NO_LIFTS_FOUND })
+      } else if (err.message === "InvalidStatus") {
+        res.status(400).json({ error: MESSAGES.INVALID_STATUS })
+      } else if (err.message === "InvalidQuery") {
+        res.status(400).json({ error: MESSAGES.INVALID_QUERY_LIFTS })
+      } else if (err.message === "DriverNotFound") {
+        res.status(400).json({ error: MESSAGES.DRIVER_NOT_FOUND })
+      } else {
+        res.status(500).json({ error: MESSAGES.FAILED_TO_RETRIEVE_LIFTS })
       }
     }
   }
@@ -174,19 +202,19 @@ class LiftController {
         res.status(400).json({
           error: MESSAGES.DUPLICATE_LIFT,
         })
-      } else if(err.message ==="MatchingLocations") {
+      } else if (err.message === "MatchingLocations") {
         res.status(400).json({
           error: MESSAGES.MATCHING_START_END,
         })
-      } else if(err.message ==="InvalidLocation") {
+      } else if (err.message === "InvalidLocation") {
         res.status(400).json({
           error: MESSAGES.INVALID_LOCATION,
         })
-      } else if(err.message ==="InvalidDateFormat") {
+      } else if (err.message === "InvalidDateFormat") {
         res.status(400).json({
           error: MESSAGES.INVALID_DATE_FORMAT,
         })
-      } else if(err.message ==="DateInPast") {
+      } else if (err.message === "DateInPast") {
         res.status(400).json({
           error: MESSAGES.DATE_IN_PAST,
         })
