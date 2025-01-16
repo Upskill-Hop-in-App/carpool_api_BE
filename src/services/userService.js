@@ -1,6 +1,8 @@
 import sqlite3 from "sqlite3"
 import bcrypt from "bcrypt"
 import {} from "dotenv/config"
+import { v4 as uuidv4 } from "uuid"
+import { validate as uuidValidate } from "uuid"
 
 import User from "../models/userModel.js"
 import logger from "../logger.js"
@@ -224,6 +226,53 @@ class UserService {
           }
         }
       )
+    })
+  }
+
+  async anonymizeUser(user) {
+    logger.info("userService - anonymizeUser")
+    const username = user.username
+    const validUuid = uuidValidate(username)
+
+    if (validUuid) {
+      throw new Error("UserAlreadyAnonym")
+    }
+
+    const uniqueId = uuidv4()
+    const anonymUsername = uniqueId
+    const anonymEmail = `deleted_user_${uniqueId}@deleted.com`
+    const anonymName = "Deleted User"
+    const anonymContact = "000000000"
+
+    await User.findByIdAndUpdate(user._id, {
+      email: anonymEmail,
+      username: anonymUsername,
+      name: anonymName,
+      contact: anonymContact,
+    })
+
+    return new Promise((resolve, reject) => {
+      const queryParts = []
+      const params = []
+
+      queryParts.push("email = ?")
+      params.push(anonymEmail)
+
+      queryParts.push("username = ?")
+      params.push(anonymUsername)
+
+      const query = `UPDATE users SET ${queryParts.join(
+        ", "
+      )} WHERE username = ?`
+      params.push(username)
+
+      db.run(query, params, function (err) {
+        if (err) {
+          reject(err)
+        } else {
+          resolve({ message: "User anonymized successfully" })
+        }
+      })
     })
   }
 }

@@ -10,6 +10,7 @@ class CarService {
 
     const isValid = await this.getCarValidation(brand, model, year)
 
+    console.log("oi", isValid)
     if (isValid === false) {
       throw new Error("CarNotValid")
     }

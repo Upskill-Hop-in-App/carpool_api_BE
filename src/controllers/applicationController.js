@@ -5,10 +5,6 @@ import logger from "../logger.js"
 import { MESSAGES } from "../utils/responseMessages.js"
 
 class ApplicationController {
-  //TODO criar validação para não deixar criar application se o status da lift não for XXXX
-  //TODO acertar as mensagens de erro
-  //TODO acrescentar outras validações
-
   async createApplication(req, res) {
     logger.info("POST: /api/applications")
     try {
@@ -27,7 +23,7 @@ class ApplicationController {
         data: outputDTO,
       })
     } catch (err) {
-      logger.error("LiftController - Error creating application", err.message)
+      logger.error("LiftController - Error creating application", err)
       if (err.name === "ValidationError") {
         let errorMessage = `${MESSAGES.VALIDATION_ERROR}: `
         for (let field in err.errors) {
@@ -54,6 +50,10 @@ class ApplicationController {
         res.status(400).json({
           error: MESSAGES.LIFT_STATUS_NOT_OPEN,
         })
+      } else if (err.message === "LiftIsFull") {
+        res.status(400).json({
+          error: MESSAGES.LIFT_IS_FULL,
+        })
       } else if (err.code === 11000) {
         res.status(400).json({
           error: MESSAGES.DUPLICATE_CA,
@@ -78,7 +78,7 @@ class ApplicationController {
     } catch (err) {
       logger.error(
         "ApplicationController - Failed to retrieve applications: ",
-        err.message
+        err
       )
       if (err.message === "NoApplicationFound") {
         res.status(404).json({ error: MESSAGES.NO_APPLICATIONS_FOUND })
@@ -100,7 +100,7 @@ class ApplicationController {
     } catch (err) {
       logger.error(
         "ApplicationController - Failed to retrieve application by code: ",
-        err.message
+        err
       )
       if (err.message === "ApplicationNotFound") {
         res.status(404).json({ error: MESSAGES.APPLICATION_NOT_FOUND })
@@ -127,7 +127,7 @@ class ApplicationController {
     } catch (err) {
       logger.error(
         "ApplicationController - Failed to retrieve applications: ",
-        err.message
+        err
       )
       if (err.message === "UserNotFound") {
         res.status(404).json({ error: MESSAGES.USER_NOT_FOUND })
@@ -216,7 +216,7 @@ class ApplicationController {
     } catch (err) {
       logger.error(
         "ApplicationController - Failed to retrieve applications: ",
-        err.message
+        err
       )
       if (err.message === "UserNotFound") {
         res.status(404).json({ error: MESSAGES.USER_NOT_FOUND })
@@ -264,7 +264,6 @@ class ApplicationController {
     }
   }
 
-  //TODO Acrescentar mais campos possiveis de filtro e fazer filtro a iniciar ja com um filtro por username
   async filterApplications(req, res) {
     try {
       logger.info(`GET:/api/applications/filter/${req.query}`)
@@ -276,12 +275,139 @@ class ApplicationController {
         message: MESSAGES.APPLICATIONS_RETRIEVED_SUCCSESS,
         data: outputDTO,
       })
-    } catch (error) {
+    } catch (err) {
       logger.error(
         "ApplicationController - Failed to filter applications:",
-        error.message
+        err
       )
-      res.status(500).json({ error: MESSAGES.FAILED_TO_RETRIEVE_APPLICATION })
+      if (err.message === "NoApplicationFound") {
+        res.status(404).json({ error: MESSAGES.NO_APPLICATIONS_FOUND })
+      } else if (err.message === "InvalidStatus") {
+        res.status(400).json({ error: MESSAGES.INVALID_STATUS })
+      } else {
+        res.status(500).json({ error: MESSAGES.FAILED_TO_RETRIEVE_APPLICATION })
+      }
+    }
+  }
+
+  async filterApplicationsByUsername(req, res) {
+    try {
+      logger.info(`GET:/api/applications/filter/${req.params.username}`)
+
+      const username = req.params.username
+      const filters = req.query
+
+      const applications =
+        await ApplicationService.filterApplicationsByUsername(username, filters)
+
+      const outputDTO = applications.map((app) => new ApplicationOutputDTO(app))
+      res.status(200).json({
+        message: MESSAGES.APPLICATIONS_RETRIEVED_SUCCSESS,
+        data: outputDTO,
+      })
+    } catch (err) {
+      logger.error(
+        "ApplicationController - Failed to filter applications by username",
+        err
+      )
+      if (err.message === "NoApplicationFound") {
+        res.status(404).json({ error: MESSAGES.NO_APPLICATIONS_FOUND })
+      } else if (err.message === "UserNotFound") {
+        res.status(400).json({ error: MESSAGES.USER_NOT_FOUND })
+      } else if (err.message === "InvalidStatus") {
+        res.status(400).json({ error: MESSAGES.INVALID_STATUS })
+      } else {
+        res.status(500).json({ error: MESSAGES.FAILED_TO_RETRIEVE_APPLICATION })
+      }
+    }
+  }
+
+  async accept(req, res) {
+    try {
+      logger.info(`PUT: /api/applications/accept/${req.params.ca}`)
+      await ApplicationService.acceptApplication(req.params.ca)
+      res.status(200).json({ message: MESSAGES.APPLICATION_ACCEPTED_SUCCESS })
+    } catch (err) {
+      logger.error("applicationController - acceptApplication", err)
+      if (err.message === "ApplicationNotFound") {
+        res.status(400).json({ error: MESSAGES.APPLICATION_NOT_FOUND })
+      } else if (err.message === "StatusNotPending") {
+        res.status(400).json({ error: MESSAGES.STATUS_NOT_PENDING })
+      } else if (err.message === "LiftNotFound") {
+        res.status(400).json({ error: MESSAGES.LIFT_NOT_FOUND })
+      } else if (err.message === "LiftIsFull") {
+        res.status(400).json({ error: MESSAGES.LIFT_IS_FULL })
+      } else if (err.message === "LiftNotOpen") {
+        res
+          .status(400)
+          .json({ error: MESSAGES.LIFT_NOT_ACCEPTING_APPLICATIONS })
+      } else {
+        res.status(500).json({ error: MESSAGES.FAILED_TO_ACCEPT_APPLICATION })
+      }
+    }
+  }
+
+  async reject(req, res) {
+    try {
+      logger.info(`PUT: /api/applications/reject/${req.params.ca}`)
+      await ApplicationService.rejectApplication(req.params.ca)
+      res.status(200).json({ message: MESSAGES.APPLICATION_REJECTED_SUCCESS })
+    } catch (err) {
+      logger.error("applicationController - rejectApplication", err)
+      if (err.message === "ApplicationNotFound") {
+        res.status(400).json({ error: MESSAGES.APPLICATION_NOT_FOUND })
+      } else if (err.message === "StatusNotPending") {
+        res.status(400).json({ error: MESSAGES.STATUS_NOT_PENDING })
+      } else if (err.message === "LiftNotFound") {
+        res.status(400).json({ error: MESSAGES.LIFT_NOT_FOUND })
+      } else if (err.message === "LiftNotOpen") {
+        res
+          .status(400)
+          .json({ error: MESSAGES.LIFT_NOT_ACCEPTING_APPLICATIONS })
+      } else {
+        res.status(500).json({ error: MESSAGES.FAILED_TO_ACCEPT_APPLICATION })
+      }
+    }
+  }
+
+  async cancel(req, res) {
+    try {
+      logger.info(`PUT: /api/applications/cancel/${req.params.ca}`)
+      await ApplicationService.cancelApplication(req.params.ca)
+      res.status(200).json({ message: MESSAGES.APPLICATION_CANCELED_SUCCESS })
+    } catch (err) {
+      logger.error("applicationController - cancelApplication", err)
+      if (err.message === "ApplicationNotFound") {
+        res.status(400).json({ error: MESSAGES.APPLICATION_NOT_FOUND })
+      } else if (err.message === "LiftAlreadyStartedOrCanceled") {
+        res.status(400).json({ error: MESSAGES.LIFT_STARTED_OR_CANCELED })
+      } else if (err.message === "LiftNotFound") {
+        res.status(400).json({ error: MESSAGES.LIFT_NOT_FOUND })
+      } else if (err.message === "ApplicationRejectedCanceled") {
+        res
+          .status(400)
+          .json({ error: MESSAGES.APPLICATION_ALREADY_REJECTED_CANCELED })
+      } else {
+        res.status(500).json({ error: MESSAGES.FAILED_TO_CANCEL_APPLICATION })
+      }
+    }
+  }
+
+  async delete(req, res) {
+    try {
+      logger.info(`DELETE: /api/applications/${req.params.ca}`)
+      await ApplicationService.delete(req.params.ca)
+      res.status(200).json({ message: MESSAGES.APPLICATION_DELETED_SUCCESS })
+    } catch (err) {
+      if (err.message === "ApplicationNotFound") {
+        res.status(400).json({ error: MESSAGES.APPLICATION_NOT_FOUND })
+      } else if (err.message === "LifNotFound") {
+        res.status(400).json({ error: MESSAGES.LIFT_NOT_FOUND })
+      } else if (err.message === "LiftAlreadyStartedOrCanceled") {
+        res.status(400).json({ error: MESSAGES.LIFT_STARTED_OR_CANCELED })
+      } else {
+        res.status(500).json({ error: MESSAGES.FAILED_TO_DELETE_APPLICATION })
+      }
     }
   }
 }
