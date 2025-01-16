@@ -5,9 +5,6 @@ import logger from "../logger.js"
 import { MESSAGES } from "../utils/responseMessages.js"
 
 class ApplicationController {
-  //TODO criar validação para não deixar criar application se o status da lift não for XXXX
-  //TODO acrescentar outras validações
-
   async createApplication(req, res) {
     logger.info("POST: /api/applications")
     try {
