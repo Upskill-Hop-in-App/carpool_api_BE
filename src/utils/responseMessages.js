@@ -53,6 +53,8 @@ export const MESSAGES = {
     "Failed to delete because there are applications associated",
   MATCHING_START_END: "Start and end locations are the same",
   INVALID_LOCATION: "Invalid start/endPoint",
+  INVALID_DATE_FORMAT: "Invalid date format, please use dd/mm/aaaa",
+  DATE_IN_PAST: "The selected date is in the past",
   /* -------------------------------------------------------------------------- */
 
   /* ---------------------- Application Success messages ---------------------- */
@@ -93,5 +95,6 @@ export const MESSAGES = {
   FAILED_TO_RETRIEVE_CAR_BY_CODE: "Failed to retrieve car by code",
   FAILED_TO_UPDATE_CAR: "Failed to update car",
   FAILED_TO_DELETE_CAR: "Failed to delete car",
+  FAILED_TO_COMMUNICATE_WITH_CARS: "Couldn't communicate with cars BE"
   /* -------------------------------------------------------------------------- */
 }

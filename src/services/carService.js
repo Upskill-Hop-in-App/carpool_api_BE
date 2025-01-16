@@ -41,11 +41,12 @@ class CarService {
       const response = await axios.get(
         `${"http://localhost:3001"}/api/cars/verify/${brand}/${model}/${year}`
       )
+
       const isValid = response.data.data
 
       return isValid
     } catch (err) {
-      return { data: { error: MESSAGES.FAILED_TO_RETRIEVE_VALIDATION_INFO } }
+      return false
     }
   }
 

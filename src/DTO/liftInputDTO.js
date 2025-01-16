@@ -36,9 +36,17 @@ class LiftInputDTO {
     this.car = car
     this.startPoint = startPoint
     this.endPoint = endPoint
-    this.schedule = schedule
+    this.schedule = new Date(schedule)
     this.price = price
     this.providedSeats = providedSeats
+
+    if (isNaN(this.schedule.getTime())) {
+      throw new Error("InvalidDateFormat")
+    }
+
+    if (this.schedule < Date.now()) {
+      throw new Error("DateInPast")
+    }
   }
 
   async toLift() {
