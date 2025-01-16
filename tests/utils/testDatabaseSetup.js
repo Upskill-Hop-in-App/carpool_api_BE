@@ -12,7 +12,7 @@ const initializeTestDatabase = async () => {
   const saltRounds = parseInt(process.env.SALT_ROUNDS, 10) || 10
 
   const hashedPasswordAdmin = await bcrypt.hash("admin123", saltRounds)
-  const hashedPasswordClient = await bcrypt.hash("client23", saltRounds)
+  const hashedPasswordClient = await bcrypt.hash("client123", saltRounds)
 
   const users = [
     {

@@ -17,23 +17,34 @@ beforeAll(async () => {
     useUnifiedTopology: true,
   })
 
-  // /* ----------------------------- get admin token ---------------------------- */
-  // const adminUser = { email: "admin@test.com", password: "admin123" }
-  // const loginResponse = await request(app)
-  //   .post("/api/auth/login")
-  //   .send(adminUser)
+  /* ----------------------------- get admin token ---------------------------- */
+  const adminUser = { email: "admin@test.com", password: "admin123" }
 
-  // expect(loginResponse.status).toBe(200)
-  // adminToken = loginResponse.body.userToken
+  try {
+    const loginResponse = await request(app)
+      .post("/api/auth/login")
+      .send(adminUser)
 
-  // /* -------------------------- get client 1 token -------------------------- */
-  // const client1User = { email: "client1@test.com", password: "client123" }
-  // const loginClient1Response = await request(app)
-  //   .post("/api/auth/login")
-  //   .send(client1User)
+    adminToken = loginResponse.body.userToken
+    expect(loginResponse.status).toBe(200)
+    logger.debug("Admin Test created successfully")
+  } catch (error) {
+    logger.error("Error logging in Admin Test: ", error.message)
+  }
 
-  // expect(loginClient1Response.status).toBe(200)
-  // clientToken = loginClient1Response.body.userToken
+  /* ---------------------------- get client token ---------------------------- */
+  const clientUser = { email: "client@test.com", password: "client123" }
+  try {
+    const loginClientResponse = await request(app)
+      .post("/api/auth/login")
+      .send(clientUser)
+
+    clientToken = loginClientResponse.body.userToken
+    expect(loginClientResponse.status).toBe(200)
+    logger.debug("Client Test created successfully")
+  } catch (error) {
+    logger.error("Error logging in Client Test: ", error.message)
+  }
 
   /* ------------------------------ Start server ------------------------------ */
   if (!server.listening) {
