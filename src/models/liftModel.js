@@ -2,16 +2,10 @@ import { Schema, model } from "mongoose"
 
 const LiftSchema = new Schema(
   {
-    //TODO acrescentar field STATUS!
     cl: {
       type: String,
       unique: true,
       required: true,
-      match: [
-        /^[A-Za-z]{2}[1-9]{3}$/,
-        "Lift code must be exactly 2 letters followed by 3 numbers",
-      ],
-      lowercase: true,
     },
     driver: {
       type: Schema.Types.ObjectId,
@@ -24,16 +18,56 @@ const LiftSchema = new Schema(
       required: true,
     },
     startPoint: {
-      type: String,
+      type: new Schema(
+        {
+          district: {
+            type: String,
+            required: true,
+            lowercase: true,
+            set: (value) => value.replace(/\s+/g, " ").trim(),
+          },
+          municipality: {
+            type: String,
+            required: true,
+            lowercase: true,
+            set: (value) => value.replace(/\s+/g, " ").trim(),
+          },
+          parish: {
+            type: String,
+            required: true,
+            lowercase: true,
+            set: (value) => value.replace(/\s+/g, " ").trim(),
+          },
+        },
+        { _id: false }
+      ),
       required: true,
-      lowercase: true,
-      set: (value) => value.replace(/\s+/g, " ").trim(),
     },
     endPoint: {
-      type: String,
+      type: new Schema(
+        {
+          district: {
+            type: String,
+            required: true,
+            lowercase: true,
+            set: (value) => value.replace(/\s+/g, " ").trim(),
+          },
+          municipality: {
+            type: String,
+            required: true,
+            lowercase: true,
+            set: (value) => value.replace(/\s+/g, " ").trim(),
+          },
+          parish: {
+            type: String,
+            required: true,
+            lowercase: true,
+            set: (value) => value.replace(/\s+/g, " ").trim(),
+          },
+        },
+        { _id: false }
+      ),
       required: true,
-      lowercase: true,
-      set: (value) => value.replace(/\s+/g, " ").trim(),
     },
     schedule: {
       type: String,
@@ -64,10 +98,10 @@ const LiftSchema = new Schema(
           "Occupied seats ({VALUE}) can't be greater than provided seats",
       },
     },
-    liftStatus: {
+    status: {
       type: String,
       default: "open",
-      enum: ["open", "inProgress", "finished", "closed"],
+      enum: ["open", "ready", "inProgress", "finished", "closed", "canceled"],
     },
     receivedDriverRatings: {
       type: Number,

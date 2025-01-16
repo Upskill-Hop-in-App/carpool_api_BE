@@ -8,7 +8,6 @@ class LiftController {
     logger.info("POST: /api/lifts")
     try {
       const {
-        cl,
         driver,
         car,
         startPoint,
@@ -18,7 +17,6 @@ class LiftController {
         providedSeats,
       } = req.body
       const inputDTO = new LiftInputDTO({
-        cl,
         driver,
         car,
         startPoint,
@@ -32,7 +30,7 @@ class LiftController {
       const outputDTO = new LiftOutputDTO(savedLift)
       res.status(201).json({ message: MESSAGES.LIFT_CREATED, data: outputDTO })
     } catch (err) {
-      logger.error("LiftController - Error creating lift: ", err.message)
+      logger.error("LiftController - Error creating lift: ", err)
       if (err.name === "ValidationError") {
         let errorMessage = `${MESSAGES.VALIDATION_ERROR}: `
         for (let field in err.errors) {
@@ -54,6 +52,26 @@ class LiftController {
       } else if (err.code === 11000) {
         res.status(400).json({
           error: MESSAGES.DUPLICATE_LIFT,
+        })
+      } else if(err.message === "FailedCarValidation") {
+        res.status(400).json({
+          error: MESSAGES.FAILED_TO_COMMUNICATE_WITH_CARS,
+        })
+      } else if(err.message ==="MatchingLocations") {
+        res.status(400).json({
+          error: MESSAGES.MATCHING_START_END,
+        })
+      } else if(err.message ==="InvalidLocation") {
+        res.status(400).json({
+          error: MESSAGES.INVALID_LOCATION,
+        })
+      } else if(err.message ==="InvalidDateFormat") {
+        res.status(400).json({
+          error: MESSAGES.INVALID_DATE_FORMAT,
+        })
+      } else if(err.message ==="DateInPast") {
+        res.status(400).json({
+          error: MESSAGES.DATE_IN_PAST,
         })
       } else {
         res.status(500).json({ error: MESSAGES.FAILED_TO_CREATE_LIFT })
@@ -128,11 +146,12 @@ class LiftController {
         providedSeats,
         occupiedSeats,
       })
-      const lift = await LiftService.update(req.params.cl, inputDTO)
+      const liftModel = await inputDTO.toLift()
+      const lift = await LiftService.update(req.params.cl, liftModel)
       const outputDTO = new LiftOutputDTO(lift)
       res.status(201).json({ message: MESSAGES.LIFT_UPDATED, data: outputDTO })
     } catch (err) {
-      logger.error("LiftController - Error updating lift: ", err.message)
+      logger.error("LiftController - Error updating lift: ", err)
       if (err.name === "ValidationError") {
         let errorMessage = `${MESSAGES.VALIDATION_ERROR}: `
         for (let field in err.errors) {
@@ -154,6 +173,22 @@ class LiftController {
       } else if (err.code === 11000) {
         res.status(400).json({
           error: MESSAGES.DUPLICATE_LIFT,
+        })
+      } else if(err.message ==="MatchingLocations") {
+        res.status(400).json({
+          error: MESSAGES.MATCHING_START_END,
+        })
+      } else if(err.message ==="InvalidLocation") {
+        res.status(400).json({
+          error: MESSAGES.INVALID_LOCATION,
+        })
+      } else if(err.message ==="InvalidDateFormat") {
+        res.status(400).json({
+          error: MESSAGES.INVALID_DATE_FORMAT,
+        })
+      } else if(err.message ==="DateInPast") {
+        res.status(400).json({
+          error: MESSAGES.DATE_IN_PAST,
         })
       } else {
         res.status(500).json({ error: MESSAGES.FAILED_TO_UPDATE_LIFT })

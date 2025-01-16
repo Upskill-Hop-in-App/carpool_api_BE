@@ -1,11 +1,11 @@
 import Lift from "../models/liftModel.js"
 import User from "../models/userModel.js"
 import logger from "../logger.js"
+import { v4 as uuidv4 } from "uuid"
 import Car from "../models/carModel.js"
 
 class LiftInputDTO {
   constructor({
-    cl,
     driver,
     car,
     startPoint,
@@ -15,11 +15,14 @@ class LiftInputDTO {
     providedSeats,
   }) {
     if (
-      !cl ||
       !driver ||
       !car ||
-      !startPoint ||
-      !endPoint ||
+      !startPoint.district ||
+      !startPoint.municipality ||
+      !startPoint.parish ||
+      !endPoint.district ||
+      !endPoint.municipality ||
+      !endPoint.parish ||
       !schedule ||
       price === undefined ||
       !providedSeats
@@ -27,14 +30,21 @@ class LiftInputDTO {
       throw new Error("MissingRequiredFields")
     }
 
-    this.cl = cl
     this.driver = driver
     this.car = car
     this.startPoint = startPoint
     this.endPoint = endPoint
-    this.schedule = schedule
+    this.schedule = new Date(schedule)
     this.price = price
     this.providedSeats = providedSeats
+
+    if (isNaN(this.schedule.getTime())) {
+      throw new Error("InvalidDateFormat")
+    }
+
+    if (this.schedule < Date.now()) {
+      throw new Error("DateInPast")
+    }
   }
 
   async toLift() {
@@ -57,7 +67,7 @@ class LiftInputDTO {
     }
 
     return new Lift({
-      cl: this.cl,
+      cl: uuidv4(),
       driver: liftDriver._id,
       car: liftCar._id,
       startPoint: this.startPoint,
