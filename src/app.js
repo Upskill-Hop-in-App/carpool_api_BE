@@ -10,7 +10,8 @@ import { carRoutes } from "./routes/carRoutes.js"
 import { applicationRoutes } from "./routes/applicationRoutes.js"
 
 const requiredEnvVars = [
-  "SECRET_KEY",
+  "PRIVATE_JWT_KEY_FILE",
+  "PUBLIC_JWT_KEY_FILE",
   "NODE_ENV",
   "DB_CONNECTION_STRING",
   "DB_TEST_CONNECTION_STRING",

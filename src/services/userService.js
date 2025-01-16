@@ -1,6 +1,8 @@
-import sqlite3 from "sqlite3"
-import bcrypt from "bcrypt"
 import {} from "dotenv/config"
+import bcrypt from "bcrypt"
+import sqlite3 from "sqlite3"
+import fs from "fs"
+import jwt from "jsonwebtoken"
 
 import User from "../models/userModel.js"
 import logger from "../logger.js"
@@ -12,6 +14,7 @@ const dbConfig = {
 
 const db = new sqlite3.Database(dbConfig[process.env.NODE_ENV])
 const saltRounds = parseInt(process.env.SALT_ROUNDS)
+const privateJwtKey = fs.readFileSync(process.env.PRIVATE_JWT_KEY_FILE, "utf8")
 
 class UserService {
   async checkEmailExists(email) {
@@ -46,9 +49,38 @@ class UserService {
     })
   }
 
-  async findUserMongo(username) {
-    logger.info(`userService - findUserMongo`)
-    return await User.findOne({ username: username })
+  async findUserByUsernameMongo(username) {
+    logger.info(`userService - findUserByUsernameMongo`)
+    try {
+      const user = await User.findOne({ username })
+      return user
+    } catch (err) {
+      logger.error(`userService - findUserByUsernameMongo: ${err.message}`)
+    }
+  }
+
+  async findUserByEmailMongo(email) {
+    logger.info(`userService - findUserByEmailMongo`)
+    try {
+      const user = await User.findOne({ email })
+      return user
+    } catch (err) {
+      logger.error(`userService - findUserByEmailMongo: ${err.message}`)
+    }
+  }
+
+  async findUserByEmailSQL(email) {
+    logger.info("userService - findUserByEmailSQL")
+    return new Promise((resolve, reject) => {
+      db.get("SELECT * FROM users WHERE email = ?", [email], (err, row) => {
+        if (err) {
+          logger.error("userService - findUserByEmailSQL: ", err.message)
+          reject(err)
+        } else {
+          resolve(row)
+        }
+      })
+    })
   }
 
   async saveUserMongo(data) {
@@ -101,6 +133,50 @@ class UserService {
   async hashPassword(password) {
     logger.info("userService - hashPassword")
     return await bcrypt.hash(password, saltRounds)
+  }
+
+  async generateToken(authData) {
+    logger.info("userService - generateToken")
+    const token = jwt.sign(authData, privateJwtKey, {
+      algorithm: "RS256",
+      expiresIn: "30d",
+    })
+    return token
+  }
+
+  async validateLogin(email, password) {
+    logger.info("userService - validateLogin")
+    const userMongo = await this.findUserByEmailMongo(email)
+    const userSQL = await this.findUserByEmailSQL(email)
+    logger.debug("userService - found userSQL: ", !!userSQL)
+    if (!userSQL) {
+      throw new Error("UserNotFound")
+    } else {
+      const hashedPassword = await userSQL.password
+      const passwordMatch = await bcrypt.compare(password, hashedPassword)
+      const authData = {
+        email: userSQL.email,
+        Role: userSQL.role,
+        status: userSQL.status,
+      }
+
+      if (!passwordMatch) {
+        logger.debug("userService - passwordMatch: false")
+        throw new Error("IncorrectUserOrPassword")
+      }
+
+      if (!privateJwtKey) {
+        logger.debug("JWT PRIVATE KEY rejected")
+        reject(new Error("JWT PRIVATE KEY rejected."))
+        return
+      }
+
+      const token = await this.generateToken(authData)
+
+      logger.debug("Token generated successfully")
+
+      return token
+    }
   }
 
   async updateUserMongo(paramsUsername, updates) {

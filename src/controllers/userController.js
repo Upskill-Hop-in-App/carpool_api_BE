@@ -76,6 +76,33 @@ class UserController {
     }
   }
 
+  login = async (req, res) => {
+    logger.info(`POST: /api/auth/login`)
+    const { email, password } = req.body
+
+    if (!email || !password) {
+      logger.error("Login - missing required fields")
+      throw new Error("MissingRequiredFields")
+    }
+
+    try {
+      const token = await UserService.validateLogin(email, password)
+      res
+        .status(200)
+        .json({ message: MESSAGES.LOGIN_SUCCESS, userToken: token })
+    } catch (err) {
+      logger.error("Error logging in: ", err)
+
+      if (err.message === "UserNotFound") {
+        res.status(404).json({ error: MESSAGES.USER_EMAIL_NOT_FOUND })
+      }
+
+      if (err.message === "IncorrectUserOrPassword") {
+        res.status(400).json({ error: MESSAGES.INCORRECT_USER_OR_PASSWORD })
+      }
+    }
+  }
+
   update = async (req, res) => {
     logger.info(`PUT: /api/auth/profile/${req.params.username}`)
     try {
@@ -86,7 +113,7 @@ class UserController {
       if (usernameExists) {
         password = usernameExists.password
       } else {
-        res.status(404).json({ error: MESSAGES.USER_NOT_FOUND })
+        res.status(404).json({ error: MESSAGES.USER_EMAIL_NOT_FOUND })
         return
       }
       const updates = {
@@ -148,7 +175,7 @@ class UserController {
         req.params.username
       )
       if (!usernameExists) {
-        res.status(404).json({ error: MESSAGES.USER_NOT_FOUND })
+        res.status(404).json({ error: MESSAGES.USER_EMAIL_NOT_FOUND })
         return
       }
 
@@ -193,9 +220,11 @@ class UserController {
   updateRating = async (req, res, ratingModel) => {
     logger.info(`userController - updateRating - ${ratingModel}`)
     try {
-      const user = await UserService.findUserMongo(req.params.username)
+      const user = await UserService.findUserByUsernameMongo(
+        req.params.username
+      )
       if (!user) {
-        res.status(404).json({ error: MESSAGES.USER_NOT_FOUND })
+        res.status(404).json({ error: MESSAGES.USER_EMAIL_NOT_FOUND })
         return
       }
 
@@ -225,15 +254,15 @@ class UserController {
     try {
       const username = req.params.username
 
-      const userMongo = await UserService.findUserMongo(username)
+      const userMongo = await UserService.findUserByUsernameMongo(username)
       if (!userMongo) {
-        res.status(404).json({ error: MESSAGES.USER_NOT_FOUND })
+        res.status(404).json({ error: MESSAGES.USER_EMAIL_NOT_FOUND })
         return
       }
 
       const userSQL = await UserService.checkUsernameExists(username)
       if (!userSQL) {
-        res.status(404).json({ error: MESSAGES.USER_NOT_FOUND })
+        res.status(404).json({ error: MESSAGES.USER_EMAIL_NOT_FOUND })
         return
       }
 
