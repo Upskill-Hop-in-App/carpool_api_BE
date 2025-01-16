@@ -8,7 +8,6 @@ class LiftController {
     logger.info("POST: /api/lifts")
     try {
       const {
-        cl,
         driver,
         car,
         startPoint,
@@ -18,7 +17,6 @@ class LiftController {
         providedSeats,
       } = req.body
       const inputDTO = new LiftInputDTO({
-        cl,
         driver,
         car,
         startPoint,
