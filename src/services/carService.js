@@ -10,7 +10,6 @@ class CarService {
 
     const isValid = await this.getCarValidation(brand, model, year)
 
-    console.log("oi", isValid)
     if (isValid === false) {
       throw new Error("CarNotValid")
     }
@@ -42,6 +41,7 @@ class CarService {
       const response = await axios.get(
         `${"http://localhost:3001"}/api/cars/verify/${brand}/${model}/${year}`
       )
+
       const isValid = response.data.data
 
       return isValid

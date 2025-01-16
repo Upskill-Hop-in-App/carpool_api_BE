@@ -8,7 +8,6 @@ class LiftController {
     logger.info("POST: /api/lifts")
     try {
       const {
-        cl,
         driver,
         car,
         startPoint,
@@ -18,7 +17,6 @@ class LiftController {
         providedSeats,
       } = req.body
       const inputDTO = new LiftInputDTO({
-        cl,
         driver,
         car,
         startPoint,
@@ -55,6 +53,10 @@ class LiftController {
         res.status(400).json({
           error: MESSAGES.DUPLICATE_LIFT,
         })
+      } else if(err.message === "FailedCarValidation") {
+        res.status(400).json({
+          error: MESSAGES.FAILED_TO_COMMUNICATE_WITH_CARS,
+        })
       } else if(err.message ==="MatchingLocations") {
         res.status(400).json({
           error: MESSAGES.MATCHING_START_END,
@@ -62,6 +64,14 @@ class LiftController {
       } else if(err.message ==="InvalidLocation") {
         res.status(400).json({
           error: MESSAGES.INVALID_LOCATION,
+        })
+      } else if(err.message ==="InvalidDateFormat") {
+        res.status(400).json({
+          error: MESSAGES.INVALID_DATE_FORMAT,
+        })
+      } else if(err.message ==="DateInPast") {
+        res.status(400).json({
+          error: MESSAGES.DATE_IN_PAST,
         })
       } else {
         res.status(500).json({ error: MESSAGES.FAILED_TO_CREATE_LIFT })
@@ -171,6 +181,14 @@ class LiftController {
       } else if(err.message ==="InvalidLocation") {
         res.status(400).json({
           error: MESSAGES.INVALID_LOCATION,
+        })
+      } else if(err.message ==="InvalidDateFormat") {
+        res.status(400).json({
+          error: MESSAGES.INVALID_DATE_FORMAT,
+        })
+      } else if(err.message ==="DateInPast") {
+        res.status(400).json({
+          error: MESSAGES.DATE_IN_PAST,
         })
       } else {
         res.status(500).json({ error: MESSAGES.FAILED_TO_UPDATE_LIFT })

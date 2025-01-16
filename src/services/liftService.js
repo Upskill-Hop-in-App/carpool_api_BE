@@ -76,7 +76,7 @@ class LiftService {
 
       return !!foundParish
     } catch (err) {
-      logger.debug("LiftService - getGeoValidation - err", err)
+      logger.debug("LiftService - getGeoValidation - err")
       return false
     }
   }
