@@ -20,7 +20,7 @@ const privateJwtKey = fs.readFileSync(process.env.PRIVATE_JWT_KEY_FILE, "utf8")
 
 class UserService {
   async checkEmailExists(email) {
-    logger.info("userService - checkEmailExists")
+    logger.debug("userService - checkEmailExists")
     return new Promise((resolve, reject) => {
       db.get("SELECT * FROM users WHERE email = ?", [email], (err, row) => {
         if (err) {
@@ -34,7 +34,7 @@ class UserService {
   }
 
   async checkUsernameExists(username) {
-    logger.info("userService - checkUsernameExists")
+    logger.debug("userService - checkUsernameExists")
     return new Promise((resolve, reject) => {
       db.get(
         "SELECT * FROM users WHERE username = ?",
@@ -52,9 +52,13 @@ class UserService {
   }
 
   async findUserByUsernameMongo(username) {
-    logger.info(`userService - findUserByUsernameMongo`)
+    logger.debug(`userService - findUserByUsernameMongo`)
     try {
       const user = await User.findOne({ username })
+      if (!user) {
+        logger.debug("userService - findUserByUsernameMongo: User not found")
+        throw new Error("UserNotFound")
+      }
       return user
     } catch (err) {
       logger.error(`userService - findUserByUsernameMongo: ${err.message}`)
@@ -62,7 +66,7 @@ class UserService {
   }
 
   async findUserByEmailMongo(email) {
-    logger.info(`userService - findUserByEmailMongo`)
+    logger.debug(`userService - findUserByEmailMongo`)
     try {
       const user = await User.findOne({ email })
       return user
@@ -72,7 +76,7 @@ class UserService {
   }
 
   async findUserByEmailSQL(email) {
-    logger.info("userService - findUserByEmailSQL")
+    logger.debug("userService - findUserByEmailSQL")
     return new Promise((resolve, reject) => {
       db.get("SELECT * FROM users WHERE email = ?", [email], (err, row) => {
         if (err) {
@@ -86,7 +90,7 @@ class UserService {
   }
 
   async saveUserMongo(data) {
-    logger.info("userService - saveUserMongo")
+    logger.debug("userService - saveUserMongo")
     const {
       email,
       name,
@@ -114,7 +118,7 @@ class UserService {
   }
 
   async saveUserSQL(email, username, password, role) {
-    logger.info("userService - saveUserSQL")
+    logger.debug("userService - saveUserSQL")
     const hashedPassword = await this.hashPassword(password)
     return new Promise((resolve, reject) => {
       db.run(
@@ -133,17 +137,22 @@ class UserService {
   }
 
   async hashPassword(password) {
-    logger.info("userService - hashPassword")
+    logger.debug("userService - hashPassword")
     return await bcrypt.hash(password, saltRounds)
   }
 
   async generateToken(authData) {
-    logger.info("userService - generateToken")
+    logger.debug("userService - generateToken")
     const token = jwt.sign(authData, privateJwtKey, {
       algorithm: "RS256",
       expiresIn: "30d",
     })
     return token
+  }
+
+  async getDecodedToken(token) {
+    logger.debug("userService - getDecodedToken")
+    return jwt.verify(token, privateJwtKey)
   }
 
   async validateLogin(email, password) {
@@ -158,7 +167,7 @@ class UserService {
       const passwordMatch = await bcrypt.compare(password, hashedPassword)
       const authData = {
         email: userSQL.email,
-        Role: userSQL.role,
+        role: userSQL.role,
         status: userSQL.status,
       }
 
@@ -182,7 +191,7 @@ class UserService {
   }
 
   async updateUserMongo(paramsUsername, updates) {
-    logger.info(`userService - updateUserMongo`)
+    logger.debug(`userService - updateUserMongo`)
     const { email, username, name, contact } = updates
 
     const user = await User.findOne({ username: paramsUsername })
@@ -199,7 +208,7 @@ class UserService {
   }
 
   async updateUserSQL(paramsUsername, password, updates) {
-    logger.info(`userService - updateUserSQL`)
+    logger.debug(`userService - updateUserSQL`)
     const { email, username } = updates
 
     let hashedPassword
@@ -239,7 +248,7 @@ class UserService {
   }
 
   async updatePassword(paramsUsername, password) {
-    logger.info(`userService - updatePassword`)
+    logger.debug(`userService - updatePassword`)
     try {
       const hashedPassword = await this.hashPassword(password)
 
@@ -263,7 +272,7 @@ class UserService {
   }
 
   async updateRating(user, ratingModel, ratingValue) {
-    logger.info("userService - updateRating")
+    logger.debug("userService - updateRating")
     if (typeof ratingValue !== "number" || ratingValue < 1 || ratingValue > 5) {
       throw new Error("RatingMustBe1To5")
     }
@@ -273,12 +282,17 @@ class UserService {
     } else {
       user.passengerRating = ratingValue
     }
-    await user.save()
-    return await User.findOne({ username: user.username })
+    try {
+      await user.save()
+      await User.findOne({ username: user.username })
+    } catch (err) {
+      logger.error(`userService - updateRating: ${err.message}`)
+    }
+    return
   }
 
   async deleteUserMongo(username) {
-    logger.info("userService - deleteUserMongo")
+    logger.debug("userService - deleteUserMongo")
     try {
       await User.findOneAndDelete({ username })
     } catch (err) {
@@ -288,7 +302,7 @@ class UserService {
   }
 
   async deleteUserSQL(username) {
-    logger.info("userService - deleteUserSQL")
+    logger.debug("userService - deleteUserSQL")
     return new Promise((resolve, reject) => {
       db.run(
         "DELETE FROM users WHERE username = ?",

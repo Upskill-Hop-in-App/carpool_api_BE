@@ -164,6 +164,7 @@ class UserController {
   updatePassword = async (req, res) => {
     logger.info(`PUT: /api/auth/password/${req.params.username}`)
     try {
+      const username = req.params.username
       const { password } = req.body
 
       if (!password || password.trim() === "") {
@@ -171,15 +172,13 @@ class UserController {
         return
       }
 
-      const usernameExists = await UserService.checkUsernameExists(
-        req.params.username
-      )
+      const usernameExists = await UserService.checkUsernameExists(username)
       if (!usernameExists) {
         res.status(404).json({ error: MESSAGES.USER_EMAIL_NOT_FOUND })
         return
       }
 
-      await UserService.updatePassword(req.params.username, password)
+      await UserService.updatePassword(username, password)
       res.status(200).json({ message: MESSAGES.PASSWORD_UPDATED_SUCCESS })
     } catch (err) {
       logger.error(`Error updating password`, err)
@@ -196,10 +195,7 @@ class UserController {
       const model = "driverRating"
       await this.updateRating(req, res, model)
     } catch (err) {
-      logger.error(
-        "UserController - Error updating driverRating - ",
-        err
-      )
+      logger.error("UserController - Error updating driverRating - ", err)
     }
   }
 
@@ -209,10 +205,7 @@ class UserController {
       const model = "passengerRating"
       await this.updateRating(req, res, model)
     } catch (err) {
-      logger.error(
-        "UserController - Error updating passengerRating - ",
-        err
-      )
+      logger.error("UserController - Error updating passengerRating - ", err)
     }
   }
 
@@ -235,7 +228,7 @@ class UserController {
       }
 
       await UserService.updateRating(user, ratingModel, ratingValue)
-      res.status(200).json({ message: `${ratingModel} updated successfully!` })
+      res.status(200).json({ message: MESSAGES.RATING_UPDATED_SUCCESS })
     } catch (err) {
       logger.error(`userController - updateRating`, err)
       if (err.message === "RatingMustBe1To5")
@@ -285,7 +278,7 @@ class UserController {
     try {
       const username = req.params.username
 
-      const userMongo = await UserService.findUserMongo(username)
+      const userMongo = await UserService.findUserByUsernameMongo(username)
       if (!userMongo) {
         res.status(404).json({ error: MESSAGES.USER_NOT_FOUND })
         return

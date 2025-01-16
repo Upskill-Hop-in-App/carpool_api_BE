@@ -72,7 +72,6 @@ const server = app.listen(port, () => {
 })
 
 app.use("/api/auth", userRoutes)
-
 app.use("/api/lifts", liftRoutes)
 app.use("/api/cars", carRoutes)
 app.use("/api/applications", applicationRoutes)
