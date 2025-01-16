@@ -57,6 +57,8 @@ export const MESSAGES = {
     "Failed to delete because there are applications associated",
   MATCHING_START_END: "Start and end locations are the same",
   INVALID_LOCATION: "Invalid start/endPoint",
+  INVALID_DATE_FORMAT: "Invalid date format, please use dd/mm/aaaa",
+  DATE_IN_PAST: "The selected date is in the past",
   /* -------------------------------------------------------------------------- */
 
   /* ---------------------- Application Success messages ---------------------- */
