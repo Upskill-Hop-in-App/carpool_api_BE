@@ -1,5 +1,6 @@
 export const MESSAGES = {
   /* -------------------------- User Success messages ------------------------- */
+  LOGIN_SUCCESS: "Logged in successfully",
   USER_UPDATED_SUCCESS: "User updated successfully",
   PASSWORD_UPDATED_SUCCESS: "Password updated successfully",
   REGISTER_SUCCESS: "Registered successfully!",
@@ -7,8 +8,9 @@ export const MESSAGES = {
   /* -------------------------------------------------------------------------- */
 
   /* --------------------------- User Error messages -------------------------- */
-  USER_NOT_FOUND: "User not found",
+  USER_EMAIL_NOT_FOUND: "User not found",
   USERNAME_NOT_REGISTERED: "Username is not registered",
+  INCORRECT_USER_OR_PASSWORD: "Incorrect username or password",
   INVALID_EMAIL_FORMAT: "Invalid email format",
   DUPLICATE_EMAIL_OR_USERNAME: "That email or username is already in use",
   INVALID_CONTACT_FORMAT: "Invalid contact format",
