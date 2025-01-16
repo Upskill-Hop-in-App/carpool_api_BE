@@ -334,12 +334,16 @@ class UserService {
     const anonymName = "Deleted User"
     const anonymContact = "000000000"
 
-    await User.findByIdAndUpdate(user._id, {
-      email: anonymEmail,
-      username: anonymUsername,
-      name: anonymName,
-      contact: anonymContact,
-    })
+    const anonymUser = await User.findByIdAndUpdate(
+      user._id,
+      {
+        email: anonymEmail,
+        username: anonymUsername,
+        name: anonymName,
+        contact: anonymContact,
+      },
+      { new: true }
+    )
 
     return new Promise((resolve, reject) => {
       const queryParts = []
@@ -360,7 +364,7 @@ class UserService {
         if (err) {
           reject(err)
         } else {
-          resolve({ message: "User anonymized successfully" })
+          resolve({ message: "User anonymized successfully", data: anonymUser })
         }
       })
     })

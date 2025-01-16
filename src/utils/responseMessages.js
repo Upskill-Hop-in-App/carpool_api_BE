@@ -23,7 +23,9 @@ export const MESSAGES = {
   RATING_MUST_1_TO_5: "Rating must be a number between 1 and 5.",
   ERROR_DELETING_USER: "Error deleting user",
   ERROR_ANONYMIZING_USER: "Error anonymizing user",
-  USER_ALREADY_ANONYM: "User has already been anonymized before",
+  USER_ALREADY_ANONYM: "User info has already been deleted",
+  PASSWORD_EMPTY: "Password field cannot be empty",
+  USER_NOT_FOUND: "User not found",
   /* -------------------------------------------------------------------------- */
 
   /* -------------------------- Common Error messages ------------------------- */

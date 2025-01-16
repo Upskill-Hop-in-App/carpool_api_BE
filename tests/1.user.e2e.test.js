@@ -4,6 +4,7 @@ import { MESSAGES } from "../src/utils/responseMessages.js"
 import { app } from "../src/app.js"
 import UserService from "../src/services/userService.js"
 import { adminToken, clientToken } from "./setup/testSetup.js"
+import { response } from "express"
 
 describe("User Endpoints", () => {
   test("should create a new admin", async () => {
@@ -110,6 +111,19 @@ describe("User Endpoints", () => {
       .send(updatedPassword)
     expect(response.status).toBe(200)
     expect(response.body.message).toBe(MESSAGES.PASSWORD_UPDATED_SUCCESS)
+  })
+
+  test("should fail to update user password to empty password", async () => {
+    const updatedPassword = {
+      password: "",
+    }
+
+    const response = await request(app)
+      .put("/api/auth/password/client_name")
+      // .set("Authorization", `Bearer ${adminToken}`)
+      .send(updatedPassword)
+    expect(response.status).toBe(400)
+    expect(response.body.error).toBe(MESSAGES.PASSWORD_EMPTY)
   })
 
   test("should update driver rating", async () => {
