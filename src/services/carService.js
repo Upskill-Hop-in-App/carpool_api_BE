@@ -2,6 +2,7 @@ import axios from "axios"
 import logger from "../logger.js"
 
 import Car from "../models/carModel.js"
+import User from "../models/userModel.js"
 
 class CarService {
   async create(car) {
@@ -48,6 +49,57 @@ class CarService {
     } catch (err) {
       return false
     }
+  }
+
+  async filterCars(filters) {
+    logger.info("CarService - filterCars")
+
+    const query = {}
+    const allowedFilters = [
+      "cc",
+      "brand",
+      "model",
+      "year",
+      "user",
+      "color",
+      "plate",
+    ]
+
+    const invalidFilters = Object.keys(filters).filter(
+      (key) => !allowedFilters.includes(key)
+    )
+
+    if (invalidFilters.length > 0) {
+      throw new Error("InvalidQuery")
+    }
+
+    allowedFilters.forEach((key) => {
+      if (filters[key]) {
+        query[key] = filters[key]
+      }
+    })
+
+    if (filters.user) {
+      const user = await User.findOne({
+        username: filters.user.toLowerCase().trim(),
+      })
+      if (!user) throw new Error("UserNotFound")
+      query.user = user._id
+    }
+
+    const sort = filters.sort || { createdAt: -1 }
+
+    const cars = await Car.find(query)
+      .populate([
+        {
+          path: "user",
+        },
+      ])
+      .sort(sort)
+
+    if (cars.length === 0) throw new Error("NoCarFound")
+
+    return cars
   }
 
   async update(code, data) {

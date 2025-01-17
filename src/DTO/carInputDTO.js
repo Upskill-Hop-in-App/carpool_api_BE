@@ -1,20 +1,34 @@
-import Car from "../models/carModel.js"
-import User from "../models/userModel.js"
-import logger from "../logger.js"
+import Car from "../models/carModel.js";
+import User from "../models/userModel.js";
 import { v4 as uuidv4 } from "uuid"
+import logger from "../logger.js"
 
 class CarInputDTO {
-  constructor({ brand, model, year, user, color, plate }) {
-    if (!brand || !model || !year || !user || !color || !plate) {
-      throw new Error("MissingRequiredFields")
+  constructor({
+    brand,
+    model,
+    year,
+    user,
+    color,
+    plate,
+  }) {
+    if (
+      !brand ||
+      !model ||
+      !year ||
+      !user ||
+      !color ||
+      !plate
+    ) {
+      throw new Error("MissingRequiredFields");
     }
 
-    this.brand = brand
-    this.model = model
-    this.year = year
-    this.user = user
-    this.color = color
-    this.plate = plate
+    this.brand = brand;
+    this.model = model;
+    this.year = year;
+    this.user = user;
+    this.color = color;
+    this.plate = plate;
   }
 
   async toCar() {

@@ -129,6 +129,138 @@ class LiftService {
     return lift
   }
 
+  async filterLifts(filters) {
+    logger.info("LiftService - filterLifts")
+
+    const query = {}
+    const allowedFilters = [
+      "cl",
+      "status",
+      "startPointDistrict",
+      "startPointMunicipality",
+      "startPointParish",
+      "endPointDistrict",
+      "endPointMunicipality",
+      "endPointParish",
+      "schedule",
+      "driver",
+      "providedSeats",
+      "occupiedSeats",
+      "passenger",
+      "car",
+      "scheduleYear",
+      "scheduleMonth",
+      "scheduleDay",
+      "scheduleHour",
+    ]
+
+    const invalidFilters = Object.keys(filters).filter(
+      (key) => !allowedFilters.includes(key)
+    )
+
+    if (invalidFilters.length > 0) {
+      throw new Error("InvalidQuery")
+    }
+
+    if (filters.cl) query.cl = filters.cl
+    if (filters.status) {
+      const validStatuses = [
+        "open",
+        "ready",
+        "inProgress",
+        "finished",
+        "closed",
+        "canceled",
+      ]
+      if (!validStatuses.includes(filters.status))
+        throw new Error("InvalidStatus")
+      query.status = filters.status
+    }
+    if (filters.startPointDistrict)
+      query["startPoint.district"] = filters.startPointDistrict
+    if (filters.startPointMunicipality)
+      query["startPoint.municipality"] = filters.startPointMunicipality
+    if (filters.startPointParish)
+      query["startPoint.parish"] = filters.startPointParish
+    if (filters.endPointDistrict)
+      query["endPoint.district"] = filters.endPointDistrict
+    if (filters.endPointMunicipality)
+      query["endPoint.municipality"] = filters.endPointMunicipality
+    if (filters.endPointParish)
+      query["endPoint.parish"] = filters.endPointParish
+    if (filters.schedule) query.schedule = filters.schedule
+    if (filters.providedSeats)
+      query.providedSeats = Number(filters.providedSeats)
+
+    const sort = filters.sort || { createdAt: -1 }
+
+    const lifts = await Lift.find(query)
+      .populate([
+        {
+          path: "driver",
+        },
+        {
+          path: "applications",
+          populate: {
+            path: "passenger",
+            model: "User",
+          },
+        },
+        {
+          path: "car",
+        },
+      ])
+      .sort(sort)
+
+    const filteredLifts = lifts.filter((lift) => {
+      const scheduleDate = new Date(lift.schedule)
+      if (filters.passenger) {
+        return lift.applications.some((application) => {
+          return (
+            application.passenger &&
+            application.passenger.username ===
+              filters.passenger.toLowerCase().trim()
+          )
+        })
+      }
+      if (filters.driver && lift.driver.username !== filters.driver) {
+        return false
+      }
+      if (filters.car && lift.car.cc !== filters.car) {
+        return false
+      }
+      if (
+        filters.scheduleYear &&
+        scheduleDate.getFullYear() !== Number(filters.scheduleYear)
+      ) {
+        return false
+      }
+      if (
+        filters.scheduleMonth &&
+        scheduleDate.getMonth() + 1 !== Number(filters.scheduleMonth)
+      ) {
+        return false
+      }
+      if (
+        filters.scheduleDay &&
+        scheduleDate.getDate() !== Number(filters.scheduleDay)
+      ) {
+        return false
+      }
+      if (
+        filters.scheduleHour &&
+        scheduleDate.getHours() !== Number(filters.scheduleHour)
+      ) {
+        return false
+      }
+      return true
+    })
+
+    if (filteredLifts.length === 0) throw new Error("NoLiftFound")
+
+    return filteredLifts
+  }
+
   async update(code, data) {
     logger.info("LiftService - update")
     const {

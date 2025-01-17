@@ -84,12 +84,39 @@ class CarController {
     }
   }
 
+  async filterCars(req, res) {
+    try {
+      logger.info(`GET:/api/cars/filter/${req.query}`)
+
+      const filters = req.query
+
+      const cars = await CarService.filterCars(filters)
+      const outputDTO = cars.map((car) => new CarOutputDTO(car))
+      res.status(200).json({
+        message: MESSAGES.CARS_RETRIEVED,
+        data: outputDTO,
+      })
+    } catch (err) {
+      logger.error("CarController - Failed to filter cars:", err)
+      if (err.message === "NoLiftFound") {
+        res.status(404).json({ error: MESSAGES.NO_CARS_FOUND })
+      } else if (err.message === "InvalidStatus") {
+        res.status(400).json({ error: MESSAGES.INVALID_STATUS })
+      } else if (err.message === "InvalidQuery") {
+        res.status(400).json({ error: MESSAGES.INVALID_QUERY_CARS })
+      } else if (err.message === "UserNotFound") {
+        res.status(400).json({ error: MESSAGES.USER_NOT_FOUND })
+      } else {
+        res.status(500).json({ error: MESSAGES.FAILED_TO_RETRIEVE_CARS })
+      }
+    }
+  }
+
   async updateCarByCode(req, res) {
     logger.info("PUT: /api/cars")
     try {
       const { cc, brand, model, year, user, color, plate } = req.body
       const inputDTO = new CarInputDTO({
-        cc,
         brand,
         model,
         year,
