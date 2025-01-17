@@ -1,14 +1,15 @@
 import express from "express"
 
 import LiftController from "../controllers/liftController.js"
+import verifyToken from "../middleware.js"
 
 const router = express.Router()
 
-router.post("/", LiftController.createLift)
-router.get("/", LiftController.getAllLifts)
-router.get("/cl/:cl", LiftController.getLiftByCode)
-router.get("/filter", LiftController.filterLifts)
-router.put("/:cl", LiftController.updateLiftByCode)
-router.delete("/:cl", LiftController.deleteLiftByCode)
+router.post("/", verifyToken, LiftController.createLift)
+router.get("/", verifyToken, LiftController.getAllLifts)
+router.get("/cl/:cl", verifyToken, LiftController.getLiftByCode)
+router.get("/filter/username/:username", verifyToken, LiftController.filterLifts)
+router.put("/:cl", verifyToken, LiftController.updateLiftByCode)
+router.delete("/:cl", verifyToken, LiftController.deleteLiftByCode)
 
 export { router as liftRoutes }
