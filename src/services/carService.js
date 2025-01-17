@@ -51,16 +51,20 @@ class CarService {
     }
   }
 
-  async filterCars(filters) {
+  async filterCars(username, filters) {
     logger.info("CarService - filterCars")
 
-    const query = {}
+    const user = await User.findOne({ username: username })
+    if (!user) {
+      throw new Error("UserNotFound")
+    }
+
+    const query = {user: username}
     const allowedFilters = [
       "cc",
       "brand",
       "model",
       "year",
-      "user",
       "color",
       "plate",
     ]
