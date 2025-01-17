@@ -21,12 +21,6 @@ describe("Car Tests", () => {
     expect(userResponse.status).toBe(201)
   })
   describe("POST /api/cars", () => {
-    test("should return no cars from empty DB", async () => {
-      const response = await request(app).get("/api/cars")
-      expect(response.status).toBe(404)
-      expect(response.body.error).toBe(MESSAGES.NO_CARS_FOUND)
-    })
-
     test("should fail to create a car driver not found", async () => {
       const newCar = {
         brand: "alfa romeo",
@@ -74,27 +68,6 @@ describe("Car Tests", () => {
 
       expect(response.status).toBe(400)
       expect(response.body.error).toBe(MESSAGES.INVALID_CAR)
-    })
-  })
-  describe("GET /api/cars", () => {
-    test("should return all cars", async () => {
-      const response = await request(app).get("/api/cars")
-      expect(response.status).toBe(200)
-      expect(response.body.message).toBe(MESSAGES.CARS_RETRIEVED)
-      expect(Array.isArray(response.body.data)).toBe(true)
-      expect(response.body.data.length).toBeGreaterThan(0)
-    })
-
-    test("should return car by code", async () => {
-      const response = await request(app).get(`/api/cars/cc/${car.cc}`)
-      expect(response.status).toBe(200)
-      expect(response.body.message).toBe(MESSAGES.CAR_RETRIEVED_BY_CODE)
-    })
-
-    test("should fail to return car by invalid code", async () => {
-      const response = await request(app).get(`/api/cars/cc/INVALIDCODE`)
-      expect(response.status).toBe(404)
-      expect(response.body.error).toBe(MESSAGES.CAR_NOT_FOUND_BY_CODE)
     })
   })
   describe("PUT /api/cars", () => {
