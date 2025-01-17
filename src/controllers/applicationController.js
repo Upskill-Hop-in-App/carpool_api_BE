@@ -46,6 +46,10 @@ class ApplicationController {
         res.status(400).json({
           error: MESSAGES.DUPLICATE_APPLICATION,
         })
+      } else if (err.message === "DriverIsPassenger") {
+        res.status(400).json({
+          error: MESSAGES.DRIVER_IS_PASSENGER,
+        })
       } else if (err.message === "LiftStatusNotOpen") {
         res.status(400).json({
           error: MESSAGES.LIFT_STATUS_NOT_OPEN,
@@ -130,9 +134,9 @@ class ApplicationController {
         err
       )
       if (err.message === "UserNotFound") {
-        res.status(404).json({ error: MESSAGES.USER_NOT_FOUND })
+        res.status(400).json({ error: MESSAGES.USER_NOT_FOUND })
       } else if (err.message === "NoApplicationFound") {
-        res.status(400).json({ error: MESSAGES.NO_APPLICATIONS_FOUND })
+        res.status(404).json({ error: MESSAGES.NO_APPLICATIONS_FOUND })
       } else {
         res.status(500).json({ error: MESSAGES.FAILED_TO_RETRIEVE_APPLICATION })
       }
@@ -159,9 +163,9 @@ class ApplicationController {
         err.message
       )
       if (err.message === "UserNotFound") {
-        res.status(404).json({ error: MESSAGES.USER_NOT_FOUND })
+        res.status(400).json({ error: MESSAGES.USER_NOT_FOUND })
       } else if (err.message === "NoApplicationFound") {
-        res.status(400).json({ error: MESSAGES.NO_APPLICATIONS_FOUND })
+        res.status(404).json({ error: MESSAGES.NO_APPLICATIONS_FOUND })
       } else {
         res.status(500).json({ error: MESSAGES.FAILED_TO_RETRIEVE_APPLICATION })
       }
@@ -189,7 +193,7 @@ class ApplicationController {
       if (err.message === "InvalidStatus") {
         res.status(400).json({ error: MESSAGES.INVALID_STATUS })
       } else if (err.message === "NoApplicationFound") {
-        res.status(400).json({ error: MESSAGES.NO_APPLICATIONS_FOUND })
+        res.status(404).json({ error: MESSAGES.NO_APPLICATIONS_FOUND })
       } else {
         res.status(500).json({ error: MESSAGES.FAILED_TO_RETRIEVE_APPLICATION })
       }
@@ -325,8 +329,15 @@ class ApplicationController {
   async accept(req, res) {
     try {
       logger.info(`PUT: /api/applications/accept/${req.params.ca}`)
-      await ApplicationService.acceptApplication(req.params.ca)
-      res.status(200).json({ message: MESSAGES.APPLICATION_ACCEPTED_SUCCESS })
+      const acceptedApplication = await ApplicationService.acceptApplication(
+        req.params.ca
+      )
+      res
+        .status(200)
+        .json({
+          message: MESSAGES.APPLICATION_ACCEPTED_SUCCESS,
+          data: acceptedApplication,
+        })
     } catch (err) {
       logger.error("applicationController - acceptApplication", err)
       if (err.message === "ApplicationNotFound") {
@@ -350,8 +361,15 @@ class ApplicationController {
   async reject(req, res) {
     try {
       logger.info(`PUT: /api/applications/reject/${req.params.ca}`)
-      await ApplicationService.rejectApplication(req.params.ca)
-      res.status(200).json({ message: MESSAGES.APPLICATION_REJECTED_SUCCESS })
+      const rejectedApplication = await ApplicationService.rejectApplication(
+        req.params.ca
+      )
+      res
+        .status(200)
+        .json({
+          message: MESSAGES.APPLICATION_REJECTED_SUCCESS,
+          data: rejectedApplication,
+        })
     } catch (err) {
       logger.error("applicationController - rejectApplication", err)
       if (err.message === "ApplicationNotFound") {
@@ -373,8 +391,15 @@ class ApplicationController {
   async cancel(req, res) {
     try {
       logger.info(`PUT: /api/applications/cancel/${req.params.ca}`)
-      await ApplicationService.cancelApplication(req.params.ca)
-      res.status(200).json({ message: MESSAGES.APPLICATION_CANCELED_SUCCESS })
+      const canceledApplication = await ApplicationService.cancelApplication(
+        req.params.ca
+      )
+      res
+        .status(200)
+        .json({
+          message: MESSAGES.APPLICATION_CANCELED_SUCCESS,
+          data: canceledApplication,
+        })
     } catch (err) {
       logger.error("applicationController - cancelApplication", err)
       if (err.message === "ApplicationNotFound") {

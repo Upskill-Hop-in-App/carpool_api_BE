@@ -32,11 +32,10 @@ class CarInputDTO {
   }
 
   async toCar() {
-
     logger.debug("carInputDTO - toCar")
-    const carDriver = await User.findOne({username: this.user})
+    const carDriver = await User.findOne({ username: this.user })
     logger.debug("carInputDTO - toCar - carDriver")
-    if(!carDriver) {
+    if (!carDriver) {
       throw new Error("DriverNotFound")
     }
 
@@ -48,8 +47,8 @@ class CarInputDTO {
       user: carDriver._id,
       color: this.color,
       plate: this.plate,
-    });
+    })
   }
 }
 
-export default CarInputDTO;
+export default CarInputDTO

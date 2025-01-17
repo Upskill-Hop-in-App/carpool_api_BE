@@ -1,15 +1,18 @@
 export const MESSAGES = {
   /* -------------------------- User Success messages ------------------------- */
+  LOGIN_SUCCESS: "Logged in successfully",
   USER_UPDATED_SUCCESS: "User updated successfully!",
   PASSWORD_UPDATED_SUCCESS: "Password updated successfully!",
   REGISTER_SUCCESS: "Registered successfully!",
   USER_DELETED_SUCCESS: "User deleted successfully!",
-  USER_ANONYMIZED_SUCCESS: "User anonymized successfully!",
+  USER_ANONYMIZED_SUCCESS: "User info deleted successfully!",
+  RATING_UPDATED_SUCCESS: "Rating updated successfully",
   /* -------------------------------------------------------------------------- */
 
   /* --------------------------- User Error messages -------------------------- */
-  USER_NOT_FOUND: "User not found",
+  USER_EMAIL_NOT_FOUND: "User not found",
   USERNAME_NOT_REGISTERED: "Username is not registered",
+  INCORRECT_USER_OR_PASSWORD: "Incorrect username or password",
   INVALID_EMAIL_FORMAT: "Invalid email format",
   DUPLICATE_EMAIL_OR_USERNAME: "That email or username is already in use",
   INVALID_CONTACT_FORMAT: "Invalid contact format",
@@ -20,7 +23,9 @@ export const MESSAGES = {
   RATING_MUST_1_TO_5: "Rating must be a number between 1 and 5.",
   ERROR_DELETING_USER: "Error deleting user",
   ERROR_ANONYMIZING_USER: "Error anonymizing user",
-  USER_ALREADY_ANONYM: "User has already been anonymized before",
+  USER_ALREADY_ANONYM: "User info has already been deleted",
+  PASSWORD_EMPTY: "Password field cannot be empty",
+  USER_NOT_FOUND: "User not found",
   /* -------------------------------------------------------------------------- */
 
   /* -------------------------- Common Error messages ------------------------- */
@@ -91,6 +96,7 @@ export const MESSAGES = {
   APPLICATION_ALREADY_REJECTED_CANCELED:
     "Application status is already rejected or canceled.",
   FAILED_TO_CANCEL_APPLICATION: "Failed to cancel application.",
+  DRIVER_IS_PASSENGER: "Driver cannot apply as a passenger to their lift",
 
   /* -------------------------------------------------------------------------- */
 

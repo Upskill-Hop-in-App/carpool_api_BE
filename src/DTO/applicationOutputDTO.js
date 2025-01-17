@@ -18,6 +18,7 @@ class ApplicationOutputDTO {
       schedule: application.lift?.schedule,
       price: application.lift?.price,
       providedSeats: application.lift?.providedSeats,
+      status: application.lift?.status,
     }
     this.status = application.status
     this.createdAt = application.createdAt

@@ -133,3 +133,7 @@ dist
 # database 
 *.db
 *.sqlite
+
+# misc
+.DS_Store
+*.pem
