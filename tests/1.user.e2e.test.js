@@ -167,7 +167,7 @@ describe("User Endpoints", () => {
     expect(responseUpdate.body.message).toBe(MESSAGES.USER_UPDATED_SUCCESS)
   })
 
-  test("should update user password", async () => {
+  test("should fail to update client password with different token user", async () => {
     const updatedPassword = {
       password: "123",
     }
@@ -175,6 +175,19 @@ describe("User Endpoints", () => {
     const response = await request(app)
       .put("/api/auth/password/client_name")
       .set("Authorization", `Bearer ${adminToken}`)
+      .send(updatedPassword)
+    expect(response.status).toBe(403)
+    expect(response.body.error).toBe(MESSAGES.ACCESS_DENIED)
+  })
+
+  test("should update client password", async () => {
+    const updatedPassword = {
+      password: "123",
+    }
+
+    const response = await request(app)
+      .put("/api/auth/password/client_name")
+      .set("Authorization", `Bearer ${clientToken}`)
       .send(updatedPassword)
     expect(response.status).toBe(200)
     expect(response.body.message).toBe(MESSAGES.PASSWORD_UPDATED_SUCCESS)
@@ -187,43 +200,53 @@ describe("User Endpoints", () => {
 
     const response = await request(app)
       .put("/api/auth/password/client_name")
-      .set("Authorization", `Bearer ${adminToken}`)
+      .set("Authorization", `Bearer ${clientToken}`)
       .send(updatedPassword)
     expect(response.status).toBe(400)
     expect(response.body.error).toBe(MESSAGES.PASSWORD_EMPTY)
   })
 
-  test("should update driver rating", async () => {
-    const updatedDriverRating = {
-      driverRating: 2,
-    }
+  // TODO: update ratings nao deve ser uma rota. Esses updates devem ocorrer internamente
+  // test("should update driver rating", async () => {
+  //   const updatedDriverRating = {
+  //     driverRating: 2,
+  //   }
 
-    const response = await request(app)
-      .put("/api/auth/driverRating/updatedClientTest")
-      .set("Authorization", `Bearer ${adminToken}`)
-      .send(updatedDriverRating)
-    expect(response.status).toBe(200)
-    expect(response.body.message).toBe(MESSAGES.RATING_UPDATED_SUCCESS)
-  })
+  //   const response = await request(app)
+  //     .put("/api/auth/driverRating/updatedClientTest")
+  //     .set("Authorization", `Bearer ${adminToken}`)
+  //     .send(updatedDriverRating)
+  //   expect(response.status).toBe(200)
+  //   expect(response.body.message).toBe(MESSAGES.RATING_UPDATED_SUCCESS)
+  // })
 
-  test("should update passenger rating", async () => {
-    const updatedPassengerRating = {
-      passengerRating: 2,
-    }
+  // test("should update passenger rating", async () => {
+  //   const updatedPassengerRating = {
+  //     passengerRating: 2,
+  //   }
 
-    const response = await request(app)
-      .put("/api/auth/passengerRating/updatedClientTest")
-      .set("Authorization", `Bearer ${adminToken}`)
-      .send(updatedPassengerRating)
-    expect(response.status).toBe(200)
-    expect(response.body.message).toBe(MESSAGES.RATING_UPDATED_SUCCESS)
-  })
+  //   const response = await request(app)
+  //     .put("/api/auth/passengerRating/updatedClientTest")
+  //     .set("Authorization", `Bearer ${adminToken}`)
+  //     .send(updatedPassengerRating)
+  //   expect(response.status).toBe(200)
+  //   expect(response.body.message).toBe(MESSAGES.RATING_UPDATED_SUCCESS)
+  // })
 
-  test("should anonymize user", async () => {
+  test("should not delete user with different token", async () => {
     const response = await request(app)
       .put("/api/auth/delete/client_name")
       .set("Authorization", `Bearer ${adminToken}`)
+    expect(response.status).toBe(403)
+    expect(response.body.error).toBe(MESSAGES.ACCESS_DENIED)
+  })
+
+  test("should delete user", async () => {
+    const response = await request(app)
+      .put("/api/auth/delete/client_name")
+      .set("Authorization", `Bearer ${clientToken}`)
+    console.log("🚀 ~ test.only ~ response:", response.body)
     expect(response.status).toBe(200)
-    expect(response.body.message).toBe(MESSAGES.USER_ANONYMIZED_SUCCESS)
+    expect(response.body.message).toBe(MESSAGES.USER_DELETED_SUCCESS)
   })
 })
