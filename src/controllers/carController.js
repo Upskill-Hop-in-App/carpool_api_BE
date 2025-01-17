@@ -127,7 +127,7 @@ class CarController {
       const carModel = await inputDTO.toCar()
       const car = await CarService.update(req.params.cc, carModel)
       const outputDTO = new CarOutputDTO(car)
-      res.status(201).json({ message: MESSAGES.CAR_UPDATED, data: outputDTO })
+      res.status(200).json({ message: MESSAGES.CAR_UPDATED, data: outputDTO })
     } catch (err) {
       logger.error("CarController - Error updating car")
       if (err.name === "ValidationError") {

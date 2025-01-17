@@ -219,6 +219,8 @@ describe("Application Tests", () => {
       expect(response.body.message).toBe(
         MESSAGES.APPLICATIONS_RETRIEVED_SUCCSESS
       )
+      expect(Array.isArray(response.body.data)).toBe(true)
+      expect(response.body.data.length).toBeGreaterThan(0)
     })
 
     test("should return application by code", async () => {

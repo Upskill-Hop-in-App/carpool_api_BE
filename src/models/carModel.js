@@ -38,22 +38,33 @@ const CarSchema = new Schema(
       type: String,
       unique: true,
       required: true,
-      lowercase: true,
       validate: {
         validator: function (v) {
-          const isOldPlate = this.year < 2000
-          const oldPlateFormat = /^[A-Za-z]{2}\d{2}[A-Za-z]{2}$/
-          const newPlateFormat = /^\d{2}-\d{2}-[A-Za-z]{2}$/
+          const year = this.year
+          const getPlateRegex = (year) => {
+            const patterns = {
+              pre1992: /^[A-Za-z]{2}-\d{2}-\d{2}$/,
+              "1992to2005": /^\d{2}-\d{2}-[A-Za-z]{2}$/,
+              "2005to2020": /^\d{2}-[A-Za-z]{2}-\d{2}$/,
+              post2020: /^[A-Za-z]{2}-\d{2}-[A-Za-z]{2}$/,
+            }
 
-          if (isOldPlate) {
-            return oldPlateFormat.test(v)
-          } else {
-            return newPlateFormat.test(v)
+            if (year < 1992) {
+              return patterns.pre1992
+            } else if (year >= 1992 && year <= 2005) {
+              return patterns["1992to2005"]
+            } else if (year > 2005 && year <= 2020) {
+              return patterns["2005to2020"]
+            } else {
+              return patterns.post2020
+            }
           }
+
+          const plateRegex = getPlateRegex(year)
+          return plateRegex.test(v)
         },
-        message: function () {
-          return "License plate format is invalid based on the car's year."
-        },
+        message: (props) =>
+          `${props.value} is not a valid plate number for the given year.`,
       },
     },
   },
