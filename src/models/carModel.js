@@ -6,11 +6,6 @@ const CarSchema = new Schema(
       type: String,
       unique: true,
       required: true,
-      match: [
-        /^[A-Za-z]{2}[1-9]{2}$/,
-        "Car code must be exactly 2 letters followed by 2 numbers",
-      ],
-      lowercase: true,
     },
     brand: {
       type: String,
@@ -50,7 +45,6 @@ const CarSchema = new Schema(
           const oldPlateFormat = /^[A-Za-z]{2}\d{2}[A-Za-z]{2}$/
           const newPlateFormat = /^\d{2}-\d{2}-[A-Za-z]{2}$/
 
-          // Validate based on the year
           if (isOldPlate) {
             return oldPlateFormat.test(v)
           } else {
@@ -58,7 +52,6 @@ const CarSchema = new Schema(
           }
         },
         message: function () {
-          // The error message is now static, and we rely on the validator to handle the logic
           return "License plate format is invalid based on the car's year."
         },
       },

@@ -1,10 +1,10 @@
 import Car from "../models/carModel.js";
 import User from "../models/userModel.js";
+import { v4 as uuidv4 } from "uuid"
 import logger from "../logger.js"
 
 class CarInputDTO {
   constructor({
-    cc,
     brand,
     model,
     year,
@@ -13,7 +13,6 @@ class CarInputDTO {
     plate,
   }) {
     if (
-      !cc ||
       !brand ||
       !model ||
       !year ||
@@ -24,7 +23,6 @@ class CarInputDTO {
       throw new Error("MissingRequiredFields");
     }
 
-    this.cc = cc;
     this.brand = brand;
     this.model = model;
     this.year = year;
@@ -43,7 +41,7 @@ class CarInputDTO {
     }
 
     return new Car({
-      cc: this.cc,
+      cc: uuidv4(),
       brand: this.brand,
       model: this.model,
       year: this.year,
