@@ -7,9 +7,8 @@ class CarController {
   async createCar(req, res) {
     logger.info("POST: /api/cars")
     try {
-      const { cc, brand, model, year, user, color, plate } = req.body
+      const { brand, model, year, user, color, plate } = req.body
       const inputDTO = new CarInputDTO({
-        cc,
         brand,
         model,
         year,

@@ -168,7 +168,7 @@ class UserController {
       const { password } = req.body
 
       if (!password || password.trim() === "") {
-        res.status(400).json({ error: "Password cannot be empty." })
+        res.status(400).json({ error: MESSAGES.PASSWORD_EMPTY })
         return
       }
 
@@ -290,9 +290,11 @@ class UserController {
         return
       }
 
-      await UserService.anonymizeUser(userMongo)
+      const anonymUser = await UserService.anonymizeUser(userMongo)
 
-      res.status(200).json({ message: MESSAGES.USER_ANONYMIZED_SUCCESS })
+      res
+        .status(200)
+        .json({ message: MESSAGES.USER_ANONYMIZED_SUCCESS, data: anonymUser })
     } catch (err) {
       logger.error(`Error deleting user`, err)
       if (err.message === "UserNotFound") {
