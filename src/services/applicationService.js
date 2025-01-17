@@ -466,37 +466,6 @@ class ApplicationService {
 
     return canceledApplication
   }
-
-  //TODO DECIDIR SE PERMITIMOS ISTO OU NAO OU, P.EX, SÓ O ADMIN PARA FINS DE ARCO QUE A USARIA POR REQUISIÇÃO
-  async delete(ca) {
-    const application = await Application.findOne({ ca: ca })
-    if (!application) {
-      throw new Error("ApplicationNotFound")
-    }
-
-    const lift = await Lift.findOne({ applications: application._id }).populate(
-      ["applications"]
-    )
-    if (!lift) {
-      throw new Error("LiftNotFound")
-    }
-
-    if (lift.status !== "open" && lift.status !== "ready") {
-      throw new Error("LiftAlreadyStartedOrCanceled")
-    }
-
-    if (application.status === "accepted" && lift.occupiedSeats > 0) {
-      lift.occupiedSeats -= 1
-    }
-
-    lift.applications = lift.applications.filter(
-      (app_id) => !app_id.equals(application._id)
-    )
-
-    await lift.save()
-
-    await application.deleteOne()
-  }
 }
 
 export default new ApplicationService()
