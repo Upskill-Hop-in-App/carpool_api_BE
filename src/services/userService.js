@@ -167,6 +167,7 @@ class UserService {
       const passwordMatch = await bcrypt.compare(password, hashedPassword)
       const authData = {
         email: userSQL.email,
+        username: userSQL.username,
         role: userSQL.role,
         status: userSQL.status,
       }
