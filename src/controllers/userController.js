@@ -273,7 +273,7 @@ class UserController {
     }
   }
 
-  anonymize = async (req, res) => {
+  delete = async (req, res) => {
     logger.info(`PUT: /api/auth/delete/${req.params.username}`)
     try {
       const username = req.params.username
@@ -290,11 +290,11 @@ class UserController {
         return
       }
 
-      const anonymUser = await UserService.anonymizeUser(userMongo)
+      const anonymUser = await UserService.deleteUser(userMongo)
 
       res
         .status(200)
-        .json({ message: MESSAGES.USER_ANONYMIZED_SUCCESS, data: anonymUser })
+        .json({ message: MESSAGES.USER_DELETED_SUCCESS, data: anonymUser })
     } catch (err) {
       logger.error(`Error deleting user`, err)
       if (err.message === "UserNotFound") {

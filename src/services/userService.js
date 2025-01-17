@@ -320,8 +320,8 @@ class UserService {
     })
   }
 
-  async anonymizeUser(user) {
-    logger.info("userService - anonymizeUser")
+  async deleteUser(user) {
+    logger.info("userService - deleteUser")
     const username = user.username
     const validUuid = uuidValidate(username)
 
@@ -365,7 +365,7 @@ class UserService {
         if (err) {
           reject(err)
         } else {
-          resolve({ message: "User anonymized successfully", data: anonymUser })
+          resolve({ message: "User deleted successfully", data: anonymUser })
         }
       })
     })

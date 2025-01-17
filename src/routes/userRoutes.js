@@ -19,7 +19,7 @@ router.put(
   verifyToken,
   UserController.updatePassengerRating
 )
-router.put("/delete/:username", verifyToken, UserController.anonymize)
+router.put("/delete/:username", verifyToken, UserController.delete)
 router.delete("/:username", verifyToken, UserController.delete)
 
 export { router as userRoutes }
