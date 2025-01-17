@@ -22,7 +22,7 @@ class CarService {
   async list() {
     const cars = await Car.find().populate("user")
     if (cars.length === 0) {
-      throw new Error("NoCarFound")
+      throw new Error("CarNotFound")
     }
     return cars
   }
@@ -31,7 +31,7 @@ class CarService {
     const car = await Car.findOne({ cc: code }).populate("user")
 
     if (!car) {
-      throw new Error("NoCarFound")
+      throw new Error("CarNotFound")
     }
     return car
   }
@@ -122,7 +122,7 @@ class CarService {
     return car
   }
   async delete(code) {
-    const car = Car.findOne({ cc: code })
+    const car = await Car.findOne({ cc: code })
     if (!car) {
       throw new Error("CarNotFound")
     }
