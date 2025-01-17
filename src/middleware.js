@@ -16,6 +16,7 @@ const PERSONAL_ROUTES = [
   "/api/auth/password",
   "/api/lifts",
   "/api/application/filter/username",
+  "/api/auth/delete",
 ]
 /* -------------------------------------------------------------------------- */
 
@@ -35,6 +36,7 @@ const verifyToken = async (req, res, next) => {
     process.env.NODE_ENV === "dev" &&
     process.env.SKIP_VALIDATION === "true"
   ) {
+    logger.debug("VALIDATION SKIPPED!")
     return next()
   }
   /* -------------------------------------------------------------------------- */
@@ -43,6 +45,7 @@ const verifyToken = async (req, res, next) => {
   /* ------------------------------ Public routes ----------------------------- */
   /* -------------------------------------------------------------------------- */
   if (PUBLIC_ROUTES.some((route) => url.startsWith(route))) {
+    logger.debug("Public routes: Access allowed")
     return next()
   }
   /* -------------------------------------------------------------------------- */
@@ -63,12 +66,14 @@ const verifyToken = async (req, res, next) => {
       role === "admin" &&
       ADMIN_ROUTES.some((route) => url.startsWith(route))
     ) {
+      logger.debug("Admin-only: Access allowed")
       return next()
     }
     /* -------------------------------------------------------------------------- */
     /* ------------- Authenticated routes (accessible to all roles) ------------- */
     /* -------------------------------------------------------------------------- */
     if (AUTHENTICATED_ROUTES.some((route) => url.startsWith(route))) {
+      logger.debug("Authenticated: Access allowed")
       return next()
     }
 
@@ -78,15 +83,20 @@ const verifyToken = async (req, res, next) => {
     if (PERSONAL_ROUTES.some((route) => url.startsWith(route))) {
       const paramUsername =
         req.params.username || req.query.username || req.body.user
-      if (username === paramUsername) {
-        return next()
+
+      if (username && username !== paramUsername) {
+        logger.error("Personal routes error: username !== paramUsername")
+        return res.status(403).json({ error: MESSAGES.ACCESS_DENIED })
       }
-      return res.status(403).json({ error: MESSAGES.ACCESS_DENIED })
+
+      logger.debug("Personal routes: Access allowed")
+      return next()
     }
 
     /* -------------------------------------------------------------------------- */
     /* ------------------ If no conditions matched, deny access ----------------- */
     /* -------------------------------------------------------------------------- */
+    logger.error("Personal routes error: no conditions matched")
     return res.status(403).json({ error: MESSAGES.ACCESS_DENIED })
   } catch (err) {
     logger.error("verifyToken - error: ", err)
