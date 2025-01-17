@@ -10,6 +10,7 @@ export const MESSAGES = {
   /* -------------------------------------------------------------------------- */
 
   /* --------------------------- User Error messages -------------------------- */
+  ACCESS_DENIED: "Access Access denied for this routedenied",
   USER_EMAIL_NOT_FOUND: "User not found",
   USERNAME_NOT_REGISTERED: "Username is not registered",
   INCORRECT_USER_OR_PASSWORD: "Incorrect username or password",
