@@ -2,56 +2,35 @@ import request from "supertest"
 
 import { MESSAGES } from "../src/utils/responseMessages.js"
 import { app } from "../src/app.js"
+import { adminToken, clientToken } from "./setup/testSetup.js"
+
+let car
+let lift
 
 describe("Lift Tests", () => {
-  let car
-  let lift
   beforeAll(async () => {
     /* ---------------------- Create prerequisites for test --------------------- */
-    const newUser = {
-      name: "User",
-      email: "user@test.com",
-      username: "user",
-      password: "123",
-      contact: "123456789",
-    }
-    const userResponse = await request(app)
-      .post("/api/auth/register/client")
-      //   .set("Authorization", `Bearer ${adminToken}`)
-      .send(newUser)
-    expect(userResponse.status).toBe(201)
-
-    const newUser1 = {
-      name: "User1",
-      email: "user1@test.com",
-      username: "user1",
-      password: "123",
-      contact: "123456789",
-    }
-    const userResponse1 = await request(app)
-      .post("/api/auth/register/client")
-      //   .set("Authorization", `Bearer ${adminToken}`)
-      .send(newUser1)
-    expect(userResponse1.status).toBe(201)
-
     const newCar = {
       brand: "toyota",
       model: "yaris",
       year: 2004,
-      user: "user",
+      user: "client_name",
       color: "pink",
       plate: "22-22-AA",
     }
     const carResponse = await request(app)
       .post("/api/cars")
-      //   .set("Authorization", `Bearer ${adminToken}`)
+      .set("Authorization", `Bearer ${adminToken}`)
       .send(newCar)
     expect(carResponse.status).toBe(201)
     car = carResponse.body.data.cc
   })
+
   describe("POST /api/lifts", () => {
     test("should return no lifts from empty DB", async () => {
-      const response = await request(app).get("/api/lifts")
+      const response = await request(app)
+        .get("/api/lifts")
+        .set("Authorization", `Bearer ${adminToken}`)
       expect(response.status).toBe(404)
       expect(response.body.error).toBe(MESSAGES.NO_LIFTS_FOUND)
     })
@@ -72,7 +51,10 @@ describe("Lift Tests", () => {
         price: 222,
         providedSeats: 2,
       }
-      const response = await request(app).post("/api/lifts").send(newLift)
+      const response = await request(app)
+        .post("/api/lifts")
+        .set("Authorization", `Bearer ${adminToken}`)
+        .send(newLift)
 
       expect(response.status).toBe(400)
       expect(response.body.error).toBe(MESSAGES.MISSING_REQUIRED_FIELDS)
@@ -96,7 +78,10 @@ describe("Lift Tests", () => {
         price: 222,
         providedSeats: 2,
       }
-      const response = await request(app).post("/api/lifts").send(newLift)
+      const response = await request(app)
+        .post("/api/lifts")
+        .set("Authorization", `Bearer ${adminToken}`)
+        .send(newLift)
 
       expect(response.status).toBe(400)
       expect(response.body.error).toBe(MESSAGES.DRIVER_NOT_FOUND_BY_CODE)
@@ -104,7 +89,7 @@ describe("Lift Tests", () => {
 
     test("should fail to create new lift for car not found", async () => {
       const newLift = {
-        driver: "user",
+        driver: "client_name",
         car: "INVALID CAR",
         startPoint: {
           district: "braga",
@@ -120,7 +105,10 @@ describe("Lift Tests", () => {
         price: 222,
         providedSeats: 2,
       }
-      const response = await request(app).post("/api/lifts").send(newLift)
+      const response = await request(app)
+        .post("/api/lifts")
+        .set("Authorization", `Bearer ${adminToken}`)
+        .send(newLift)
 
       expect(response.status).toBe(400)
       expect(response.body.error).toBe(MESSAGES.CAR_NOT_FOUND_BY_CODE)
@@ -128,7 +116,7 @@ describe("Lift Tests", () => {
 
     test("should fail to create new lift for same start and end points", async () => {
       const newLift = {
-        driver: "user",
+        driver: "client_name",
         car: car,
         startPoint: {
           district: "braga",
@@ -144,7 +132,10 @@ describe("Lift Tests", () => {
         price: 222,
         providedSeats: 2,
       }
-      const response = await request(app).post("/api/lifts").send(newLift)
+      const response = await request(app)
+        .post("/api/lifts")
+        .set("Authorization", `Bearer ${adminToken}`)
+        .send(newLift)
 
       expect(response.status).toBe(400)
       expect(response.body.error).toBe(MESSAGES.MATCHING_START_END)
@@ -152,7 +143,7 @@ describe("Lift Tests", () => {
 
     test("should fail to create new lift for invalid location", async () => {
       const newLift = {
-        driver: "user",
+        driver: "client_name",
         car: car,
         startPoint: {
           district: "INVALID LOCATION",
@@ -168,7 +159,10 @@ describe("Lift Tests", () => {
         price: 222,
         providedSeats: 2,
       }
-      const response = await request(app).post("/api/lifts").send(newLift)
+      const response = await request(app)
+        .post("/api/lifts")
+        .set("Authorization", `Bearer ${adminToken}`)
+        .send(newLift)
 
       expect(response.status).toBe(400)
       expect(response.body.error).toBe(MESSAGES.INVALID_LOCATION)
@@ -176,7 +170,7 @@ describe("Lift Tests", () => {
 
     test("should fail to create new lift for invalid date format", async () => {
       const newLift = {
-        driver: "user",
+        driver: "client_name",
         car: car,
         startPoint: {
           district: "braga",
@@ -192,7 +186,10 @@ describe("Lift Tests", () => {
         price: 222,
         providedSeats: 2,
       }
-      const response = await request(app).post("/api/lifts").send(newLift)
+      const response = await request(app)
+        .post("/api/lifts")
+        .set("Authorization", `Bearer ${adminToken}`)
+        .send(newLift)
 
       expect(response.status).toBe(400)
       expect(response.body.error).toBe(MESSAGES.INVALID_DATE_FORMAT)
@@ -200,7 +197,7 @@ describe("Lift Tests", () => {
 
     test("should fail to create new lift for invalid date format", async () => {
       const newLift = {
-        driver: "user",
+        driver: "client_name",
         car: car,
         startPoint: {
           district: "braga",
@@ -216,7 +213,10 @@ describe("Lift Tests", () => {
         price: 222,
         providedSeats: 2,
       }
-      const response = await request(app).post("/api/lifts").send(newLift)
+      const response = await request(app)
+        .post("/api/lifts")
+        .set("Authorization", `Bearer ${adminToken}`)
+        .send(newLift)
 
       expect(response.status).toBe(400)
       expect(response.body.error).toBe(MESSAGES.DATE_IN_PAST)
@@ -224,7 +224,7 @@ describe("Lift Tests", () => {
 
     test("should create new lift", async () => {
       const newLift = {
-        driver: "user",
+        driver: "client_name",
         car: car,
         startPoint: {
           district: "braga",
@@ -240,7 +240,10 @@ describe("Lift Tests", () => {
         price: 222,
         providedSeats: 2,
       }
-      const response = await request(app).post("/api/lifts").send(newLift)
+      const response = await request(app)
+        .post("/api/lifts")
+        .set("Authorization", `Bearer ${clientToken}`)
+        .send(newLift)
 
       expect(response.status).toBe(201)
       expect(response.body.message).toBe(MESSAGES.LIFT_CREATED)
@@ -249,7 +252,9 @@ describe("Lift Tests", () => {
   })
   describe("GET /api/lifts", () => {
     test("should return all lifts", async () => {
-      const response = await request(app).get("/api/lifts")
+      const response = await request(app)
+        .get("/api/lifts")
+        .set("Authorization", `Bearer ${clientToken}`)
       expect(response.status).toBe(200)
       expect(response.body.message).toBe(MESSAGES.LIFTS_RETRIEVED)
       expect(Array.isArray(response.body.data)).toBe(true)
@@ -258,7 +263,7 @@ describe("Lift Tests", () => {
 
     test("should return lift by code", async () => {
       const newLift = {
-        driver: "user",
+        driver: "client_name",
         car: car,
         startPoint: {
           district: "braga",
@@ -274,13 +279,18 @@ describe("Lift Tests", () => {
         price: 222,
         providedSeats: 2,
       }
-      const response = await request(app).post("/api/lifts").send(newLift)
+      const response = await request(app)
+        .post("/api/lifts")
+        .set("Authorization", `Bearer ${clientToken}`)
+        .send(newLift)
 
       expect(response.status).toBe(201)
       expect(response.body.message).toBe(MESSAGES.LIFT_CREATED)
       lift = response.body.data
 
-      const response1 = await request(app).get(`/api/lifts/cl/${lift.cl}`)
+      const response1 = await request(app)
+        .get(`/api/lifts/cl/${lift.cl}`)
+        .set("Authorization", `Bearer ${clientToken}`)
       expect(response1.status).toBe(200)
       expect(response1.body.message).toBe(MESSAGES.LIFT_RETRIEVED_BY_CODE)
     })
@@ -288,7 +298,7 @@ describe("Lift Tests", () => {
   describe("PUT /api/lifts", () => {
     test("should update lift", async () => {
       const newLift = {
-        driver: "user",
+        driver: "client_name",
         car: car,
         startPoint: {
           district: "braga",
@@ -304,14 +314,17 @@ describe("Lift Tests", () => {
         price: 222,
         providedSeats: 2,
       }
-      const response = await request(app).post("/api/lifts").send(newLift)
+      const response = await request(app)
+        .post("/api/lifts")
+        .set("Authorization", `Bearer ${clientToken}`)
+        .send(newLift)
 
       expect(response.status).toBe(201)
       expect(response.body.message).toBe(MESSAGES.LIFT_CREATED)
       lift = response.body.data
 
       const updatedLift = {
-        driver: "user",
+        driver: "client_name",
         car: car,
         startPoint: {
           district: "braga",
@@ -330,6 +343,7 @@ describe("Lift Tests", () => {
 
       const response1 = await request(app)
         .put(`/api/lifts/${lift.cl}`)
+        .set("Authorization", `Bearer ${clientToken}`)
         .send(updatedLift)
       expect(response1.status).toBe(200)
       expect(response1.body.message).toBe(MESSAGES.LIFT_UPDATED)
@@ -337,7 +351,7 @@ describe("Lift Tests", () => {
 
     test("should fail to update lift for missing required fields", async () => {
       const newLift = {
-        driver: "user",
+        driver: "client_name",
         car: car,
         startPoint: {
           district: "braga",
@@ -353,14 +367,17 @@ describe("Lift Tests", () => {
         price: 222,
         providedSeats: 2,
       }
-      const response = await request(app).post("/api/lifts").send(newLift)
+      const response = await request(app)
+        .post("/api/lifts")
+        .set("Authorization", `Bearer ${clientToken}`)
+        .send(newLift)
 
       expect(response.status).toBe(201)
       expect(response.body.message).toBe(MESSAGES.LIFT_CREATED)
       lift = response.body.data
 
       const updatedLift = {
-        car: car,
+        driver: "client_name",
         startPoint: {
           district: "braga",
           municipality: "braga",
@@ -378,13 +395,15 @@ describe("Lift Tests", () => {
 
       const response1 = await request(app)
         .put(`/api/lifts/${lift.cl}`)
+        .set("Authorization", `Bearer ${clientToken}`)
         .send(updatedLift)
       expect(response1.status).toBe(400)
       expect(response1.body.error).toBe(MESSAGES.MISSING_REQUIRED_FIELDS)
     })
+
     test("should fail to update lift for invalid lift code", async () => {
       const newLift = {
-        driver: "user",
+        driver: "client_name",
         car: car,
         startPoint: {
           district: "braga",
@@ -400,14 +419,17 @@ describe("Lift Tests", () => {
         price: 222,
         providedSeats: 2,
       }
-      const response = await request(app).post("/api/lifts").send(newLift)
+      const response = await request(app)
+        .post("/api/lifts")
+        .set("Authorization", `Bearer ${clientToken}`)
+        .send(newLift)
 
       expect(response.status).toBe(201)
       expect(response.body.message).toBe(MESSAGES.LIFT_CREATED)
       lift = response.body.data
 
       const updatedLift = {
-        driver: "user",
+        driver: "client_name",
         car: car,
         startPoint: {
           district: "braga",
@@ -426,13 +448,15 @@ describe("Lift Tests", () => {
 
       const response1 = await request(app)
         .put(`/api/lifts/INVALID CODE`)
+        .set("Authorization", `Bearer ${clientToken}`)
         .send(updatedLift)
       expect(response1.status).toBe(400)
       expect(response1.body.error).toBe(MESSAGES.LIFT_NOT_FOUND_BY_CODE)
     })
+
     test("should fail to update lift for driver not found", async () => {
       const newLift = {
-        driver: "user",
+        driver: "client_name",
         car: car,
         startPoint: {
           district: "braga",
@@ -448,7 +472,10 @@ describe("Lift Tests", () => {
         price: 222,
         providedSeats: 2,
       }
-      const response = await request(app).post("/api/lifts").send(newLift)
+      const response = await request(app)
+        .post("/api/lifts")
+        .set("Authorization", `Bearer ${clientToken}`)
+        .send(newLift)
 
       expect(response.status).toBe(201)
       expect(response.body.message).toBe(MESSAGES.LIFT_CREATED)
@@ -474,13 +501,15 @@ describe("Lift Tests", () => {
 
       const response1 = await request(app)
         .put(`/api/lifts/${lift.cl}`)
+        .set("Authorization", `Bearer ${clientToken}`)
         .send(updatedLift)
-      expect(response1.status).toBe(400)
-      expect(response1.body.error).toBe(MESSAGES.DRIVER_NOT_FOUND_BY_CODE)
+      expect(response1.status).toBe(403)
+      expect(response1.body.error).toBe(MESSAGES.ACCESS_DENIED)
     })
+
     test("should fail to update lift for car not found", async () => {
       const newLift = {
-        driver: "user",
+        driver: "client_name",
         car: car,
         startPoint: {
           district: "braga",
@@ -496,14 +525,17 @@ describe("Lift Tests", () => {
         price: 222,
         providedSeats: 2,
       }
-      const response = await request(app).post("/api/lifts").send(newLift)
+      const response = await request(app)
+        .post("/api/lifts")
+        .set("Authorization", `Bearer ${clientToken}`)
+        .send(newLift)
 
       expect(response.status).toBe(201)
       expect(response.body.message).toBe(MESSAGES.LIFT_CREATED)
       lift = response.body.data
 
       const updatedLift = {
-        driver: "user",
+        driver: "client_name",
         car: "INVALID CAR",
         startPoint: {
           district: "braga",
@@ -522,13 +554,15 @@ describe("Lift Tests", () => {
 
       const response1 = await request(app)
         .put(`/api/lifts/${lift.cl}`)
+        .set("Authorization", `Bearer ${clientToken}`)
         .send(updatedLift)
       expect(response1.status).toBe(400)
       expect(response1.body.error).toBe(MESSAGES.CAR_NOT_FOUND_BY_CODE)
     })
+
     test("should fail to update lift for same start and end points", async () => {
       const newLift = {
-        driver: "user",
+        driver: "client_name",
         car: car,
         startPoint: {
           district: "braga",
@@ -544,14 +578,17 @@ describe("Lift Tests", () => {
         price: 222,
         providedSeats: 2,
       }
-      const response = await request(app).post("/api/lifts").send(newLift)
+      const response = await request(app)
+        .post("/api/lifts")
+        .set("Authorization", `Bearer ${clientToken}`)
+        .send(newLift)
 
       expect(response.status).toBe(201)
       expect(response.body.message).toBe(MESSAGES.LIFT_CREATED)
       lift = response.body.data
 
       const updatedLift = {
-        driver: "user",
+        driver: "client_name",
         car: car,
         startPoint: {
           district: "braga",
@@ -570,13 +607,15 @@ describe("Lift Tests", () => {
 
       const response1 = await request(app)
         .put(`/api/lifts/${lift.cl}`)
+        .set("Authorization", `Bearer ${clientToken}`)
         .send(updatedLift)
       expect(response1.status).toBe(400)
       expect(response1.body.error).toBe(MESSAGES.MATCHING_START_END)
     })
+
     test("should fail to update lift for invalid location", async () => {
       const newLift = {
-        driver: "user",
+        driver: "client_name",
         car: car,
         startPoint: {
           district: "braga",
@@ -592,14 +631,17 @@ describe("Lift Tests", () => {
         price: 222,
         providedSeats: 2,
       }
-      const response = await request(app).post("/api/lifts").send(newLift)
+      const response = await request(app)
+        .post("/api/lifts")
+        .set("Authorization", `Bearer ${clientToken}`)
+        .send(newLift)
 
       expect(response.status).toBe(201)
       expect(response.body.message).toBe(MESSAGES.LIFT_CREATED)
       lift = response.body.data
 
       const updatedLift = {
-        driver: "user",
+        driver: "client_name",
         car: car,
         startPoint: {
           district: "INVALID LOCATION",
@@ -618,13 +660,15 @@ describe("Lift Tests", () => {
 
       const response1 = await request(app)
         .put(`/api/lifts/${lift.cl}`)
+        .set("Authorization", `Bearer ${clientToken}`)
         .send(updatedLift)
       expect(response1.status).toBe(400)
       expect(response1.body.error).toBe(MESSAGES.INVALID_LOCATION)
     })
+
     test("should fail to update lift for invalid date format", async () => {
       const newLift = {
-        driver: "user",
+        driver: "client_name",
         car: car,
         startPoint: {
           district: "braga",
@@ -640,14 +684,17 @@ describe("Lift Tests", () => {
         price: 222,
         providedSeats: 2,
       }
-      const response = await request(app).post("/api/lifts").send(newLift)
+      const response = await request(app)
+        .post("/api/lifts")
+        .set("Authorization", `Bearer ${clientToken}`)
+        .send(newLift)
 
       expect(response.status).toBe(201)
       expect(response.body.message).toBe(MESSAGES.LIFT_CREATED)
       lift = response.body.data
 
       const updatedLift = {
-        driver: "user",
+        driver: "client_name",
         car: car,
         startPoint: {
           district: "braga",
@@ -666,13 +713,15 @@ describe("Lift Tests", () => {
 
       const response1 = await request(app)
         .put(`/api/lifts/${lift.cl}`)
+        .set("Authorization", `Bearer ${clientToken}`)
         .send(updatedLift)
       expect(response1.status).toBe(400)
       expect(response1.body.error).toBe(MESSAGES.INVALID_DATE_FORMAT)
     })
+
     test("should fail to update lift for invalid date format", async () => {
       const newLift = {
-        driver: "user",
+        driver: "client_name",
         car: car,
         startPoint: {
           district: "braga",
@@ -688,14 +737,17 @@ describe("Lift Tests", () => {
         price: 222,
         providedSeats: 2,
       }
-      const response = await request(app).post("/api/lifts").send(newLift)
+      const response = await request(app)
+        .post("/api/lifts")
+        .set("Authorization", `Bearer ${clientToken}`)
+        .send(newLift)
 
       expect(response.status).toBe(201)
       expect(response.body.message).toBe(MESSAGES.LIFT_CREATED)
       lift = response.body.data
 
       const updatedLift = {
-        driver: "user",
+        driver: "client_name",
         car: car,
         startPoint: {
           district: "braga",
@@ -714,6 +766,7 @@ describe("Lift Tests", () => {
 
       const response1 = await request(app)
         .put(`/api/lifts/${lift.cl}`)
+        .set("Authorization", `Bearer ${clientToken}`)
         .send(updatedLift)
       expect(response1.status).toBe(400)
       expect(response1.body.error).toBe(MESSAGES.DATE_IN_PAST)
