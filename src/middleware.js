@@ -5,6 +5,7 @@ import logger from "./logger.js"
 import { MESSAGES } from "./utils/responseMessages.js"
 import Application from "./models/applicationModel.js"
 import Lift from "./models/liftModel.js"
+import Car from "./models/carModel.js"
 
 const publicJwtKey = fs.readFileSync(process.env.PUBLIC_JWT_KEY_FILE, "utf8")
 
@@ -82,19 +83,41 @@ const verifyToken = async (req, res, next) => {
     /* ---------- Personal routes (only the user themselves can access) --------- */
     /* -------------------------------------------------------------------------- */
     if (PERSONAL_ROUTES.some((route) => url.startsWith(route))) {
-      const paramsUsername = [req.body.passenger]
+      /* -------------------------------------------------------------------------- */
+      /* -------------------------- CRUD Personal Routes -------------------------- */
+      /* -------------------------------------------------------------------------- */
+      if (url.startsWith("/api/cars")) {
+        if (
+          (method === "POST" || method === "PUT") &&
+          req.body.user === username
+        ) {
+          logger.debug("Authenticated: Access allowed")
+          return next()
+        } else if (method === "DELETE") {
+          const carFound = await Car.findOne({ cc: req.params.cc }).populate(
+            "user"
+          )
+          if (username && username === carFound.user.username) {
+            logger.debug("Authenticated: Access allowed")
+            return next()
+          }
+        }
+      }
+      if (url.startsWith("/api/auth")) {
+        if (username && req.params?.username === username) {
+          logger.debug("Authenticated: Access allowed")
+          return next()
+        }
+      }
+      /* -------------------------------------------------------------------------- */
 
       /* -------------------------------------------------------------------------- */
       /* --------------------------- Create applications -------------------------- */
       /* -------------------------------------------------------------------------- */
       if (url.startsWith("/api/applications") && method === "POST") {
-        if (username && paramsUsername.every((param) => param !== username)) {
-          logger.error(
-            "Personal routes error: username !== paramPassengerUsername"
-          )
-          return res
-            .status(403)
-            .json({ error: MESSAGES.ACCESS_DENIED, err: "personal" })
+        if (username && req.body.passenger === username) {
+          logger.debug("Authenticated: Access allowed")
+          return next()
         }
       }
       /* -------------------------------------------------------------------------- */
@@ -110,11 +133,9 @@ const verifyToken = async (req, res, next) => {
           "driver"
         )
 
-        if (username !== liftFound.driver.username) {
-          return res.status(403).json({
-            error: MESSAGES.ACCESS_DENIED,
-            err: "application accept reject",
-          })
+        if (username === liftFound.driver.username) {
+          logger.debug("Authenticated: Access allowed")
+          return next()
         }
       }
       /* -------------------------------------------------------------------------- */
@@ -127,17 +148,12 @@ const verifyToken = async (req, res, next) => {
           ca: req.params?.ca,
         }).populate("passenger")
 
-        if (username !== applicationFound.passenger.username) {
-          return res.status(403).json({
-            error: MESSAGES.ACCESS_DENIED,
-            err: "application accept reject",
-          })
+        if (username === applicationFound.passenger.username) {
+          logger.debug("Authenticated: Access allowed")
+          return next()
         }
       }
       /* -------------------------------------------------------------------------- */
-
-      logger.debug("Personal routes: Access allowed")
-      return next()
     }
 
     /* -------------------------------------------------------------------------- */
