@@ -104,11 +104,11 @@ const LiftSchema = new Schema(
       enum: ["open", "ready", "inProgress", "finished", "closed", "canceled"],
     },
     receivedDriverRatings: {
-      type: Number,
-      default: null,
-      validate: {
+      type: [Number],
+      default: [],
+      /* validate: {
         validator: (rating) => (rating >= 1 && rating <= 5) || rating === null,
-      },
+      }, */
     },
   },
   { collection: "lifts", timestamps: true }

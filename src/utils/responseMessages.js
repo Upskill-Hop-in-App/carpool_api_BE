@@ -65,6 +65,15 @@ export const MESSAGES = {
   INVALID_DATE_FORMAT: "Invalid date format, please use dd/mm/aaaa",
   DATE_IN_PAST: "The selected date is in the past",
   INVALID_QUERY_LIFTS: "Invalid query parameter",
+  LIFT_NOT_READY: "Can't change lift status to inProgress because it wasn't ready to start",
+  PASSENGER_NOT_READY: "Can't change lift status to inProgress because no passenger is ready",
+  LIFT_NOT_IN_PROGRESS: "Can't change lift status to finished since it wasn't inProgress",
+  LIFT_NOT_FINISHED: "Lift not finished",
+  MISSING_RATINGS: "Cannot close lift because driver/passenger ratings are missing",
+  CANNOT_CANCEL_LIFT: "Can't cancel lift since it has already progressed too far in status, only allowed when open or ready",
+  FAILED_TO_UPDATE_LIFT_STATUS: "Failed to change lift status",
+  FAILED_TO_UPDATE_LIFT_DRIVER_RATING: "Failed to update received driver ratings",
+  MAX_RATINGS: "All occupants have already given their ratings to the driver",
   /* -------------------------------------------------------------------------- */
 
   /* ---------------------- Application Success messages ---------------------- */
@@ -75,6 +84,8 @@ export const MESSAGES = {
   APPLICATION_ACCEPTED_SUCCESS: "Application accepted successfully!",
   APPLICATION_REJECTED_SUCCESS: "Application rejected successfully!",
   APPLICATION_CANCELED_SUCCESS: "Application canceled successfully!",
+  APPLICATION_UPDATED_READY: "Application status updated to ready",
+  PASSENGER_RATING_UPDATE: "Passenger rating loaded",
   /* -------------------------------------------------------------------------- */
 
   /* ----------------------- Application Error messages ----------------------- */
@@ -97,6 +108,11 @@ export const MESSAGES = {
     "Application status is already rejected or canceled.",
   FAILED_TO_CANCEL_APPLICATION: "Failed to cancel application.",
   DRIVER_IS_PASSENGER: "Driver cannot apply as a passenger to their lift",
+  APPLICATION_NOT_ACCEPTED: "Application cannot be set to ready because it wasn't accepted",
+  APPLICATION_NOT_READY: "Cannot load passenger rating because the application wasn't ready",
+  FAILED_TO_UPDATE_APPLICATION: "Failed to update application",
+  APPLICATION_LIFT_NOT_FINISHED: "Cannot load passenger rating because the lift wasn't finished",
+  APPLICATION_LIFT_IN_PROGRESS: "Cannot set status to ready because lift is already in progress",
 
   /* -------------------------------------------------------------------------- */
 

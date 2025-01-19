@@ -40,9 +40,12 @@ class LiftOutputDTO {
             passengerRating: application.passenger?.passengerRating || null,
           },
           status: application?.status || null,
+          receivedPassengerRating: application?.receivedPassengerRating || null,
         }))
       : []
     this.occupiedSeats = lift.occupiedSeats
+    this.receivedDriverRatings = lift.receivedDriverRatings || null
+    this.status = lift.status
     this.createdAt = lift.createdAt
     this.updatedAt = lift.updatedAt
   }

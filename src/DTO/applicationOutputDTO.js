@@ -21,6 +21,7 @@ class ApplicationOutputDTO {
       status: application.lift?.status,
     }
     this.status = application.status
+    this.receivedPassengerRating = application.receivedPassengerRating
     this.createdAt = application.createdAt
     this.updatedAt = application.updatedAt
   }

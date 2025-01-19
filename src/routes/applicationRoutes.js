@@ -29,6 +29,8 @@ router.get(
 router.put("/accept/:ca", ApplicationController.accept)
 router.put("/reject/:ca", ApplicationController.reject)
 router.put("/cancel/:ca", ApplicationController.cancel)
+router.put("/ready/:ca", ApplicationController.updatePassengerReady)
+router.put("/ca/rating/:ca/:rating", ApplicationController.updatePassengerRating)
 router.delete("/:ca", ApplicationController.delete)
 
 export { router as applicationRoutes }

@@ -149,6 +149,78 @@ class LiftController {
     }
   }
 
+  async updateLiftStatusByCode(req, res) {
+    logger.info("PUT: /api/lifts/status")
+    try {
+      const lift = await LiftService.updateStatus(
+        req.params.cl,
+        req.params.status
+      )
+      const outputDTO = new LiftOutputDTO(lift)
+      res.status(201).json({ message: MESSAGES.LIFT_UPDATED, data: outputDTO })
+    } catch (err) {
+      logger.error("LiftController - Error updating lift: ", err)
+
+      if (err.message === "LiftNotFound") {
+        res.status(400).json({ error: MESSAGES.LIFT_NOT_FOUND_BY_CODE })
+      } else if (err.message === "LiftNotReady") {
+        res.status(400).json({ error: MESSAGES.LIFT_NOT_READY })
+      } else if (err.message === "ApplicationNotFound") {
+        res.status(400).json({ error: MESSAGES.APPLICATION_NOT_FOUND })
+      } else if (err.message === "PassengerNotReady") {
+        res.status(400).json({
+          error: MESSAGES.PASSENGER_NOT_READY,
+        })
+      } else if (err.message === "LiftNotInProgress") {
+        res.status(400).json({
+          error: MESSAGES.LIFT_NOT_IN_PROGRESS,
+        })
+      } else if (err.message === "LiftNotFinished") {
+        res.status(400).json({
+          error: MESSAGES.LIFT_NOT_FINISHED,
+        })
+      } else if (err.message === "MissingRatings") {
+        res.status(400).json({
+          error: MESSAGES.MISSING_RATINGS,
+        })
+      } else if (err.message === "InvalidStatusToCancel") {
+        res.status(400).json({
+          error: MESSAGES.CANNOT_CANCEL_LIFT,
+        })
+      } else {
+        res.status(500).json({ error: MESSAGES.FAILED_TO_UPDATE_LIFT_STATUS })
+      }
+    }
+  }
+
+  async updateDriverRatingsByCode(req, res) {
+    logger.info("PUT: /api/lifts/rating")
+    try {
+      const lift = await LiftService.loadDriverRating(
+        req.params.cl,
+        req.params.rating
+      )
+      const outputDTO = new LiftOutputDTO(lift)
+      res.status(201).json({ message: MESSAGES.LIFT_UPDATED, data: outputDTO })
+    } catch (err) {
+      logger.error("LiftController - Error updating lift: ", err)
+
+      if (err.message === "LiftNotFound") {
+        res.status(400).json({ error: MESSAGES.LIFT_NOT_FOUND_BY_CODE })
+      } else if (err.message === "LiftNotFinished") {
+        res.status(400).json({
+          error: MESSAGES.LIFT_NOT_FINISHED,
+        })
+      } else if (err.message === "MaxRatingsGiven") {
+        res.status(400).json({
+          error: MESSAGES.MAX_RATINGS,
+        })
+      } else {
+        res.status(500).json({ error: MESSAGES.FAILED_TO_UPDATE_LIFT_DRIVER_RATING })
+      }
+    }
+  }
+
   async updateLiftByCode(req, res) {
     logger.info("PUT: /api/lifts")
     try {

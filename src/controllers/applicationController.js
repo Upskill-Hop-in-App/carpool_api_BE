@@ -418,6 +418,61 @@ class ApplicationController {
     }
   }
 
+  async updatePassengerReady(req, res) {
+    try {
+      logger.info(`PUT: /api/applications/ready/${req.params.ca}`)
+      const readyApplication = await ApplicationService.updateStatusReady(
+        req.params.ca
+      )
+      const outputDTO = new ApplicationOutputDTO(readyApplication)
+      res
+        .status(200)
+        .json({
+          message: MESSAGES.APPLICATION_UPDATED_READY,
+          data: outputDTO,
+        })
+    } catch (err) {
+      logger.error("applicationController - cancelApplication", err)
+      if (err.message === "ApplicationNotFound") {
+        res.status(400).json({ error: MESSAGES.APPLICATION_NOT_FOUND })
+      } else if (err.message === "ApplicationNotAccepted") {
+        res.status(400).json({ error: MESSAGES.APPLICATION_NOT_ACCEPTED })
+      } else if (err.message === "LiftAlreadyInProgress") {
+        res.status(400).json({ error: MESSAGES.APPLICATION_LIFT_IN_PROGRESS })
+      } else {
+        res.status(500).json({ error: MESSAGES.FAILED_TO_UPDATE_APPLICATION })
+      }
+    }
+  }
+
+  async updatePassengerRating(req, res) {
+    try {
+      logger.info(`PUT: /api/applications/rating/${req.params.ca}`)
+      const application = await ApplicationService.loadPassengerRating(
+        req.params.ca,
+        req.params.rating
+      )
+      const outputDTO = new ApplicationOutputDTO(application)
+      res
+        .status(200)
+        .json({
+          message: MESSAGES.PASSENGER_RATING_UPDATE,
+          data: outputDTO,
+        })
+    } catch (err) {
+      logger.error("applicationController - updatePassengerRating", err)
+      if (err.message === "ApplicationNotFound") {
+        res.status(400).json({ error: MESSAGES.APPLICATION_NOT_FOUND })
+      } else if (err.message === "ApplicationNotReady") {
+        res.status(400).json({ error: MESSAGES.APPLICATION_NOT_READY })
+      } else if (err.message === "LiftNotfinished") {
+        res.status(400).json({ error: MESSAGES.APPLICATION_LIFT_NOT_FINISHED })
+      } else {
+        res.status(500).json({ error: MESSAGES.FAILED_TO_UPDATE_APPLICATION })
+      }
+    }
+  }
+
   async delete(req, res) {
     try {
       logger.info(`DELETE: /api/applications/${req.params.ca}`)
