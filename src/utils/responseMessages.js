@@ -66,6 +66,7 @@ export const MESSAGES = {
   INVALID_DATE_FORMAT: "Invalid date format, please use dd/mm/aaaa",
   DATE_IN_PAST: "The selected date is in the past",
   INVALID_QUERY_LIFTS: "Invalid query parameter",
+  FAILED_TO_RETRIEVE_LIFT_BY_USERNAME: "Failed to retrieve lift by username",
   /* -------------------------------------------------------------------------- */
 
   /* ---------------------- Application Success messages ---------------------- */
@@ -122,5 +123,6 @@ export const MESSAGES = {
   FAILED_TO_DELETE_CAR: "Failed to delete car",
   INVALID_QUERY_CARS:
     "Invalid query parameter, try: cc/brand/model/year/user/color/plate",
+  FAILED_TO_RETRIEVE_CAR_BY_USERNAME: "Failed to retrieve car by username",
   /* -------------------------------------------------------------------------- */
 }

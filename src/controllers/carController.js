@@ -47,6 +47,26 @@ class CarController {
     }
   }
 
+  async getCarByUsername(req, res) {
+    logger.info("GET:/api/cars by Username: " + req.params.username)
+    try {
+      const cars = await CarService.listByUsername(req.params.username)
+      const outputDTOs = cars.map((car) => new CarOutputDTO(car))
+      res
+        .status(200)
+        .json({ message: MESSAGES.CARS_RETRIEVED, data: outputDTOs })
+    } catch (err) {
+      logger.error("CarController - Failed to retrieve car by username")
+      if (err.message === "UserNotFound") {
+        res.status(404).json({ error: MESSAGES.USER_NOT_FOUND })
+      } else if (err.message === "NoCarsFound") {
+        res.status(404).json({ error: MESSAGES.NO_CARS_FOUND })
+      } else {
+        res.status(500).json({ error: MESSAGES.FAILED_TO_RETRIEVE_CAR_BY_USERNAME })
+      }
+    }
+  }
+
   async filterCars(req, res) {
     try {
       logger.info(`GET:/api/cars/filter/username/${req.query}`)
