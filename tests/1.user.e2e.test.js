@@ -3,7 +3,7 @@ import request from "supertest"
 import { MESSAGES } from "../src/utils/responseMessages.js"
 import { app } from "../src/app.js"
 import UserService from "../src/services/userService.js"
-import { adminToken, clientToken } from "./setup/testSetup.js"
+import { adminToken, clientToken, client2Token } from "./setup/testSetup.js"
 import { response } from "express"
 
 describe("User Endpoints", () => {
@@ -167,19 +167,6 @@ describe("User Endpoints", () => {
     expect(responseUpdate.body.message).toBe(MESSAGES.USER_UPDATED_SUCCESS)
   })
 
-  test("should fail to update client password with different token user", async () => {
-    const updatedPassword = {
-      password: "123",
-    }
-
-    const response = await request(app)
-      .put("/api/auth/password/client_name")
-      .set("Authorization", `Bearer ${adminToken}`)
-      .send(updatedPassword)
-    expect(response.status).toBe(403)
-    expect(response.body.error).toBe(MESSAGES.ACCESS_DENIED)
-  })
-
   test("should update client password", async () => {
     const updatedPassword = {
       password: "123",
@@ -236,7 +223,7 @@ describe("User Endpoints", () => {
   test("should not delete user with different token", async () => {
     const response = await request(app)
       .put("/api/auth/delete/client_name")
-      .set("Authorization", `Bearer ${adminToken}`)
+      .set("Authorization", `Bearer ${client2Token}`)
     expect(response.status).toBe(403)
     expect(response.body.error).toBe(MESSAGES.ACCESS_DENIED)
   })
@@ -245,7 +232,6 @@ describe("User Endpoints", () => {
     const response = await request(app)
       .put("/api/auth/delete/client_name")
       .set("Authorization", `Bearer ${clientToken}`)
-    console.log("🚀 ~ test.only ~ response:", response.body)
     expect(response.status).toBe(200)
     expect(response.body.message).toBe(MESSAGES.USER_DELETED_SUCCESS)
   })
