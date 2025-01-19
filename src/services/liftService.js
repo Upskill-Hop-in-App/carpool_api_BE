@@ -129,6 +129,35 @@ class LiftService {
     return lift
   }
 
+  async listByUsername(username) {
+    logger.info("LiftService - listByUsername")
+    const user = await User.findOne({ username: username })
+    if (!user) {
+      throw new Error("UserNotFound")
+    }
+
+    const lifts = await Lift.find({ driver: user }).populate([
+      {
+        path: "driver",
+      },
+      {
+        path: "applications",
+        populate: {
+          path: "passenger",
+          model: "User",
+        },
+      },
+      {
+        path: "car",
+      },
+    ])
+
+    if (lifts.length === 0) {
+      throw new Error("NoLiftsFound")
+    }
+    return lifts
+  }
+
   async filterLifts(filters) {
     logger.info("LiftService - filterLifts")
 

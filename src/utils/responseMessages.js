@@ -74,6 +74,7 @@ export const MESSAGES = {
   FAILED_TO_UPDATE_LIFT_STATUS: "Failed to change lift status",
   FAILED_TO_UPDATE_LIFT_DRIVER_RATING: "Failed to update received driver ratings",
   MAX_RATINGS: "All occupants have already given their ratings to the driver",
+  FAILED_TO_RETRIEVE_LIFT_BY_USERNAME: "Failed to retrieve lift by username",
   /* -------------------------------------------------------------------------- */
 
   /* ---------------------- Application Success messages ---------------------- */
@@ -135,8 +136,8 @@ export const MESSAGES = {
   FAILED_TO_RETRIEVE_CAR_BY_CODE: "Failed to retrieve car by code",
   FAILED_TO_UPDATE_CAR: "Failed to update car",
   FAILED_TO_DELETE_CAR: "Failed to delete car",
-  FAILED_TO_RETRIEVE_VALIDATION_INFO: "Failed to retrieve validation info",
   INVALID_QUERY_CARS:
     "Invalid query parameter, try: cc/brand/model/year/user/color/plate",
+  FAILED_TO_RETRIEVE_CAR_BY_USERNAME: "Failed to retrieve car by username",
   /* -------------------------------------------------------------------------- */
 }

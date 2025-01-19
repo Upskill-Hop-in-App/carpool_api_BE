@@ -55,7 +55,7 @@ class LiftController {
         })
       } else if (err.message === "FailedCarValidation") {
         res.status(400).json({
-          error: MESSAGES.FAILED_TO_COMMUNICATE_WITH_CARS,
+          error: MESSAGES.FAILED_TO_RETRIEVE_VALIDATION_INFO,
         })
       } else if (err.message === "MatchingLocations") {
         res.status(400).json({
@@ -89,7 +89,7 @@ class LiftController {
         .json({ message: MESSAGES.LIFTS_RETRIEVED, data: outputDTOs })
     } catch (err) {
       logger.error("LiftController - Failed to retrieve lifts: ", err.message)
-      if (err.message === "LiftNotFound") {
+      if (err.message === "NoLiftFound") {
         res.status(404).json({ error: MESSAGES.NO_LIFTS_FOUND })
       } else {
         res.status(500).json({ error: MESSAGES.FAILED_TO_RETRIEVE_LIFTS })
@@ -117,6 +117,28 @@ class LiftController {
         res
           .status(500)
           .json({ error: MESSAGES.FAILED_TO_RETRIEVE_LIFT_BY_CODE })
+      }
+    }
+  }
+
+  async getLiftByUsername(req, res) {
+    logger.info("GET:/api/lifts by Username: " + req.params.username)
+    try {
+      const lifts = await LiftService.listByUsername(req.params.username)
+      const outputDTOs = lifts.map((lift) => new LiftOutputDTO(lift))
+      res
+        .status(200)
+        .json({ message: MESSAGES.LIFTS_RETRIEVED, data: outputDTOs })
+    } catch (err) {
+      logger.error("LiftController - Failed to retrieve lifs by username")
+      if (err.message === "UserNotFound") {
+        res.status(404).json({ error: MESSAGES.USER_NOT_FOUND })
+      } else if (err.message === "NoLiftsFound") {
+        res.status(404).json({ error: MESSAGES.NO_LIFTS_FOUND })
+      } else {
+        res
+          .status(500)
+          .json({ error: MESSAGES.FAILED_TO_RETRIEVE_LIFT_BY_USERNAME })
       }
     }
   }
@@ -249,7 +271,7 @@ class LiftController {
       const liftModel = await inputDTO.toLift()
       const lift = await LiftService.update(req.params.cl, liftModel)
       const outputDTO = new LiftOutputDTO(lift)
-      res.status(201).json({ message: MESSAGES.LIFT_UPDATED, data: outputDTO })
+      res.status(200).json({ message: MESSAGES.LIFT_UPDATED, data: outputDTO })
     } catch (err) {
       logger.error("LiftController - Error updating lift: ", err)
       if (err.name === "ValidationError") {
