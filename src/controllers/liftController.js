@@ -121,6 +121,28 @@ class LiftController {
     }
   }
 
+  async getLiftByUsername(req, res) {
+    logger.info("GET:/api/lifts by Username: " + req.params.username)
+    try {
+      const lifts = await LiftService.listByUsername(req.params.username)
+      const outputDTOs = lifts.map((lift) => new LiftOutputDTO(lift))
+      res
+        .status(200)
+        .json({ message: MESSAGES.LIFTS_RETRIEVED, data: outputDTOs })
+    } catch (err) {
+      logger.error("LiftController - Failed to retrieve lifs by username")
+      if (err.message === "UserNotFound") {
+        res.status(404).json({ error: MESSAGES.USER_NOT_FOUND })
+      } else if (err.message === "NoLiftsFound") {
+        res.status(404).json({ error: MESSAGES.NO_LIFTS_FOUND })
+      } else {
+        res
+          .status(500)
+          .json({ error: MESSAGES.FAILED_TO_RETRIEVE_LIFT_BY_USERNAME })
+      }
+    }
+  }
+
   async filterLifts(req, res) {
     try {
       logger.info(`GET:/api/lifts/filter/${req.query}`)

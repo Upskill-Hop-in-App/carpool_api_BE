@@ -36,6 +36,18 @@ class CarService {
     return car
   }
 
+  async listByUsername(username) {
+    const user = await User.findOne({ username: username })
+    if (!user) {
+      throw new Error("UserNotFound")
+    }
+    const cars = await Car.find({ user: user }).populate("user")
+    if (cars.length===0) {
+      throw new Error("NoCarsFound")
+    }
+    return cars
+  }
+
   async getCarValidation(brand, model, year) {
     try {
       logger.debug("CarService - create")
