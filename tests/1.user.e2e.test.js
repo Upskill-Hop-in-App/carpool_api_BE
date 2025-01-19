@@ -143,7 +143,7 @@ describe("User Endpoints", () => {
 
     const updatedClient = {
       email: "updatedclient@test.com",
-      username: "updatedClientTest",
+      username: "clientTest3",
       name: "Client Test",
       contact: "1234567890",
     }
