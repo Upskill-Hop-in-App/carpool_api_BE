@@ -59,6 +59,11 @@ const verifyToken = async (req, res, next) => {
     const token = req.headers["authorization"]?.split(" ")[1]
     const decodedToken = await getDecodedToken(token)
     const { role, username } = decodedToken
+
+    if (!username) {
+      logger.error("Invalid Token")
+      return res.status(403).json({ error: MESSAGES.ACCESS_DENIED })
+    }
     /* -------------------------------------------------------------------------- */
 
     /* -------------------------------------------------------------------------- */
@@ -97,14 +102,14 @@ const verifyToken = async (req, res, next) => {
           const carFound = await Car.findOne({ cc: req.params.cc }).populate(
             "user"
           )
-          if (username && username === carFound.user.username) {
+          if (username === carFound.user.username) {
             logger.debug("Authenticated: Access allowed")
             return next()
           }
         }
       }
       if (url.startsWith("/api/auth")) {
-        if (username && req.params?.username === username) {
+        if (req.params?.username === username) {
           logger.debug("Authenticated: Access allowed")
           return next()
         }
@@ -115,7 +120,7 @@ const verifyToken = async (req, res, next) => {
       /* --------------------------- Create applications -------------------------- */
       /* -------------------------------------------------------------------------- */
       if (url.startsWith("/api/applications") && method === "POST") {
-        if (username && req.body.passenger === username) {
+        if (req.body.passenger === username) {
           logger.debug("Authenticated: Access allowed")
           return next()
         }
@@ -154,18 +159,45 @@ const verifyToken = async (req, res, next) => {
         }
       }
       /* -------------------------------------------------------------------------- */
+
+      /* -------------------------------------------------------------------------- */
+      /* ---------------------------------- Lift ---------------------------------- */
+      /* -------------------------------------------------------------------------- */
+      if (url.startsWith("/api/lifts")) {
+        if (method === "GET") {
+          logger.debug("Authenticated: Access allowed")
+          return next()
+        }
+
+        if (
+          (method === "POST" || method === "PUT") &&
+          username === req.body.driver
+        ) {
+          logger.debug("Authenticated: Access allowed")
+          return next()
+        }
+
+        if (method === "DELETE" && username === req.params?.cl) {
+          const liftFound = Lift.findOne({ cl: req.params.cl }).populate(
+            "driver"
+          )
+          if (username && liftFound.driver.username) {
+            logger.debug("Authenticated: Access allowed")
+            return next()
+          }
+        }
+      }
+      /* -------------------------------------------------------------------------- */
     }
 
     /* -------------------------------------------------------------------------- */
     /* ------------------ If no conditions matched, deny access ----------------- */
     /* -------------------------------------------------------------------------- */
     logger.error("Personal routes error: no conditions matched")
-    return res
-      .status(403)
-      .json({ error: MESSAGES.ACCESS_DENIED, err: "no conditions" })
+    return res.status(403).json({ error: MESSAGES.ACCESS_DENIED })
   } catch (err) {
     logger.error("verifyToken - error: ", err)
-    return res.status(403).json({ error: MESSAGES.ACCESS_DENIED, err: "catch" })
+    return res.status(403).json({ error: MESSAGES.ACCESS_DENIED })
     /* -------------------------------------------------------------------------- */
   }
 }
