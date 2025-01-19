@@ -228,7 +228,7 @@ describe("Application Tests", () => {
     }
     const liftResponse1 = await request(app)
       .post("/api/lifts")
-      .set("Authorization", `Bearer ${user0Token}`)
+      .set("Authorization", `Bearer ${adminToken}`)
       .send(newLift1)
 
     expect(liftResponse1.status).toBe(201)
@@ -249,7 +249,7 @@ describe("Application Tests", () => {
     }
     const liftResponse2 = await request(app)
       .post("/api/lifts")
-      .set("Authorization", `Bearer ${user0Token}`)
+      .set("Authorization", `Bearer ${adminToken}`)
       .send(newLift2)
 
     expect(liftResponse2.status).toBe(201)
