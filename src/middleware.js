@@ -28,7 +28,8 @@ const ROUTES = {
 const isDevMode =
   process.env.NODE_ENV === "dev" && process.env.SKIP_VALIDATION === "true"
 
-const getTokenFromHeaders = (headers) => headers["authorization"]?.split(" ")[1]
+export const getTokenFromHeaders = (headers) =>
+  headers["authorization"]?.split(" ")[1]
 
 const getDecodedToken = async (token) => {
   if (!token) throw new Error("Missing Token")
@@ -67,6 +68,8 @@ const handleApplicationRoutes = async (url, method, username, req) => {
 
     if (
       url.startsWith("/api/applications/accept") ||
+      url.startsWith("/api/applications/ready") ||
+      url.startsWith("/api/applications/ca/rating") ||
       url.startsWith("/api/applications/reject")
     ) {
       const liftFound = await Lift.findOne({ ca: req.params?.ca }).populate(
@@ -87,7 +90,23 @@ const handleApplicationRoutes = async (url, method, username, req) => {
 
 const handleLiftRoutes = async (url, method, username, req) => {
   if (url.startsWith("/api/lifts")) {
-    if (method === "GET") return true
+    if (url.startsWith("/api/lifts/cl/status") && method === "PUT") {
+      const liftFound = await Lift.findOne({ cl: req.params.cl }).populate(
+        "driver"
+      )
+      return liftFound?.driver?.username === username
+    } else if (url.startsWith("/api/lifts/cl/rating") && method === "PUT") {
+      const liftFound = await Lift.findOne({ cl: req.params.cl })
+        .populate("applications")
+        .populate({
+          path: "applications",
+          populate: { path: "passenger", model: "User" },
+        })
+      const applications = liftFound?.applications
+      return applications.some(
+        (application) => application?.passenger?.username === username
+      )
+    } else if (method === "GET") return true
 
     if ((method === "POST" || method === "PUT") && req.body.driver === username)
       return true

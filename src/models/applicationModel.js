@@ -20,7 +20,7 @@ const ApplicationSchema = new Schema(
     status: {
       type: String,
       default: "pending",
-      enum: ["pending", "accepted", "rejected", "canceled"],
+      enum: ["pending", "accepted", "ready", "rejected", "canceled"],
     },
     receivedPassengerRating: {
       type: Number,

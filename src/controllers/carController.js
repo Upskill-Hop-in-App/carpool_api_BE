@@ -18,7 +18,7 @@ class CarController {
       })
       logger.debug("CarController - createCar - inputDTO")
       const carModel = await inputDTO.toCar()
-      const savedCar = await CarService.create(carModel)
+      const savedCar = await CarService.create(carModel, req)
       const outputDTO = new CarOutputDTO(savedCar)
       res.status(201).json({ message: MESSAGES.CAR_CREATED, data: outputDTO })
     } catch (err) {

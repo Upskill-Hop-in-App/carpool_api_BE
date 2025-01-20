@@ -290,6 +290,190 @@ class LiftService {
     return filteredLifts
   }
 
+  async updateStatus(code, status) {
+    logger.info("LiftService - update")
+
+    const lift = await Lift.findOne({ cl: code }).populate([
+      {
+        path: "driver",
+      },
+      {
+        path: "applications",
+        populate: {
+          path: "passenger",
+          model: "User",
+        },
+      },
+      {
+        path: "car",
+      },
+    ])
+
+    if (!lift) {
+      throw new Error("LiftNotFound")
+    }
+
+    const statusValidations = {
+      inProgress: () => {
+        if (lift.status !== "ready" && lift.status !== "open")
+          throw new Error("LiftNotReady")
+        if (lift.applications.length === 0)
+          throw new Error("ApplicationNotFound")
+        if (!lift.applications.some((app) => app.status === "ready"))
+          throw new Error("PassengerNotReady")
+      },
+      finished: () => {
+        if (lift.status !== "inProgress") throw new Error("LiftNotInProgress")
+      },
+      closed: async () => {
+        if (lift.status !== "finished") throw new Error("LiftNotFinished")
+        const hasPassengerRatings = lift.applications.some(
+          (app) => app.receivedPassengerRating
+        )
+        if (lift.receivedDriverRatings.length === 0 || !hasPassengerRatings) {
+          throw new Error("MissingRatings")
+        }
+        lift.status = "closed"
+        await lift.save()
+        await this.updateRatings(lift)
+      },
+      canceled: async () => {
+        if (["inProgress", "finished", "closed"].includes(lift.status)) {
+          throw new Error("InvalidStatusToCancel")
+        }
+        const applicationIds = lift.applications.map((app) => app.ca)
+
+        await Application.updateMany(
+          { ca: { $in: applicationIds } },
+          { $set: { status: "rejected" } }
+        )
+      },
+    }
+
+    if (statusValidations[status]) {
+      await statusValidations[status]()
+    } else {
+      throw new Error("InvalidStatus")
+    }
+
+    if (status !== "closed") {
+      lift.status = status
+      await lift.save()
+    }
+    return lift
+  }
+
+  async loadDriverRating(cl, rating) {
+    const lift = await Lift.findOne({ cl: cl }).populate([
+      {
+        path: "driver",
+      },
+      {
+        path: "applications",
+        populate: {
+          path: "passenger",
+          model: "User",
+        },
+      },
+      {
+        path: "car",
+      },
+    ])
+
+    if (!lift) {
+      throw new Error("LiftNotFound")
+    }
+
+    if (lift.status !== "finished") {
+      throw new Error("LiftNotFinished")
+    }
+
+    const readyApplicationsCount = lift.applications.filter(
+      (app) => app.status === "ready"
+    ).length
+
+    if (lift.receivedDriverRatings.length >= readyApplicationsCount) {
+      throw new Error("MaxRatingsGiven")
+    }
+
+    lift.receivedDriverRatings.push(rating)
+    await lift.save()
+    return lift
+  }
+
+  async updateRatings(lift) {
+    logger.info("LiftService - update ratings")
+    const driver = lift.driver
+    const driverRatings = await Lift.find({
+      driver: driver._id,
+      status: "closed",
+    })
+      .select("receivedDriverRatings")
+      .lean()
+
+    const allDriverRatings = driverRatings.flatMap(
+      (l) => l.receivedDriverRatings
+    )
+    const ratingsIncludingInitial =
+      allDriverRatings.length > 0 ? [5, ...allDriverRatings] : [5]
+
+    const averageDriverRating =
+      ratingsIncludingInitial.length > 0
+        ? ratingsIncludingInitial.reduce((sum, rating) => sum + rating, 0) /
+          ratingsIncludingInitial.length
+        : driver.driverRating
+
+    driver.driverRating = parseFloat(averageDriverRating.toFixed(2))
+
+    await driver.save()
+
+    const passengerUpdates = lift.applications.map(async (application) => {
+      const passenger = application.passenger
+
+      const liftWithApplications = await Lift.find()
+        .populate({
+          path: "applications",
+          populate: {
+            path: "passenger",
+            model: "User",
+          },
+        })
+        .lean()
+
+      const relevantLifts = liftWithApplications.filter((lift) =>
+        lift.applications.some(
+          (app) =>
+            app.passenger._id.toString() === passenger._id.toString() &&
+            app.status === "ready"
+        )
+      )
+
+      const allPassengerRatings = relevantLifts
+        .flatMap((lift) =>
+          lift.applications
+            .map((app) => app.receivedPassengerRating)
+        )
+        .filter(Boolean)
+
+      const ratingsIncludingInitialPassenger =
+        allPassengerRatings.length > 0 ? [5, ...allPassengerRatings] : [5]
+
+      const averagePassengerRating =
+        ratingsIncludingInitialPassenger.length > 0
+          ? ratingsIncludingInitialPassenger.reduce(
+              (sum, rating) => sum + rating,
+              0
+            ) / ratingsIncludingInitialPassenger.length
+          : passenger.passengerRating
+
+      passenger.passengerRating = parseFloat(averagePassengerRating.toFixed(2))
+
+      await passenger.save()
+    })
+
+    await Promise.all(passengerUpdates)
+  }
+
   async update(code, data) {
     logger.info("LiftService - update")
     const {
@@ -354,6 +538,7 @@ class LiftService {
       },
     ])
   }
+
   async delete(cl) {
     logger.info("LiftService - delete")
     const lift = Lift.findOne({ cl: cl })

@@ -2,6 +2,8 @@ import Lift from "../models/liftModel.js"
 import User from "../models/userModel.js"
 import logger from "../logger.js"
 import Application from "../models/applicationModel.js"
+import { application } from "express"
+import liftService from "./liftService.js"
 // import Car from "../models/carModel.js";
 
 class ApplicationService {
@@ -468,6 +470,54 @@ class ApplicationService {
     ])
 
     return canceledApplication
+  }
+
+  async updateStatusReady(ca) {
+    const application = await Application.findOne({ ca: ca }).populate({path: "lift"})
+
+    if (!application) {
+      throw new Error("ApplicationNotFound")
+    }
+    if(application.lift.status !== "open" && application.lift.status !== "ready") {
+      throw new Error("LiftAlreadyInProgress")
+    }
+    if (application.status !== "accepted") {
+      throw new Error("ApplicationNotAccepted")
+    }
+    application.status = "ready"
+    await application.save()
+
+    return application
+  }
+
+  async loadPassengerRating(ca, rating) {
+    const application = await Application.findOne({ ca: ca }).populate([
+      {
+        path: "passenger",
+      },
+      {
+        path: "lift",
+        populate: {
+          path: "driver",
+        },
+      },
+    ])
+
+    if (!application) {
+      throw new Error("ApplicationNotFound")
+    }
+    if (application.status !== "ready") {
+      throw new Error("ApplicationNotReady")
+    }
+
+    if (application.lift.status !== "finished") {
+      throw new Error("LiftNotfinished")
+    }
+
+    application.receivedPassengerRating = rating
+    await application.save()
+
+    return application
   }
 }
 

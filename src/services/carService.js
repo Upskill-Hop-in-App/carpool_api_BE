@@ -3,13 +3,23 @@ import logger from "../logger.js"
 
 import Car from "../models/carModel.js"
 import User from "../models/userModel.js"
+import { getTokenFromHeaders } from "../middleware.js"
+const isTestMode = process.env.NODE_ENV === "test"
+
+let token
 
 class CarService {
-  async create(car) {
+  async create(car, req) {
     logger.info("CarService - create")
     const { cc, brand, model, year, user, color, plate } = car
+    let isValid
 
-    const isValid = await this.getCarValidation(brand, model, year)
+    if (isTestMode) {
+      isValid = true
+    } else {
+      token = await getTokenFromHeaders(req.headers)
+      isValid = await this.getCarValidation(brand, model, year, token)
+    }
 
     if (isValid === false) {
       throw new Error("CarNotValid")
@@ -42,17 +52,22 @@ class CarService {
       throw new Error("UserNotFound")
     }
     const cars = await Car.find({ user: user }).populate("user")
-    if (cars.length===0) {
+    if (cars.length === 0) {
       throw new Error("NoCarsFound")
     }
     return cars
   }
 
-  async getCarValidation(brand, model, year) {
+  async getCarValidation(brand, model, year, token) {
     try {
       logger.debug("CarService - create")
       const response = await axios.get(
-        `${"http://localhost:3001"}/api/cars/verify/${brand}/${model}/${year}`
+        `http://localhost:3001/api/cars/verify/${brand}/${model}/${year}`,
+        {
+          headers: {
+            Authorization: `Bearer ${isTestMode ? clientToken : token}`,
+          },
+        }
       )
 
       const isValid = response.data.data
@@ -71,15 +86,8 @@ class CarService {
       throw new Error("UserNotFound")
     }
 
-    const query = {user: username}
-    const allowedFilters = [
-      "cc",
-      "brand",
-      "model",
-      "year",
-      "color",
-      "plate",
-    ]
+    const query = { user: username }
+    const allowedFilters = ["cc", "brand", "model", "year", "color", "plate"]
 
     const invalidFilters = Object.keys(filters).filter(
       (key) => !allowedFilters.includes(key)
