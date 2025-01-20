@@ -4,7 +4,6 @@ import { MESSAGES } from "../src/utils/responseMessages.js"
 import { app } from "../src/app.js"
 import UserService from "../src/services/userService.js"
 import { adminToken, clientToken, client2Token } from "./setup/testSetup.js"
-import { response } from "express"
 
 describe("User Endpoints", () => {
   test("should not create a new admin without token", async () => {
@@ -192,33 +191,6 @@ describe("User Endpoints", () => {
     expect(response.status).toBe(400)
     expect(response.body.error).toBe(MESSAGES.PASSWORD_EMPTY)
   })
-
-  // TODO: update ratings nao deve ser uma rota. Esses updates devem ocorrer internamente
-  // test("should update driver rating", async () => {
-  //   const updatedDriverRating = {
-  //     driverRating: 2,
-  //   }
-
-  //   const response = await request(app)
-  //     .put("/api/auth/driverRating/updatedClientTest")
-  //     .set("Authorization", `Bearer ${adminToken}`)
-  //     .send(updatedDriverRating)
-  //   expect(response.status).toBe(200)
-  //   expect(response.body.message).toBe(MESSAGES.RATING_UPDATED_SUCCESS)
-  // })
-
-  // test("should update passenger rating", async () => {
-  //   const updatedPassengerRating = {
-  //     passengerRating: 2,
-  //   }
-
-  //   const response = await request(app)
-  //     .put("/api/auth/passengerRating/updatedClientTest")
-  //     .set("Authorization", `Bearer ${adminToken}`)
-  //     .send(updatedPassengerRating)
-  //   expect(response.status).toBe(200)
-  //   expect(response.body.message).toBe(MESSAGES.RATING_UPDATED_SUCCESS)
-  // })
 
   test("should not delete user with different token", async () => {
     const response = await request(app)

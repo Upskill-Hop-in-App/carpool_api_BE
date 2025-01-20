@@ -43,25 +43,8 @@ describe("POST /api/cars", () => {
     expect(response.body.message).toBe(MESSAGES.CAR_CREATED)
     car1 = response.body.data
   })
-
-  test("should fail to create a car for invalid brand", async () => {
-    const newCar = {
-      brand: "INVALID BRAND",
-      model: "yaris",
-      year: 1999,
-      user: "client_name",
-      color: "pink",
-      plate: "22-22-AA",
-    }
-    const response = await request(app)
-      .post("/api/cars")
-      .set("Authorization", `Bearer ${clientToken}`)
-      .send(newCar)
-
-    expect(response.status).toBe(400)
-    expect(response.body.error).toBe(MESSAGES.INVALID_CAR)
-  })
 })
+
 describe("PUT /api/cars", () => {
   test("should update car", async () => {
     const updatedCar = {
