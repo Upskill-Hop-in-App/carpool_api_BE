@@ -44,10 +44,12 @@ router.put("/reject/:ca", verifyToken, ApplicationController.reject)
 router.put("/cancel/:ca", verifyToken, ApplicationController.cancel)
 router.put(
   "/ready/:ca",
+  verifyToken,
   ApplicationController.updatePassengerReady
 )
 router.put(
   "/ca/rating/:ca/:rating",
+  verifyToken,
   ApplicationController.updatePassengerRating
 )
 
