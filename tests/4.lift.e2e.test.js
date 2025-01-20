@@ -773,7 +773,7 @@ describe("Lift Tests", () => {
       expect(response1.body.error).toBe(MESSAGES.DATE_IN_PAST)
     })
 
-    test("should update lift status and ratings", async () => {
+    test("update update lift status and ratings and test all possible fault combinations", async () => {
       const newApplication = {
         passenger: "client2_name",
         lift: lift.cl,
@@ -791,38 +791,74 @@ describe("Lift Tests", () => {
         .set("Authorization", `Bearer ${clientToken}`)
       expect(response1.status).toBe(200)
 
+      const response2Fail = await request(app)
+        .put(`/api/applications/ready/${application.ca}`)
+        .set("Authorization", `Bearer ${client2Token}`)
+      expect(response2Fail.status).toBe(403)
+      expect(response2Fail.body.error).toBe(MESSAGES.ACCESS_DENIED)
+
       const response2 = await request(app)
         .put(`/api/applications/ready/${application.ca}`)
-        /* .set("Authorization", `Bearer ${clientToken}`) */
+        .set("Authorization", `Bearer ${clientToken}`)
       expect(response2.status).toBe(200)
+
+      const response3Fail = await request(app)
+        .put(`/api/lifts/cl/status/${lift.cl}/inProgress`)
+        .set("Authorization", `Bearer ${client2Token}`)
+      expect(response3Fail.status).toBe(403)
+      expect(response3Fail.body.error).toBe(MESSAGES.ACCESS_DENIED)
 
       const response3 = await request(app)
         .put(`/api/lifts/cl/status/${lift.cl}/inProgress`)
-        /* .set("Authorization", `Bearer ${clientToken}`) */
+        .set("Authorization", `Bearer ${clientToken}`)
       expect(response3.status).toBe(200)
       expect(response3.body.data.status).toBe("inProgress")
 
+      const response4Fail = await request(app)
+        .put(`/api/lifts/cl/status/${lift.cl}/finished`)
+        .set("Authorization", `Bearer ${client2Token}`)
+      expect(response4Fail.status).toBe(403)
+      expect(response4Fail.body.error).toBe(MESSAGES.ACCESS_DENIED)
+
       const response4 = await request(app)
         .put(`/api/lifts/cl/status/${lift.cl}/finished`)
-        /* .set("Authorization", `Bearer ${clientToken}`) */
+        .set("Authorization", `Bearer ${clientToken}`)
       expect(response4.status).toBe(200)
       expect(response4.body.data.status).toBe("finished")
 
+      const response5Fail = await request(app)
+        .put(`/api/lifts/cl/rating/${lift.cl}/4`)
+        .set("Authorization", `Bearer ${clientToken}`)
+      expect(response5Fail.status).toBe(403)
+      expect(response5Fail.body.error).toBe(MESSAGES.ACCESS_DENIED)
+
       const response5 = await request(app)
         .put(`/api/lifts/cl/rating/${lift.cl}/4`)
-        /* .set("Authorization", `Bearer ${client2Token}`) */
+        .set("Authorization", `Bearer ${client2Token}`)
       expect(response5.status).toBe(200)
       expect(response5.body.data.receivedDriverRatings).toContain(4)
 
+      const response6Fail = await request(app)
+        .put(`/api/applications/ca/rating/${application.ca}/4`)
+        .set("Authorization", `Bearer ${client2Token}`)
+      expect(response6Fail.status).toBe(403)
+      expect(response6Fail.body.error).toBe(MESSAGES.ACCESS_DENIED)
+
       const response6 = await request(app)
         .put(`/api/applications/ca/rating/${application.ca}/4`)
-        /* .set("Authorization", `Bearer ${clientToken}`) */
+        .set("Authorization", `Bearer ${clientToken}`)
       expect(response6.status).toBe(200)
       expect(response6.body.data.receivedPassengerRating).toBe(4)
 
+      const response7Fail = await request(app)
+        .put(`/api/lifts/cl/status/${lift.cl}/closed`)
+        .set("Authorization", `Bearer ${client2Token}`)
+      expect(response7Fail.status).toBe(403)
+      expect(response7Fail.body.error).toBe(MESSAGES.ACCESS_DENIED)
+
       const response7 = await request(app)
         .put(`/api/lifts/cl/status/${lift.cl}/closed`)
-        /* .set("Authorization", `Bearer ${clientToken}`) */
+        .set("Authorization", `Bearer ${clientToken}`)
       expect(response7.status).toBe(200)
       expect(response7.body.data.status).toBe("closed")
     })
