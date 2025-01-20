@@ -1,12 +1,16 @@
-import {} from "dotenv/config"
+import sqlite3 from "sqlite3"
+import bcrypt from "bcrypt"
+import fs from "fs"
+import path from "path"
 import mongoose from "mongoose"
+import {} from "dotenv/config"
+import { v4 as uuidv4 } from "uuid"
+
 import Car from "../models/carModel.js"
 import logger from "../logger.js"
 import User from "../models/userModel.js"
 import Lift from "../models/liftModel.js"
 import Application from "../models/applicationModel.js"
-import { v4 as uuidv4 } from "uuid"
-import applicationService from "../services/applicationService.js"
 
 const requiredEnvVars = [
   "NODE_ENV",
@@ -22,6 +26,130 @@ if (missingEnvVars.length) {
       ", "
     )}. Use 'env.sample' as example.`
   )
+}
+
+const dbPath = path.resolve(process.env.DB_SQLITE)
+const saltRounds = parseInt(process.env.SALT_ROUNDS, 10) || 10
+
+const hashedPasswordAdmin = await bcrypt.hash("admin123", saltRounds)
+const hashedPasswordClient = await bcrypt.hash("client123", saltRounds)
+const users = [
+  {
+    email: "admin1@test.com",
+    username: "admin1_user",
+    password: hashedPasswordAdmin,
+    name: "Admin Name",
+    role: "admin",
+    contact: "1234567890",
+  },
+  {
+    email: "client1@test.com",
+    username: "client1_name",
+    password: hashedPasswordClient,
+    name: "Client Name",
+    role: "client",
+    contact: "1234567890",
+  },
+]
+
+/* ------------------------- Create sqlite database ------------------------- */
+const db = new sqlite3.Database(
+  dbPath,
+  sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE
+)
+
+/* ---------------- Check if 'users' table exists and drop it ---------------- */
+await new Promise((resolve, reject) => {
+  db.get(
+    `SELECT name FROM sqlite_master WHERE type='table' AND name='users';`,
+    (err, row) => {
+      if (err) {
+        logger.error("Error checking for 'users' table: ", err.message)
+        reject(`Error checking for 'users' table: ${err.message}`)
+      } else if (row) {
+        db.run(`DROP TABLE IF EXISTS users;`, (err) => {
+          if (err) {
+            logger.error("Error dropping 'users' table: ", err.message)
+            reject(`Error dropping 'users' table: ${err.message}`)
+          } else {
+            logger.info("'users' table dropped.")
+            resolve()
+          }
+        })
+      } else {
+        resolve()
+      }
+    }
+  )
+})
+
+/* -------------------------- Force file creation -------------------------- */
+await new Promise((resolve, reject) => {
+  db.run("PRAGMA user_version = 1;", (err) => {
+    if (err) {
+      logger.error("Error initializing database file: ", err.message)
+      reject(`Error initializing database file: ${err.message}`)
+    } else {
+      resolve()
+    }
+  })
+})
+
+/* ------------------ Set permissions to full access ------------------ */
+if (fs.existsSync(dbPath)) {
+  try {
+    fs.chmodSync(dbPath, 0o666)
+    logger.info(`Permissions for ${dbPath} set to 666.`)
+  } catch (err) {
+    logger.error("Error setting permissions to full access: ", err.message)
+  }
+} else {
+  logger.error(`Database file not found at ${dbPath}`)
+}
+
+/* ------------------------- Create 'users' table ------------------------ */
+await new Promise((resolve, reject) => {
+  db.run(
+    `CREATE TABLE users
+      (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        email TEXT NOT NULL UNIQUE,
+        username TEXT NOT NULL UNIQUE,
+        password TEXT NOT NULL,
+        role TEXT NOT NULL
+      );
+    `,
+    (err) => {
+      if (err) {
+        reject(`Error creating table: ${err.message}`)
+      } else {
+        resolve()
+      }
+    }
+  )
+})
+
+/* ---------------------- Insert users into sqlite3 ---------------------- */
+const insertAccount = (db, email, username, password, role) => {
+  return new Promise((resolve, reject) => {
+    db.run(
+      `INSERT INTO users (email, username, password, role) 
+       VALUES (?, ?, ?, ?)`,
+      [email, username, password, role],
+      (err) => {
+        if (err) {
+          logger.error("Error inserting test users: ", err.message)
+          reject(`Error inserting account (${email}): ${err.message}`)
+        } else {
+          resolve()
+        }
+      }
+    )
+  })
+}
+
+for (const user of users) {
+  await insertAccount(db, user.email, user.username, user.password, user.role)
 }
 
 const dbConfig = {
@@ -46,32 +174,15 @@ async function connectToDatabase() {
   }
 }
 
-async function populateData() {
+async function test() {
   try {
     await mongoose.connection.dropDatabase()
-
-    const users = [
-      {
-        name: "Admin",
-        username: "admin",
-        role: "admin",
-        email: "admin@test.com",
-        contact: "911111111",
-      },
-      {
-        name: "Client",
-        username: "client",
-        role: "client",
-        email: "client@test.com",
-        contact: "911111111",
-      },
-    ]
 
     const createdUsers = await User.insertMany(users, { ordered: false })
     logger.info(`Successfully imported ${createdUsers.length} users.`)
 
-    const user1 = await User.findOne({ username: "admin" })
-    const user2 = await User.findOne({ username: "client" })
+    const user1 = await User.findOne({ username: "admin1_user" })
+    const user2 = await User.findOne({ username: "client1_name" })
 
     if (!user1 || !user2) {
       throw new Error(
@@ -196,16 +307,23 @@ async function populateData() {
   }
 }
 
-async function connectAndPopulate() {
+async function connectAndtest() {
   try {
     await connectToDatabase()
-    await populateData()
+    await test()
   } catch (error) {
     logger.error("Error in main execution:", error)
   } finally {
     await mongoose.connection.close()
     logger.info("Database connection closed")
+    db.close((err) => {
+      if (err) {
+        logger.error("Error closing the SQLite database: ", err.message)
+      } else {
+        logger.info("SQLite database connection closed.")
+      }
+    })
   }
 }
 
-await connectAndPopulate()
+await connectAndtest()

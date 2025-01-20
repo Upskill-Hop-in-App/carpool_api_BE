@@ -5,11 +5,12 @@ export const MESSAGES = {
   PASSWORD_UPDATED_SUCCESS: "Password updated successfully!",
   REGISTER_SUCCESS: "Registered successfully!",
   USER_DELETED_SUCCESS: "User deleted successfully!",
-  USER_ANONYMIZED_SUCCESS: "User info deleted successfully!",
+  USER_DELETED_SUCCESS: "User info deleted successfully!",
   RATING_UPDATED_SUCCESS: "Rating updated successfully",
   /* -------------------------------------------------------------------------- */
 
   /* --------------------------- User Error messages -------------------------- */
+  ACCESS_DENIED: "Access denied for this route",
   USER_EMAIL_NOT_FOUND: "User not found",
   USERNAME_NOT_REGISTERED: "Username is not registered",
   INCORRECT_USER_OR_PASSWORD: "Incorrect username or password",
