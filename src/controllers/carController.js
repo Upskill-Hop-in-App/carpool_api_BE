@@ -47,43 +47,6 @@ class CarController {
     }
   }
 
-  async getAllCars(req, res) {
-    logger.info("GET:/api/cars")
-    try {
-      const cars = await CarService.list()
-      const outputDTOs = cars.map((car) => new CarOutputDTO(car))
-      res
-        .status(200)
-        .json({ message: MESSAGES.CARS_RETRIEVED, data: outputDTOs })
-    } catch (err) {
-      logger.error("CarController - Failed to retrieve cars", err)
-      if (err.message === "CarNotFound") {
-        res.status(404).json({ error: MESSAGES.NO_CARS_FOUND })
-      } else {
-        res.status(500).json({ error: MESSAGES.FAILED_TO_RETRIEVE_CARS })
-      }
-    }
-  }
-
-  async getCarByCode(req, res) {
-    logger.info("GET:/api/cars by Code: " + req.params.cc)
-    try {
-      const car = await CarService.listByCode(req.params.cc)
-      const outputDTO = new CarOutputDTO(car)
-      res.status(200).json({
-        message: MESSAGES.CAR_RETRIEVED_BY_CODE,
-        data: outputDTO,
-      })
-    } catch (err) {
-      logger.error("CarController - Failed to retrieve car by code")
-      if (err.message === "CarNotFound") {
-        res.status(404).json({ error: MESSAGES.CAR_NOT_FOUND_BY_CODE })
-      } else {
-        res.status(500).json({ error: MESSAGES.FAILED_TO_RETRIEVE_CAR_BY_CODE })
-      }
-    }
-  }
-
   async getCarByUsername(req, res) {
     logger.info("GET:/api/cars by Username: " + req.params.username)
     try {
@@ -106,7 +69,7 @@ class CarController {
 
   async filterCars(req, res) {
     try {
-      logger.info(`GET:/api/cars/filter/${req.query}`)
+      logger.info(`GET:/api/cars/filter/username/${req.query}`)
 
       const filters = req.query
 

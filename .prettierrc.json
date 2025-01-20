@@ -2,5 +2,6 @@
   "tabWidth": 2,
   "trailingComma": "es5",
   "bracketSameLine": true,
-  "semi": false
+  "semi": false,
+  "printWidth": 80
 }

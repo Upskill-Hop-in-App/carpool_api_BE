@@ -332,12 +332,10 @@ class ApplicationController {
       const acceptedApplication = await ApplicationService.acceptApplication(
         req.params.ca
       )
-      res
-        .status(200)
-        .json({
-          message: MESSAGES.APPLICATION_ACCEPTED_SUCCESS,
-          data: acceptedApplication,
-        })
+      res.status(200).json({
+        message: MESSAGES.APPLICATION_ACCEPTED_SUCCESS,
+        data: acceptedApplication,
+      })
     } catch (err) {
       logger.error("applicationController - acceptApplication", err)
       if (err.message === "ApplicationNotFound") {
@@ -364,12 +362,10 @@ class ApplicationController {
       const rejectedApplication = await ApplicationService.rejectApplication(
         req.params.ca
       )
-      res
-        .status(200)
-        .json({
-          message: MESSAGES.APPLICATION_REJECTED_SUCCESS,
-          data: rejectedApplication,
-        })
+      res.status(200).json({
+        message: MESSAGES.APPLICATION_REJECTED_SUCCESS,
+        data: rejectedApplication,
+      })
     } catch (err) {
       logger.error("applicationController - rejectApplication", err)
       if (err.message === "ApplicationNotFound") {
@@ -394,12 +390,10 @@ class ApplicationController {
       const canceledApplication = await ApplicationService.cancelApplication(
         req.params.ca
       )
-      res
-        .status(200)
-        .json({
-          message: MESSAGES.APPLICATION_CANCELED_SUCCESS,
-          data: canceledApplication,
-        })
+      res.status(200).json({
+        message: MESSAGES.APPLICATION_CANCELED_SUCCESS,
+        data: canceledApplication,
+      })
     } catch (err) {
       logger.error("applicationController - cancelApplication", err)
       if (err.message === "ApplicationNotFound") {
@@ -469,24 +463,6 @@ class ApplicationController {
         res.status(400).json({ error: MESSAGES.APPLICATION_LIFT_NOT_FINISHED })
       } else {
         res.status(500).json({ error: MESSAGES.FAILED_TO_UPDATE_APPLICATION })
-      }
-    }
-  }
-
-  async delete(req, res) {
-    try {
-      logger.info(`DELETE: /api/applications/${req.params.ca}`)
-      await ApplicationService.delete(req.params.ca)
-      res.status(200).json({ message: MESSAGES.APPLICATION_DELETED_SUCCESS })
-    } catch (err) {
-      if (err.message === "ApplicationNotFound") {
-        res.status(400).json({ error: MESSAGES.APPLICATION_NOT_FOUND })
-      } else if (err.message === "LifNotFound") {
-        res.status(400).json({ error: MESSAGES.LIFT_NOT_FOUND })
-      } else if (err.message === "LiftAlreadyStartedOrCanceled") {
-        res.status(400).json({ error: MESSAGES.LIFT_STARTED_OR_CANCELED })
-      } else {
-        res.status(500).json({ error: MESSAGES.FAILED_TO_DELETE_APPLICATION })
       }
     }
   }

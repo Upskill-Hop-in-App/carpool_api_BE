@@ -1,16 +1,25 @@
 import express from "express"
 import UserController from "../controllers/userController.js"
+import verifyToken from "../middleware.js"
 
 const router = express.Router()
 
-router.post("/register/admin", UserController.registerAdmin)
-router.post("/register/client", UserController.registerClient)
-router.post("/login", UserController.login)
-router.put("/profile/:username", UserController.update)
-router.put("/password/:username", UserController.updatePassword)
-router.put("/driverRating/:username", UserController.updateDriverRating)
-router.put("/passengerRating/:username", UserController.updatePassengerRating)
-router.put("/delete/:username", UserController.anonymize)
-router.delete("/:username", UserController.delete)
+router.post("/login", verifyToken, UserController.login)
+router.post("/register/client", verifyToken, UserController.registerClient)
+router.post("/register/admin", verifyToken, UserController.registerAdmin)
+router.put("/profile/:username", verifyToken, UserController.update)
+router.put("/password/:username", verifyToken, UserController.updatePassword)
+router.put(
+  "/driverRating/:username",
+  verifyToken,
+  UserController.updateDriverRating
+)
+router.put(
+  "/passengerRating/:username",
+  verifyToken,
+  UserController.updatePassengerRating
+)
+router.put("/delete/:username", verifyToken, UserController.delete)
+router.delete("/:username", verifyToken, UserController.delete)
 
 export { router as userRoutes }
