@@ -116,9 +116,12 @@ class ApplicationService {
       },
       {
         path: "lift",
-        populate: {
-          path: "driver",
-        },
+        populate: [
+          {
+            path: "driver",
+          },
+          { path: "car" },
+        ],
       },
     ])
 
