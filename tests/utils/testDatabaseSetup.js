@@ -31,6 +31,14 @@ const initializeTestDatabase = async () => {
       role: "client",
       contact: "1234567890",
     },
+    {
+      email: "client2@test.com",
+      username: "client2_name",
+      password: hashedPasswordClient,
+      name: "Client Name 2",
+      role: "client",
+      contact: "1234567890",
+    },
   ]
 
   /* ------------------------- Create sqlite database ------------------------- */

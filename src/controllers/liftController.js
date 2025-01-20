@@ -179,7 +179,7 @@ class LiftController {
         req.params.status
       )
       const outputDTO = new LiftOutputDTO(lift)
-      res.status(201).json({ message: MESSAGES.LIFT_UPDATED, data: outputDTO })
+      res.status(200).json({ message: MESSAGES.LIFT_UPDATED, data: outputDTO })
     } catch (err) {
       logger.error("LiftController - Error updating lift: ", err)
 
@@ -223,7 +223,7 @@ class LiftController {
         req.params.rating
       )
       const outputDTO = new LiftOutputDTO(lift)
-      res.status(201).json({ message: MESSAGES.LIFT_UPDATED, data: outputDTO })
+      res.status(200).json({ message: MESSAGES.LIFT_UPDATED, data: outputDTO })
     } catch (err) {
       logger.error("LiftController - Error updating lift: ", err)
 

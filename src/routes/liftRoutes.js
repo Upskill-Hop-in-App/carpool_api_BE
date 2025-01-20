@@ -14,8 +14,8 @@ router.get(
   verifyToken,
   LiftController.filterLifts
 )
-router.put("/cl/status/:cl/:status", verifyToken, LiftController.updateLiftStatusByCode)
-router.put("/cl/rating/:cl/:rating", verifyToken, LiftController.updateDriverRatingsByCode)
+router.put("/cl/status/:cl/:status", LiftController.updateLiftStatusByCode)
+router.put("/cl/rating/:cl/:rating", LiftController.updateDriverRatingsByCode)
 router.put("/:cl", verifyToken, LiftController.updateLiftByCode)
 router.delete("/:cl", verifyToken, LiftController.deleteLiftByCode)
 
