@@ -451,9 +451,6 @@ class LiftService {
       const allPassengerRatings = relevantLifts
         .flatMap((lift) =>
           lift.applications
-            .filter(
-              (app) => app.passenger._id.toString() === passenger._id.toString()
-            )
             .map((app) => app.receivedPassengerRating)
         )
         .filter(Boolean)
