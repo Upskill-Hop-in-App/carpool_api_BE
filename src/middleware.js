@@ -28,7 +28,8 @@ const ROUTES = {
 const isDevMode =
   process.env.NODE_ENV === "dev" && process.env.SKIP_VALIDATION === "true"
 
-const getTokenFromHeaders = (headers) => headers["authorization"]?.split(" ")[1]
+export const getTokenFromHeaders = (headers) =>
+  headers["authorization"]?.split(" ")[1]
 
 const getDecodedToken = async (token) => {
   if (!token) throw new Error("Missing Token")
