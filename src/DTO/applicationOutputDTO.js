@@ -10,9 +10,21 @@ class ApplicationOutputDTO {
     }
     this.lift = {
       cl: application.lift?.cl,
-      driver: application.lift.driver?.username,
-      driverRating: application.lift.driver?.driverRating,
-      driverName: application.lift.driver?.name,
+      driver: {
+        name: application.lift.driver?.name,
+        username: application.lift.driver?.username,
+        driverRating: application.lift.driver?.driverRating,
+        contact: application.lift.driver?.contact,
+        email: application.lift.driver?.email,
+      },
+      car: {
+        cc: application.lift.car?.cc || null,
+        brand: application.lift.car?.brand || null,
+        model: application.lift.car?.model || null,
+        year: application.lift.car?.year || null,
+        color: application.lift.car?.color || null,
+        plate: application.lift.car?.plate || null,
+      },
       startPoint: application.lift?.startPoint,
       endPoint: application.lift?.endPoint,
       schedule: application.lift?.schedule,
