@@ -201,6 +201,10 @@ class LiftController {
         res.status(400).json({
           error: MESSAGES.LIFT_NOT_FINISHED,
         })
+      } else if (err.message === "DriverAlreadyHasLiftInProgress") {
+        res.status(400).json({
+          error: MESSAGES.DRIVER_HAS_LIFT_INPROGRESS,
+        })
       } else if (err.message === "MissingRatings") {
         res.status(400).json({
           error: MESSAGES.MISSING_RATINGS,
@@ -238,7 +242,9 @@ class LiftController {
           error: MESSAGES.MAX_RATINGS,
         })
       } else {
-        res.status(500).json({ error: MESSAGES.FAILED_TO_UPDATE_LIFT_DRIVER_RATING })
+        res
+          .status(500)
+          .json({ error: MESSAGES.FAILED_TO_UPDATE_LIFT_DRIVER_RATING })
       }
     }
   }

@@ -53,16 +53,13 @@ class UserService {
 
   async findUserByUsernameMongo(username) {
     logger.debug(`userService - findUserByUsernameMongo`)
-    try {
-      const user = await User.findOne({ username })
-      if (!user) {
-        logger.debug("userService - findUserByUsernameMongo: User not found")
-        throw new Error("UserNotFound")
-      }
-      return user
-    } catch (err) {
-      logger.error(`userService - findUserByUsernameMongo: ${err.message}`)
+
+    const user = await User.findOne({ username })
+    if (!user) {
+      logger.debug("userService - findUserByUsernameMongo: User not found")
+      throw new Error("UserNotFound")
     }
+    return user
   }
 
   async findUserByEmailMongo(email) {
@@ -276,26 +273,6 @@ class UserService {
       logger.error(`Error hashing password: ${err.message}`)
       throw err
     }
-  }
-
-  async updateRating(user, ratingModel, ratingValue) {
-    logger.debug("userService - updateRating")
-    if (typeof ratingValue !== "number" || ratingValue < 1 || ratingValue > 5) {
-      throw new Error("RatingMustBe1To5")
-    }
-
-    if (ratingModel === "driverRating") {
-      user.driverRating = ratingValue
-    } else {
-      user.passengerRating = ratingValue
-    }
-    try {
-      await user.save()
-      await User.findOne({ username: user.username })
-    } catch (err) {
-      logger.error(`userService - updateRating: ${err.message}`)
-    }
-    return
   }
 
   async deleteUserMongo(username) {

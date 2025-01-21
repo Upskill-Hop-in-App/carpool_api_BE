@@ -313,6 +313,11 @@ class LiftService {
       throw new Error("LiftNotFound")
     }
 
+    const driverLifts = await Lift.find({
+      driver: lift.driver,
+      status: "inProgress",
+    })
+
     const statusValidations = {
       inProgress: () => {
         if (lift.status !== "ready" && lift.status !== "open")
@@ -321,6 +326,8 @@ class LiftService {
           throw new Error("ApplicationNotFound")
         if (!lift.applications.some((app) => app.status === "ready"))
           throw new Error("PassengerNotReady")
+        if (driverLifts.length !== 0)
+          throw new Error("DriverAlreadyHasLiftInProgress")
       },
       finished: () => {
         if (lift.status !== "inProgress") throw new Error("LiftNotInProgress")
@@ -450,8 +457,7 @@ class LiftService {
 
       const allPassengerRatings = relevantLifts
         .flatMap((lift) =>
-          lift.applications
-            .map((app) => app.receivedPassengerRating)
+          lift.applications.map((app) => app.receivedPassengerRating)
         )
         .filter(Boolean)
 
