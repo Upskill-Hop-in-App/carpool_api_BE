@@ -275,34 +275,6 @@ class UserService {
     }
   }
 
-  async deleteUserMongo(username) {
-    logger.debug("userService - deleteUserMongo")
-    try {
-      await User.findOneAndDelete({ username })
-    } catch (err) {
-      logger.error(`userService - deleteUserMongo: ${err.message}`)
-      throw err
-    }
-  }
-
-  async deleteUserSQL(username) {
-    logger.debug("userService - deleteUserSQL")
-    return new Promise((resolve, reject) => {
-      db.run(
-        "DELETE FROM users WHERE username = ?",
-        [username],
-        function (err) {
-          if (err) {
-            logger.error("userService - deleteUserSQL: ", err.message)
-            reject(err)
-          } else {
-            resolve({ message: "User deleted successfully from SQLite" })
-          }
-        }
-      )
-    })
-  }
-
   async deleteUser(user) {
     logger.info("userService - deleteUser")
     const username = user.username

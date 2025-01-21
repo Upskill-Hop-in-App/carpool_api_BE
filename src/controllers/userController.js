@@ -210,37 +210,6 @@ class UserController {
   }
 
   delete = async (req, res) => {
-    logger.info(`DELETE: /api/auth/delete/${req.params.username}`)
-    try {
-      const username = req.params.username
-
-      const userMongo = await UserService.findUserByUsernameMongo(username)
-      if (!userMongo) {
-        res.status(404).json({ error: MESSAGES.USER_EMAIL_NOT_FOUND })
-        return
-      }
-
-      const userSQL = await UserService.checkUsernameExists(username)
-      if (!userSQL) {
-        res.status(404).json({ error: MESSAGES.USER_EMAIL_NOT_FOUND })
-        return
-      }
-
-      const deleteMongo = UserService.deleteUserMongo(username)
-      const deleteSQL = UserService.deleteUserSQL(username)
-
-      await Promise.all([deleteMongo, deleteSQL])
-      res.status(200).json({ message: MESSAGES.USER_DELETED_SUCCESS })
-    } catch (err) {
-      logger.error(`Error deleting user`, err)
-      res.status(500).json({
-        error: MESSAGES.ERROR_DELETING_USER,
-        details: err.message,
-      })
-    }
-  }
-
-  delete = async (req, res) => {
     logger.info(`PUT: /api/auth/delete/${req.params.username}`)
     try {
       const username = req.params.username
