@@ -157,6 +157,12 @@ class UserService {
 
   async validateLogin(email, password) {
     logger.info("userService - validateLogin")
+
+    if (!email || !password) {
+      logger.error("Login - missing required fields")
+      throw new Error("MissingRequiredFields")
+    }
+
     const userMongo = await this.findUserByEmailMongo(email)
     const userSQL = await this.findUserByEmailSQL(email)
     logger.debug("userService - found userSQL: ", !!userSQL)

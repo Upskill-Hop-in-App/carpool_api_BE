@@ -80,11 +80,6 @@ class UserController {
     logger.info(`POST: /api/auth/login`)
     const { email, password } = req.body
 
-    if (!email || !password) {
-      logger.error("Login - missing required fields")
-      throw new Error("MissingRequiredFields")
-    }
-
     try {
       const token = await UserService.validateLogin(email, password)
       res
@@ -92,6 +87,10 @@ class UserController {
         .json({ message: MESSAGES.LOGIN_SUCCESS, userToken: token })
     } catch (err) {
       logger.error("Error logging in: ", err)
+
+      if (err.message === "MissingRequiredFields") {
+        res.status(404).json({ error: MESSAGES.MISSING_REQUIRED_FIELDS })
+      }
 
       if (err.message === "UserNotFound") {
         res.status(404).json({ error: MESSAGES.USER_EMAIL_NOT_FOUND })
