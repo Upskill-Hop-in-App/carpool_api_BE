@@ -53,16 +53,13 @@ class UserService {
 
   async findUserByUsernameMongo(username) {
     logger.debug(`userService - findUserByUsernameMongo`)
-    try {
-      const user = await User.findOne({ username })
-      if (!user) {
-        logger.debug("userService - findUserByUsernameMongo: User not found")
-        throw new Error("UserNotFound")
-      }
-      return user
-    } catch (err) {
-      logger.error(`userService - findUserByUsernameMongo: ${err.message}`)
+
+    const user = await User.findOne({ username })
+    if (!user) {
+      logger.debug("userService - findUserByUsernameMongo: User not found")
+      throw new Error("UserNotFound")
     }
+    return user
   }
 
   async findUserByEmailMongo(email) {

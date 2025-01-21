@@ -78,12 +78,45 @@ describe("User Endpoints", () => {
       contact: "1234567890",
     }
 
-    const response = await request(app)
+    const response1 = await request(app)
       .post("/api/auth/register/client")
-      .set("Authorization", `Bearer ${adminToken}`)
       .send(newClient)
-    expect(response.status).toBe(201)
-    expect(response.body.message).toBe(MESSAGES.REGISTER_SUCCESS)
+    expect(response1.status).toBe(201)
+    expect(response1.body.message).toBe(MESSAGES.REGISTER_SUCCESS)
+
+    const response2 = await request(app)
+      .get("/api/auth/username/clientTest")
+      .set("Authorization", `Bearer ${adminToken}`)
+
+    expect(response2.status).toBe(200)
+    expect(response2.body.message).toBe(MESSAGES.USER_RETRIEVED_SUCCESS)
+  })
+
+  test("should get user by username", async () => {
+    const response2 = await request(app)
+      .get("/api/auth/username/client_name")
+      .set("Authorization", `Bearer ${clientToken}`)
+
+    expect(response2.status).toBe(200)
+    expect(response2.body.message).toBe(MESSAGES.USER_RETRIEVED_SUCCESS)
+  })
+
+  test("should fail to get user by username with different token", async () => {
+    const response = await request(app)
+      .get("/api/auth/username/admin_name")
+      .set("Authorization", `Bearer ${clientToken}`)
+
+    expect(response.status).toBe(403)
+    expect(response.body.error).toBe(MESSAGES.ACCESS_DENIED)
+  })
+
+  test("should fail to get user by username for invalid username", async () => {
+    const response = await request(app)
+      .get("/api/auth/username/INVALIDUSERNAME")
+      .set("Authorization", `Bearer ${adminToken}`)
+
+    expect(response.status).toBe(404)
+    expect(response.body.error).toBe(MESSAGES.USER_NOT_FOUND)
   })
 
   test("should login as client", async () => {

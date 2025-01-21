@@ -115,7 +115,7 @@ class UserController {
         data: outputDTO,
       })
     } catch (err) {
-      if (err.messgae === "UserNotFound") {
+      if (err.message === "UserNotFound") {
         res.status(404).json({ error: MESSAGES.USER_NOT_FOUND })
       } else {
         res.status(500).json({ error: MESSAGES.FAILED_RETRIEVING_USER })
