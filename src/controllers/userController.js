@@ -2,6 +2,7 @@ import {} from "dotenv/config"
 import UserService from "../services/userService.js"
 import logger from "../logger.js"
 import UserInputDTO from "../DTO/userInputDTO.js"
+import UserOutputDTO from "../DTO/userOutputDTO.js"
 import { MESSAGES } from "../utils/responseMessages.js"
 
 class UserController {
@@ -98,6 +99,26 @@ class UserController {
 
       if (err.message === "IncorrectUserOrPassword") {
         res.status(400).json({ error: MESSAGES.INCORRECT_USER_OR_PASSWORD })
+      }
+    }
+  }
+
+  getUserByUsername = async (req, res) => {
+    logger.info(`GET: /api/auth/username/${req.params.username}`)
+    try {
+      const user = await UserService.findUserByUsernameMongo(
+        req.params.username
+      )
+      const outputDTO = new UserOutputDTO(user)
+      res.status(200).json({
+        message: MESSAGES.USER_RETRIEVED_SUCCESS,
+        data: outputDTO,
+      })
+    } catch (err) {
+      if (err.messgae === "UserNotFound") {
+        res.status(404).json({ error: MESSAGES.USER_NOT_FOUND })
+      } else {
+        res.status(500).json({ error: MESSAGES.FAILED_RETRIEVING_USER })
       }
     }
   }

@@ -7,6 +7,7 @@ export const MESSAGES = {
   USER_DELETED_SUCCESS: "User deleted successfully!",
   USER_DELETED_SUCCESS: "User info deleted successfully!",
   RATING_UPDATED_SUCCESS: "Rating updated successfully",
+  USER_RETRIEVED_SUCCESS: "User retrieved successfully",
   /* -------------------------------------------------------------------------- */
 
   /* --------------------------- User Error messages -------------------------- */
@@ -27,6 +28,7 @@ export const MESSAGES = {
   USER_ALREADY_ANONYM: "User info has already been deleted",
   PASSWORD_EMPTY: "Password field cannot be empty",
   USER_NOT_FOUND: "User not found",
+  FAILED_RETRIEVING_USER: "Failed to retrieve user",
   /* -------------------------------------------------------------------------- */
 
   /* -------------------------- Common Error messages ------------------------- */
