@@ -62,7 +62,9 @@ class CarController {
       } else if (err.message === "NoCarsFound") {
         res.status(404).json({ error: MESSAGES.NO_CARS_FOUND })
       } else {
-        res.status(500).json({ error: MESSAGES.FAILED_TO_RETRIEVE_CAR_BY_USERNAME })
+        res
+          .status(500)
+          .json({ error: MESSAGES.FAILED_TO_RETRIEVE_CAR_BY_USERNAME })
       }
     }
   }
