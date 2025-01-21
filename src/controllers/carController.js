@@ -98,7 +98,7 @@ class CarController {
   async updateCarByCode(req, res) {
     logger.info("PUT: /api/cars")
     try {
-      const { cc, brand, model, year, user, color, plate } = req.body
+      const { brand, model, year, user, color, plate } = req.body
       const inputDTO = new CarInputDTO({
         brand,
         model,

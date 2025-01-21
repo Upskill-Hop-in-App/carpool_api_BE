@@ -127,14 +127,13 @@ class CarService {
   }
 
   async update(code, data) {
-    const { cc, brand, model, year, user, color, plate } = data
+    const { brand, model, year, user, color, plate } = data
 
     const car = await Car.findOne({ cc: code }).populate("user")
     if (!car) {
       throw new Error("CarNotFound")
     }
 
-    car.cc = cc || car.cc
     car.brand = car.brand
     car.model = car.model
     car.year = car.year
