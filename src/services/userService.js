@@ -278,26 +278,6 @@ class UserService {
     }
   }
 
-  async updateRating(user, ratingModel, ratingValue) {
-    logger.debug("userService - updateRating")
-    if (typeof ratingValue !== "number" || ratingValue < 1 || ratingValue > 5) {
-      throw new Error("RatingMustBe1To5")
-    }
-
-    if (ratingModel === "driverRating") {
-      user.driverRating = ratingValue
-    } else {
-      user.passengerRating = ratingValue
-    }
-    try {
-      await user.save()
-      await User.findOne({ username: user.username })
-    } catch (err) {
-      logger.error(`userService - updateRating: ${err.message}`)
-    }
-    return
-  }
-
   async deleteUserMongo(username) {
     logger.debug("userService - deleteUserMongo")
     try {

@@ -188,59 +188,6 @@ class UserController {
     }
   }
 
-  updateDriverRating = async (req, res) => {
-    logger.info(`PUT: /api/auth/driverRating/${req.params.username}`)
-    try {
-      const model = "driverRating"
-      await this.updateRating(req, res, model)
-    } catch (err) {
-      logger.error("UserController - Error updating driverRating - ", err)
-    }
-  }
-
-  updatePassengerRating = async (req, res) => {
-    logger.info(`PUT: /api/auth/passengerRating/${req.params.username}`)
-    try {
-      const model = "passengerRating"
-      await this.updateRating(req, res, model)
-    } catch (err) {
-      logger.error("UserController - Error updating passengerRating - ", err)
-    }
-  }
-
-  //TODO acrescentar totalRatings ao modelo e nesta função aqui fazer incremento +1 e média nova consoante valor introduzido OU fazer um get all + count das ofertas de boleia terminadas (ou candidaturas a boleia aceites em boleias terminadas) para obter o numero total e fazer o mesmo OU fazer a funçao que calcula a média à parte e trazer o valor para esta função aqui
-  updateRating = async (req, res, ratingModel) => {
-    logger.info(`userController - updateRating - ${ratingModel}`)
-    try {
-      const user = await UserService.findUserByUsernameMongo(
-        req.params.username
-      )
-      if (!user) {
-        res.status(404).json({ error: MESSAGES.USER_EMAIL_NOT_FOUND })
-        return
-      }
-
-      const ratingValue = req.body[ratingModel]
-      if (ratingValue === undefined) {
-        res.status(400).json({ error: `Missing value for ${ratingModel}` })
-        return
-      }
-
-      await UserService.updateRating(user, ratingModel, ratingValue)
-      res.status(200).json({ message: MESSAGES.RATING_UPDATED_SUCCESS })
-    } catch (err) {
-      logger.error(`userController - updateRating`, err)
-      if (err.message === "RatingMustBe1To5")
-        res.status(400).json({ error: MESSAGES.RATING_MUST_1_TO_5 })
-      else {
-        res.status(500).json({
-          error: `Failed updating ${ratingModel}`,
-          details: err,
-        })
-      }
-    }
-  }
-
   delete = async (req, res) => {
     logger.info(`DELETE: /api/auth/delete/${req.params.username}`)
     try {

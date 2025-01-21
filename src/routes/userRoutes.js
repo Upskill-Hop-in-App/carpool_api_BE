@@ -9,16 +9,6 @@ router.post("/register/client", verifyToken, UserController.registerClient)
 router.post("/register/admin", verifyToken, UserController.registerAdmin)
 router.put("/profile/:username", verifyToken, UserController.update)
 router.put("/password/:username", verifyToken, UserController.updatePassword)
-router.put(
-  "/driverRating/:username",
-  verifyToken,
-  UserController.updateDriverRating
-)
-router.put(
-  "/passengerRating/:username",
-  verifyToken,
-  UserController.updatePassengerRating
-)
 router.put("/delete/:username", verifyToken, UserController.delete)
 router.delete("/:username", verifyToken, UserController.delete)
 
