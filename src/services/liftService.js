@@ -370,6 +370,76 @@ class LiftService {
     return lift
   }
 
+  async checkInProgress(username) {
+    const lifts = await Lift.find().populate([
+      {
+        path: "driver",
+      },
+      {
+        path: "applications",
+        populate: {
+          path: "passenger",
+          model: "User",
+        },
+      },
+      {
+        path: "car",
+      },
+    ])
+
+    if(lifts.length === 0) {
+      throw new Error("LiftNotFound")
+    }
+
+    const filterInProgress = lifts.filter((lift) => lift.status !== "open" && lift.status !== "ready") 
+    const filteredLifts = filterInProgress.filter((lift) => lift.driver.username === username || lift.applications.some((app) => app.passenger.username === username))
+    
+    if(filteredLifts.length > 0){
+      return true
+    } else {
+      return false
+    }
+  }
+
+  async driverOrPassenger(username) {
+    const lifts = await Lift.find().populate([
+      {
+        path: "driver",
+      },
+      {
+        path: "applications",
+        populate: {
+          path: "passenger",
+          model: "User",
+        },
+      },
+      {
+        path: "car",
+      },
+    ])
+
+    if(lifts.length === 0) {
+      throw new Error("LiftNotFound")
+    }
+
+    const filterInProgress = lifts.filter((lift) => lift.status !== "open" && lift.status !== "ready") 
+    const isDriver = filterInProgress.some(
+      (lift) => lift.driver.username === username,
+    );
+    const isPassenger = lifts.some((lift) =>
+      lift.applications?.some((app) => app.passenger?.username === username),
+    );
+    
+    
+    if(isDriver){
+      return "driver"
+    } else if(isPassenger) {
+      return "passenger"
+    } else {
+      throw new Error("UserRoleNotFound")
+    }
+  }
+
   async loadDriverRating(cl, rating) {
     const lift = await Lift.findOne({ cl: cl }).populate([
       {

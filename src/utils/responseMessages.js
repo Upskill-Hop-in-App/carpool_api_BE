@@ -85,6 +85,7 @@ export const MESSAGES = {
   MAX_RATINGS: "All occupants have already given their ratings to the driver",
   FAILED_TO_RETRIEVE_LIFT_BY_USERNAME: "Failed to retrieve lift by username",
   DRIVER_HAS_LIFT_INPROGRESS: "Driver already has a lift in progress",
+  USER_ROLE_NOT_FOUND: "User role could not be retrieved",
   /* -------------------------------------------------------------------------- */
 
   /* ---------------------- Application Success messages ---------------------- */

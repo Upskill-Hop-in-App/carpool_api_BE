@@ -282,7 +282,7 @@ class ApplicationService {
 
     if (filters.ca) query.ca = filters.ca
     if (filters.status) {
-      const validStatuses = ["pending", "accepted", "rejected"]
+      const validStatuses = ["pending", "accepted", "rejected, ready, canceled"]
       if (!validStatuses.includes(filters.status))
         throw new Error("InvalidStatus")
       query.status = filters.status
