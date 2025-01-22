@@ -15,6 +15,9 @@ router.get(
   verifyToken,
   LiftController.filterLiftsByUsername
 )
+router.get("/inProgress/:username", verifyToken, LiftController.getInProgressByUsername)
+router.get("/role/:username", verifyToken, LiftController.getRoleInLift)
+
 router.put(
   "/cl/status/:cl/:status",
   verifyToken,
