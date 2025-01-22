@@ -11,6 +11,5 @@ router.get("/username/:username", verifyToken, UserController.getUserByUsername)
 router.put("/profile/:username", verifyToken, UserController.update)
 router.put("/password/:username", verifyToken, UserController.updatePassword)
 router.put("/delete/:username", verifyToken, UserController.delete)
-router.delete("/:username", verifyToken, UserController.delete)
 
 export { router as userRoutes }
