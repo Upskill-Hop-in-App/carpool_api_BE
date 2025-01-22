@@ -1,0 +1,36 @@
+services:
+  # Node.js application service
+  node:
+    build: . # Build the Node.js container from the Dockerfile in the current directory
+    ports:
+      - "3000:3000" # Expose port 3000 for the Node.js app (host:container)
+    environment:
+      - NODE_ENV=dev
+      - MONGO_URL=mongodb://mongo:27017/carpooldatabase # Set the MongoDB connection URL (using the 'mongo' service)
+      - ALLOWED_ORIGINS=['http://localhost:4200', 'http://localhost:3001']
+      - LOG_LEVEL=info
+      - SKIP_VALIDATION=false
+      - DB_CONNECTION_STRING=mongodb://mongo:27017/carpooldatabase
+      - DB_TEST_CONNECTION_STRING="mongodb://127.0.0.1:27017/testcarpooldatabase"
+      - DB_SQLITE=database.db
+      - DB_SQLITE_TEST="testdatabase.db"
+      - PRIVATE_JWT_KEY_FILE=./keys/private.pem
+      - PUBLIC_JWT_KEY_FILE=./keys/public.pem
+    depends_on:
+      - mongo # Ensure MongoDB container starts before Node.js
+    # Run the cars:populate script first, then start the application
+    command: /bin/sh -c "NODE_OPTIONS='--max-old-space-size=4096' npm run carpool:populate && npm run start"
+
+  # MongoDB service
+  mongo:
+    image: mongo:8.0 # Use the official MongoDB 8.0 image
+    volumes:
+      - mongo_data:/data/db # Mount a volume to persist MongoDB data
+    command: mongod --quiet --logpath /dev/null
+    logging:
+      driver: "none" # Disable all logging for the MongoDB container
+
+# Define named volumes for persistence
+volumes:
+  mongo_data:
+    driver: local # Use the default local driver to store MongoDB data persistently
