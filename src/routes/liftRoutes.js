@@ -9,10 +9,11 @@ router.post("/", verifyToken, LiftController.createLift)
 router.get("/", verifyToken, LiftController.getAllLifts)
 router.get("/cl/:cl", verifyToken, LiftController.getLiftByCode)
 router.get("/username/:username", verifyToken, LiftController.getLiftByUsername)
+router.get("/filter", verifyToken, LiftController.filterLifts)
 router.get(
   "/filter/username/:username",
   verifyToken,
-  LiftController.filterLifts
+  LiftController.filterLiftsByUsername
 )
 router.put(
   "/cl/status/:cl/:status",

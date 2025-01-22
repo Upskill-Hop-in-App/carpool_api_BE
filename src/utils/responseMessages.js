@@ -128,6 +128,7 @@ export const MESSAGES = {
     "Cannot load passenger rating because the lift wasn't finished",
   APPLICATION_LIFT_IN_PROGRESS:
     "Cannot set status to ready because lift is already in progress",
+  PASSENGER_ALREADY_RATED: "This passenger has already been rated",
 
   /* -------------------------------------------------------------------------- */
 

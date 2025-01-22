@@ -171,6 +171,34 @@ class LiftController {
     }
   }
 
+  async filterLiftsByUsername(req, res) {
+    try {
+      logger.info(`GET:/api/lifts/filter/${req.query}`)
+
+      const filters = req.query
+
+      const lifts = await LiftService.filterLifts(filters)
+      const outputDTO = lifts.map((lift) => new LiftOutputDTO(lift))
+      res.status(200).json({
+        message: MESSAGES.LIFTS_RETRIEVED,
+        data: outputDTO,
+      })
+    } catch (err) {
+      logger.error("LiftController - Failed to filter lifts:", err)
+      if (err.message === "NoLiftFound") {
+        res.status(404).json({ error: MESSAGES.NO_LIFTS_FOUND })
+      } else if (err.message === "InvalidStatus") {
+        res.status(400).json({ error: MESSAGES.INVALID_STATUS })
+      } else if (err.message === "InvalidQuery") {
+        res.status(400).json({ error: MESSAGES.INVALID_QUERY_LIFTS })
+      } else if (err.message === "DriverNotFound") {
+        res.status(400).json({ error: MESSAGES.DRIVER_NOT_FOUND })
+      } else {
+        res.status(500).json({ error: MESSAGES.FAILED_TO_RETRIEVE_LIFTS })
+      }
+    }
+  }
+
   async updateLiftStatusByCode(req, res) {
     logger.info("PUT: /api/lifts/status")
     try {

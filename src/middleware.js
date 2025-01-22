@@ -76,10 +76,13 @@ const handleApplicationRoutes = async (url, method, username, req) => {
       url.startsWith("/api/applications/ca/rating") ||
       url.startsWith("/api/applications/reject")
     ) {
-      const liftFound = await Lift.findOne({ ca: req.params?.ca }).populate(
-        "driver"
-      )
-      return liftFound?.driver?.username === username
+      const applicationFound = await Application.findOne({ ca: req.params?.ca })
+        .populate("lift")
+        .populate({
+          path: "lift",
+          populate: { path: "driver", model: "User" },
+        })
+      return applicationFound.lift?.driver?.username === username
     }
 
     if (url.startsWith("/api/applications/cancel")) {
