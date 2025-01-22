@@ -52,6 +52,10 @@ const handleCarRoutes = async (url, method, username, req) => {
       const carFound = await Car.findOne({ cc: req.params.cc }).populate("user")
       return carFound?.user?.username === username
     }
+
+    if (method === "GET" && username === req.params.username) {
+      return true
+    }
   }
   return false
 }
