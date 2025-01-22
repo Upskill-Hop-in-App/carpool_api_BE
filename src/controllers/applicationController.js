@@ -461,6 +461,8 @@ class ApplicationController {
         res.status(400).json({ error: MESSAGES.APPLICATION_NOT_READY })
       } else if (err.message === "LiftNotfinished") {
         res.status(400).json({ error: MESSAGES.APPLICATION_LIFT_NOT_FINISHED })
+      } else if (err.message === "PassengerAlreadyRated") {
+        res.status(400).json({ error: MESSAGES.PASSENGER_ALREADY_RATED })
       } else {
         res.status(500).json({ error: MESSAGES.FAILED_TO_UPDATE_APPLICATION })
       }

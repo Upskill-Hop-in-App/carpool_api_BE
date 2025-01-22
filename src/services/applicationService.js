@@ -510,6 +510,10 @@ class ApplicationService {
       throw new Error("ApplicationNotReady")
     }
 
+    if (application.receivedPassengerRating) {
+      throw new Error("PassengerAlreadyRated")
+    }
+
     if (application.lift.status !== "finished") {
       throw new Error("LiftNotfinished")
     }
