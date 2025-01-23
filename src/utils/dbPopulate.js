@@ -11,6 +11,7 @@ import logger from "../logger.js"
 import User from "../models/userModel.js"
 import Lift from "../models/liftModel.js"
 import Application from "../models/applicationModel.js"
+import applicationService from "../services/applicationService.js"
 
 const requiredEnvVars = [
   "NODE_ENV",
@@ -45,6 +46,22 @@ const users = [
   {
     email: "client1@test.com",
     username: "client1_name",
+    password: hashedPasswordClient,
+    name: "Client Name",
+    role: "client",
+    contact: "1234567890",
+  },
+  {
+    email: "client2@test.com",
+    username: "client2_name",
+    password: hashedPasswordClient,
+    name: "Client Name",
+    role: "client",
+    contact: "1234567890",
+  },
+  {
+    email: "client3@test.com",
+    username: "client3_name",
     password: hashedPasswordClient,
     name: "Client Name",
     role: "client",
@@ -183,6 +200,8 @@ async function test() {
 
     const user1 = await User.findOne({ username: "admin1_user" })
     const user2 = await User.findOne({ username: "client1_name" })
+    const user3 = await User.findOne({ username: "client2_name" })
+    const user4 = await User.findOne({ username: "client3_name" })
 
     if (!user1 || !user2) {
       throw new Error(
@@ -299,6 +318,142 @@ async function test() {
       { _id: lift1._id },
       { $push: { applications: application2._id } }
     )
+
+    await applicationService.rejectApplication(application1.ca)
+    await applicationService.rejectApplication(application2.ca)
+
+    const applications2 = [
+      {
+        ca: uuidv4(),
+        passenger: user1._id,
+        lift: lift2._id,
+      },
+      {
+        ca: uuidv4(),
+        passenger: user2._id,
+        lift: lift1._id,
+      },
+    ]
+
+    const createdApplications2 = await Application.insertMany(applications2, {
+      ordered: false,
+    })
+    logger.info(
+      `Successfully imported ${createdApplications2.length} applications.`
+    )
+
+    const application3 = await Application.findOne({
+      passenger: user1._id,
+      status: "pending",
+    })
+    const application4 = await Application.findOne({
+      passenger: user2._id,
+      status: "pending",
+    })
+
+    await Lift.updateOne(
+      { _id: lift2._id },
+      { $push: { applications: application3._id } }
+    )
+
+    await Lift.updateOne(
+      { _id: lift1._id },
+      { $push: { applications: application4._id } }
+    )
+
+    await applicationService.cancelApplication(application3.ca)
+    await applicationService.cancelApplication(application4.ca)
+
+    const applications3 = [
+      {
+        ca: uuidv4(),
+        passenger: user1._id,
+        lift: lift2._id,
+      },
+      {
+        ca: uuidv4(),
+        passenger: user2._id,
+        lift: lift1._id,
+      },
+    ]
+
+    const createdApplications3 = await Application.insertMany(applications3, {
+      ordered: false,
+    })
+    logger.info(
+      `Successfully imported ${createdApplications3.length} applications.`
+    )
+
+    const application6 = await Application.findOne({
+      passenger: user2._id,
+      status: "pending",
+    })
+
+    await Lift.updateOne(
+      { _id: lift1._id },
+      { $push: { applications: application6._id } }
+    )
+
+    const applications4 = [
+      {
+        ca: uuidv4(),
+        passenger: user1._id,
+        lift: lift2._id,
+      },
+      {
+        ca: uuidv4(),
+        passenger: user2._id,
+        lift: lift1._id,
+      },
+      {
+        ca: uuidv4(),
+        passenger: user3._id,
+        lift: lift1._id,
+      },
+      {
+        ca: uuidv4(),
+        passenger: user4._id,
+        lift: lift1._id,
+      },
+    ]
+
+    const createdApplications4 = await Application.insertMany(applications4, {
+      ordered: false,
+    })
+    logger.info(
+      `Successfully imported ${createdApplications4.length} applications.`
+    )
+
+    const application7 = await Application.findOne({
+      passenger: user1._id,
+      status: "pending",
+    })
+    const application9 = await Application.findOne({
+      passenger: user3._id,
+      status: "pending",
+    })
+    const application10 = await Application.findOne({
+      passenger: user4._id,
+      status: "pending",
+    })
+
+    await Lift.updateOne(
+      { _id: lift2._id },
+      { $push: { applications: application7._id } }
+    )
+
+    await Lift.updateOne(
+      { _id: lift1._id },
+      { $push: { applications: application9._id } }
+    )
+
+    await Lift.updateOne(
+      { _id: lift1._id },
+      { $push: { applications: application10._id } }
+    )
+
+    await applicationService.acceptApplication(application7.ca)
+    await applicationService.acceptApplication(application9.ca)
 
     logger.info("Successfully updated lifts with application references.")
   } catch (err) {
