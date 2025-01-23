@@ -199,6 +199,34 @@ class LiftController {
     }
   }
 
+  async getInProgressByUsername(req, res) {
+    try {
+      const isInProgress = await LiftService.checkInProgress(req.params.username)
+      res.status(200).json(isInProgress)
+    } catch(err) {
+      if (err.message === "NoLiftFound") {
+        res.status(404).json({ error: MESSAGES.NO_LIFTS_FOUND })
+      } else {
+        res.status(500).json({ error: MESSAGES.FAILED_TO_RETRIEVE_LIFTS })
+      }
+    }
+  }
+
+  async getRoleInLift(req, res) {
+    try {
+      const role = await LiftService.driverOrPassenger(req.params.username)
+      res.status(200).json(role)
+    } catch(err) {
+      if (err.message === "NoLiftFound") {
+        res.status(404).json({ error: MESSAGES.NO_LIFTS_FOUND })
+      } else if (err.message === "UserRoleNotFound") {
+        res.status(400).json({ error: MESSAGES.USER_ROLE_NOT_FOUND })
+      } else {
+        res.status(500).json({ error: MESSAGES.FAILED_TO_RETRIEVE_LIFTS })
+      }
+    }
+  }
+
   async updateLiftStatusByCode(req, res) {
     logger.info("PUT: /api/lifts/status")
     try {
