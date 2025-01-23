@@ -337,7 +337,8 @@ class LiftService {
         const hasPassengerRatings = lift.applications.some(
           (app) => app.receivedPassengerRating
         )
-        if (lift.receivedDriverRatings.length === 0 || !hasPassengerRatings) {
+        const filteredApplications = lift.applications.filter((app) => app.status === "ready")
+        if (lift.receivedDriverRatings.length < filteredApplications.length || !hasPassengerRatings) {
           throw new Error("MissingRatings")
         }
         lift.status = "closed"

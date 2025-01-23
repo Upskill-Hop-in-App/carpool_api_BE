@@ -106,10 +106,14 @@ const LiftSchema = new Schema(
     receivedDriverRatings: {
       type: [Number],
       default: [],
-      /* validate: {
-        validator: (rating) => (rating >= 1 && rating <= 5) || rating === null,
-      }, */
-    },
+      validate: {
+        validator: function (ratings) {
+          // Ensure it's an array and all elements are valid
+          return ratings.every((rating) => (rating >= 1 && rating <= 5) || rating === null);
+        },
+        message: "All ratings must be between 1 and 5 or null.",
+      },
+    },    
   },
   { collection: "lifts", timestamps: true }
 )
