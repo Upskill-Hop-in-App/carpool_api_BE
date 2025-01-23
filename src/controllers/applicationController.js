@@ -296,7 +296,7 @@ class ApplicationController {
 
   async filterApplicationsByUsername(req, res) {
     try {
-      logger.info(`GET:/api/applications/filter/${req.params.username}`)
+      logger.info(`GET:/api/applications/filter/username/${req.params.username}`)
 
       const username = req.params.username
       const filters = req.query
