@@ -48,11 +48,11 @@ class LiftService {
   async getGeoValidation(location) {
     try {
       logger.debug("LiftService - getGeoValidation")
+      const baseUrlGeoApi =
+        process.env.BASE_URL_GEOAPI || "https://json.geoapi.pt"
 
       const districtResponse = await axios.get(
-        `https://json.geoapi.pt/distrito/${encodeURIComponent(
-          location.district
-        )}`
+        `${baseUrlGeoApi}/distrito/${encodeURIComponent(location.district)}`
       )
 
       if (districtResponse.status !== 200) return false
@@ -63,7 +63,7 @@ class LiftService {
       if (!foundMunicipio) return false
 
       const municipalityResponse = await axios.get(
-        `https://json.geoapi.pt/municipio/${encodeURIComponent(
+        `${baseUrlGeoApi}/municipio/${encodeURIComponent(
           location.municipality
         )}`
       )
@@ -387,14 +387,20 @@ class LiftService {
       },
     ])
 
-    if(lifts.length === 0) {
+    if (lifts.length === 0) {
       throw new Error("LiftNotFound")
     }
 
-    const filterInProgress = lifts.filter((lift) => lift.status !== "open" && lift.status !== "ready") 
-    const filteredLifts = filterInProgress.filter((lift) => lift.driver.username === username || lift.applications.some((app) => app.passenger.username === username))
-    
-    if(filteredLifts.length > 0){
+    const filterInProgress = lifts.filter(
+      (lift) => lift.status !== "open" && lift.status !== "ready"
+    )
+    const filteredLifts = filterInProgress.filter(
+      (lift) =>
+        lift.driver.username === username ||
+        lift.applications.some((app) => app.passenger.username === username)
+    )
+
+    if (filteredLifts.length > 0) {
       return true
     } else {
       return false
@@ -418,22 +424,23 @@ class LiftService {
       },
     ])
 
-    if(lifts.length === 0) {
+    if (lifts.length === 0) {
       throw new Error("LiftNotFound")
     }
 
-    const filterInProgress = lifts.filter((lift) => lift.status !== "open" && lift.status !== "ready") 
+    const filterInProgress = lifts.filter(
+      (lift) => lift.status !== "open" && lift.status !== "ready"
+    )
     const isDriver = filterInProgress.some(
-      (lift) => lift.driver.username === username,
-    );
+      (lift) => lift.driver.username === username
+    )
     const isPassenger = lifts.some((lift) =>
-      lift.applications?.some((app) => app.passenger?.username === username),
-    );
-    
-    
-    if(isDriver){
+      lift.applications?.some((app) => app.passenger?.username === username)
+    )
+
+    if (isDriver) {
       return "driver"
-    } else if(isPassenger) {
+    } else if (isPassenger) {
       return "passenger"
     } else {
       throw new Error("UserRoleNotFound")
