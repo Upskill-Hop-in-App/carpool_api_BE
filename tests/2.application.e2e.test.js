@@ -605,4 +605,49 @@ describe("Application Tests", () => {
       expect(response.body.data.lift.status).toBe("open")
     })
   })
+  describe("Filters", () => {
+      test("should return lifts from valid filter by username", async () => {
+        const newLift = {
+          driver: "client_name",
+          car: car,
+          startPoint: {
+            district: "braga",
+            municipality: "braga",
+            parish: "tadim",
+          },
+          endPoint: {
+            district: "braga",
+            municipality: "braga",
+            parish: "priscos",
+          },
+          schedule: "2025/10/10 16:00:00",
+          price: 222,
+          providedSeats: 2,
+        }
+        const response = await request(app)
+          .post("/api/lifts")
+          .set("Authorization", `Bearer ${clientToken}`)
+          .send(newLift)
+  
+        expect(response.status).toBe(201)
+        expect(response.body.message).toBe(MESSAGES.LIFT_CREATED)
+
+        lift1 = response.body.data.cl
+
+        const newApplication = { passenger: "user0", lift: lift1 }
+      const response1 = await request(app)
+        .post("/api/applications")
+        .set("Authorization", `Bearer ${adminToken}`)
+        .send(newApplication)
+
+      expect(response1.status).toBe(201)
+      expect(response1.body.message).toBe(MESSAGES.APPLICATION_CREATED_SUCCESS)
+
+        const response2 = await request(app)
+          .get("/api/applications/filter/username/user0?status=pending")
+          .set("Authorization", `Bearer ${adminToken}`)
+          console.log("oi", response2.error)
+        expect(response2.status).toBe(200)
+      })
+    })
 })
