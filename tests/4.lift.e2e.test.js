@@ -863,4 +863,105 @@ describe("Lift Tests", () => {
       expect(response7.body.data.status).toBe("closed")
     })
   })
+  describe("Filters", () => {
+    test("should return no lifts from invalid filter", async () => {
+      const response = await request(app)
+        .get("/api/lifts/filter?INVALID=INVALID")
+        .set("Authorization", `Bearer ${adminToken}`)
+      expect(response.status).toBe(400)
+    })
+
+    test("should return lifts from valid filter", async () => {
+      const newLift = {
+        driver: "client_name",
+        car: car,
+        startPoint: {
+          district: "braga",
+          municipality: "braga",
+          parish: "tadim",
+        },
+        endPoint: {
+          district: "braga",
+          municipality: "braga",
+          parish: "priscos",
+        },
+        schedule: "2025/10/10 16:00:00",
+        price: 222,
+        providedSeats: 2,
+      }
+      const response = await request(app)
+        .post("/api/lifts")
+        .set("Authorization", `Bearer ${clientToken}`)
+        .send(newLift)
+
+      expect(response.status).toBe(201)
+      expect(response.body.message).toBe(MESSAGES.LIFT_CREATED)
+      const response1 = await request(app)
+        .get("/api/lifts/filter?status=open")
+        .set("Authorization", `Bearer ${adminToken}`)
+      expect(response1.status).toBe(200)
+    })
+
+    test("should return no lifts from invalid filter by username", async () => {
+      const newLift = {
+        driver: "client_name",
+        car: car,
+        startPoint: {
+          district: "braga",
+          municipality: "braga",
+          parish: "tadim",
+        },
+        endPoint: {
+          district: "braga",
+          municipality: "braga",
+          parish: "priscos",
+        },
+        schedule: "2025/10/10 16:00:00",
+        price: 222,
+        providedSeats: 2,
+      }
+      const response = await request(app)
+        .post("/api/lifts")
+        .set("Authorization", `Bearer ${clientToken}`)
+        .send(newLift)
+
+      expect(response.status).toBe(201)
+      expect(response.body.message).toBe(MESSAGES.LIFT_CREATED)
+      const response1 = await request(app)
+        .get("/api/lifts/filter/username/client_name?INVALID=INVALID")
+        .set("Authorization", `Bearer ${adminToken}`)
+      expect(response1.status).toBe(400)
+    })
+
+    test("should return lifts from valid filter by username", async () => {
+      const newLift = {
+        driver: "client_name",
+        car: car,
+        startPoint: {
+          district: "braga",
+          municipality: "braga",
+          parish: "tadim",
+        },
+        endPoint: {
+          district: "braga",
+          municipality: "braga",
+          parish: "priscos",
+        },
+        schedule: "2025/10/10 16:00:00",
+        price: 222,
+        providedSeats: 2,
+      }
+      const response = await request(app)
+        .post("/api/lifts")
+        .set("Authorization", `Bearer ${clientToken}`)
+        .send(newLift)
+
+      expect(response.status).toBe(201)
+      expect(response.body.message).toBe(MESSAGES.LIFT_CREATED)
+      const response1 = await request(app)
+        .get("/api/lifts/filter/username/client_name?status=open")
+        .set("Authorization", `Bearer ${adminToken}`)
+      expect(response1.status).toBe(200)
+    })
+  })
 })
