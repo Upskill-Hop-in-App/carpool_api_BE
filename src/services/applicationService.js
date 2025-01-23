@@ -272,70 +272,124 @@ class ApplicationService {
   async filterApplicationsByUsername(username, filters) {
     logger.info("ApplicationService - filterApplicationsByUsername")
 
+    const query = {}
+
     const user = await User.findOne({ username: username })
     if (!user) {
       throw new Error("UserNotFound")
     }
 
-    //Garantir que o ponto de partida é um filtro por username dos params
-    const query = { "passenger.username": username }
-
-    if (filters.ca) query.ca = filters.ca
-    if (filters.status) {
-      const validStatuses = ["pending", "accepted", "rejected"]
-      if (!validStatuses.includes(filters.status))
-        throw new Error("InvalidStatus")
-      query.status = filters.status
-    }
-
     const sort = filters.sort || { createdAt: -1 }
 
-    const applications = await Application.find(query)
+    let applications = await Application.find({
+      passenger: user._id,
+    })
       .populate([
         {
           path: "passenger",
         },
         {
           path: "lift",
-          populate: {
-            path: "driver",
-          },
+          populate: [
+            {
+              path: "driver",
+            },
+            { path: "car" },
+          ],
         },
       ])
       .sort(sort)
 
-    const filteredApplications = applications.filter((application) => {
-      if (
-        filters.startPoint &&
-        application.lift?.startPoint !== filters.startPoint
-      ) {
-        return false
-      }
+    if (filters.ca) query.ca = filters.ca
+    if (filters.status) {
+      const validStatuses = [
+        "pending",
+        "accepted",
+        "rejected",
+        "ready",
+        "canceled",
+      ]
+      if (!validStatuses.includes(filters.status))
+        throw new Error("InvalidStatus")
+      applications = applications.filter(
+        (application) => application.status === filters.status
+      )
+    }
 
-      if (filters.endPoint && application.lift?.endPoint !== filters.endPoint) {
-        return false
-      }
+    if (filters.startPointDistrict) {
+      applications = applications.filter(
+        (application) =>
+          application.lift.startPoint.district === filters.startPointDistrict
+      )
+    }
+    if (filters.startPointMunicipality) {
+      applications = applications.filter(
+        (application) =>
+          application.lift.startPoint.municipality === filters.startPointMunicipality
+      )
+    }
+    if (filters.startPointParish) {
+      applications = applications.filter(
+        (application) =>
+          application.lift.startPoint.parish === filters.startPointParish
+      )
+    }
+    if (filters.endPointDistrict) {
+      applications = applications.filter(
+        (application) =>
+          application.lift.endPoint.district === filters.endPointDistrict
+      )
+    }
+    if (filters.endPointMunicipality) {
+      applications = applications.filter(
+        (application) =>
+          application.lift.endPoint.municipality === filters.endPointMunicipality
+      )
+    }
+    if (filters.endPointParish) {
+      applications = applications.filter(
+        (application) =>
+          application.lift.endPoint.parish === filters.endPointParish
+      )
+    }
+    if (filters.providedSeats) {
+      applications = applications.filter(
+        (application) =>
+          application.lift.providedSeats === filters.providedSeats
+      )
+    }
 
-      if (
-        filters.driver &&
-        application.lift?.driver.username !== filters.driver
-      ) {
-        return false
-      }
+    if (filters.scheduleTime && filters.scheduleDate) {
+      const filterTimeAndDate = applications.filter((application) => {
+        const time = new Date(application.lift.schedule).toLocaleTimeString(
+          "pt-PT"
+        )
+        const date = new Date(application.lift.schedule).toLocaleDateString(
+          "pt-PT"
+        )
+        return (
+          time === filters.scheduleTime + ":00" &&
+          date === new Date(filters.scheduleDate).toLocaleDateString("pt-PT")
+        )
+      })
+      return filterTimeAndDate
+    } else if (filters.scheduleDate) {
+      const filterDate = applications.filter((application) => {
+        const date = new Date(application.lift.schedule).toLocaleDateString(
+          "pt-PT"
+        )
+        return (
+          date === new Date(filters.scheduleDate).toLocaleDateString("pt-PT")
+        )
+      })
+      return filterDate
+    }
 
-      if (
-        filters.driverRating &&
-        application.lift?.driver?.driverRating !== Number(filters.driverRating)
-      ) {
-        return false
-      }
+    if (applications.length === 0) {
+      throw new Error("NoApplicationFound")
+    }
 
-      return true
-    })
-
-    if (filteredApplications.length === 0) throw new Error("NoApplicationFound")
-
-    return filteredApplications
+    return applications
   }
 
   async acceptApplication(ca) {
@@ -473,12 +527,17 @@ class ApplicationService {
   }
 
   async updateStatusReady(ca) {
-    const application = await Application.findOne({ ca: ca }).populate({path: "lift"})
+    const application = await Application.findOne({ ca: ca }).populate({
+      path: "lift",
+    })
 
     if (!application) {
       throw new Error("ApplicationNotFound")
     }
-    if(application.lift.status !== "open" && application.lift.status !== "ready") {
+    if (
+      application.lift.status !== "open" &&
+      application.lift.status !== "ready"
+    ) {
       throw new Error("LiftAlreadyInProgress")
     }
     if (application.status !== "accepted") {

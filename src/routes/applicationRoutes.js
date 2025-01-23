@@ -37,7 +37,7 @@ router.get("/filter", verifyToken, ApplicationController.filterApplications)
 router.get(
   "/filter/username/:username",
   verifyToken,
-  ApplicationController.filterApplications
+  ApplicationController.filterApplicationsByUsername
 )
 router.put("/accept/:ca", verifyToken, ApplicationController.accept)
 router.put("/reject/:ca", verifyToken, ApplicationController.reject)
