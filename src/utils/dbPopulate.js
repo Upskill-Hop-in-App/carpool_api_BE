@@ -67,6 +67,14 @@ const users = [
     role: "client",
     contact: "1234567890",
   },
+  {
+    email: "client4@test.com",
+    username: "client4_name",
+    password: hashedPasswordClient,
+    name: "Client Name",
+    role: "client",
+    contact: "1234567890",
+  },
 ]
 
 /* ------------------------- Create sqlite database ------------------------- */
@@ -202,6 +210,7 @@ async function test() {
     const user2 = await User.findOne({ username: "client1_name" })
     const user3 = await User.findOne({ username: "client2_name" })
     const user4 = await User.findOne({ username: "client3_name" })
+    const user5 = await User.findOne({ username: "client4_name" })
 
     if (!user1 || !user2) {
       throw new Error(
@@ -265,9 +274,9 @@ async function test() {
         driver: user2._id,
         car: car2._id,
         startPoint: {
-          district: "braga",
-          municipality: "braga",
-          parish: "tadim",
+          district: "porto",
+          municipality: "maia",
+          parish: "folgosa",
         },
         endPoint: {
           district: "braga",
@@ -294,7 +303,7 @@ async function test() {
       },
       {
         ca: uuidv4(),
-        passenger: user2._id,
+        passenger: user5._id,
         lift: lift1._id,
       },
     ]
@@ -307,7 +316,7 @@ async function test() {
     )
 
     const application1 = await Application.findOne({ passenger: user1._id })
-    const application2 = await Application.findOne({ passenger: user2._id })
+    const application2 = await Application.findOne({ passenger: user5._id })
 
     await Lift.updateOne(
       { _id: lift2._id },
@@ -330,7 +339,7 @@ async function test() {
       },
       {
         ca: uuidv4(),
-        passenger: user2._id,
+        passenger: user4._id,
         lift: lift1._id,
       },
     ]
@@ -347,7 +356,7 @@ async function test() {
       status: "pending",
     })
     const application4 = await Application.findOne({
-      passenger: user2._id,
+      passenger: user4._id,
       status: "pending",
     })
 
@@ -399,11 +408,6 @@ async function test() {
         ca: uuidv4(),
         passenger: user1._id,
         lift: lift2._id,
-      },
-      {
-        ca: uuidv4(),
-        passenger: user2._id,
-        lift: lift1._id,
       },
       {
         ca: uuidv4(),
